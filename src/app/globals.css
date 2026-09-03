@@ -1,26 +1,126 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-app);
+  --font-mono: var(--font-code);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --gqai-primary: #3ecf8e;
+  --gqai-primary-deep: #24b47e;
+  --gqai-primary-soft: #4ade80;
+  --gqai-canvas: #ffffff;
+  --gqai-canvas-soft: #fafafa;
+  --gqai-canvas-night: #1c1c1c;
+  --gqai-hairline-cool: #ededed;
+  --gqai-hairline: #dfdfdf;
+  --gqai-hairline-strong: #c7c7c7;
+  --gqai-ink: #171717;
+  --gqai-ink-secondary: #212121;
+  --gqai-ink-mute: #707070;
+  --gqai-ink-mute-2: #9a9a9a;
+  --gqai-ink-faint: #b2b2b2;
+  --gqai-on-dark: #ffffff;
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #3ecf8e;
+  --primary-foreground: #171717;
+  --secondary: #fafafa;
+  --secondary-foreground: #212121;
+  --muted: #fafafa;
+  --muted-foreground: #707070;
+  --accent: #f2fff8;
+  --accent-foreground: #171717;
+  --destructive: #171717;
+  --border: #dfdfdf;
+  --input: #dfdfdf;
+  --ring: #24b47e;
+  --success: #24b47e;
+  --warning: #707070;
+  --radius: 12px;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply bg-background font-sans text-foreground;
+  }
+  body {
+    @apply min-h-dvh bg-background text-foreground antialiased;
+    font-weight: 400;
+  }
+  button,
+  a,
+  input,
+  textarea,
+  select {
+    -webkit-tap-highlight-color: transparent;
+  }
+  ::selection {
+    background: #3ecf8e;
+    color: #171717;
+  }
+  :focus-visible {
+    scroll-margin: 24px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .content-wrap {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-6;
+  }
+  .focus-card {
+    @apply rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)];
+  }
+  .eyebrow {
+    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground;
+  }
+  .native-select {
+    @apply h-10 rounded-sm border border-input bg-white px-3 text-sm outline-none transition-[border-color,box-shadow,background-color] focus:border-ring focus:ring-3 focus:ring-primary/20 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

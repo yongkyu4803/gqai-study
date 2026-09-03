@@ -1,0 +1,1189 @@
+[
+  {
+    "id": "module-ai-friend",
+    "versionId": "version-ai-friend-1",
+    "sourceDate": "2026-08-12",
+    "snapshot": {
+      "title": "AI와 친해지기",
+      "summary": "관심 있는 주제로 AI와 30분 이상 대화하고, 과정을 HTML 기록으로 남기는 입문 실습입니다.",
+      "category": "AI 기본기",
+      "difficulty": "beginner",
+      "estimatedMinutes": 40,
+      "tags": ["대화", "기록", "입문", "2026-08-12"],
+      "learningObjectives": [
+        "AI와 스스로 주제를 정해 목적 있는 대화를 이어갈 수 있다.",
+        "긴 대화를 중간마다 구조화해 학습 기록으로 남길 수 있다."
+      ],
+      "prerequisites": [
+        "ChatGPT 또는 Claude 계정",
+        "집중해서 대화할 수 있는 30분 이상"
+      ],
+      "submissionRequirements": [
+        "10분 간격으로 정리한 HTML 대화 기록 3개 이상",
+        "대화에서 발견한 핵심 내용과 다음 학습 목표"
+      ],
+      "completionCriteria": [
+        "AI와 30분 이상 대화했다.",
+        "충실한 대화 기록을 3개 이상 저장하고 제출했다."
+      ],
+      "blocks": [
+        { "id": "ai-01", "type": "heading", "text": "오늘의 과제" },
+        {
+          "id": "ai-02",
+          "type": "bullet_list",
+          "text": "AI와 하고 싶은 주제에 대해 이야기합니다."
+        },
+        {
+          "id": "ai-03",
+          "type": "bullet_list",
+          "text": "효율화하고 싶은 업무, 만들고 싶은 프로젝트 등 어떤 주제도 괜찮습니다."
+        },
+        { "id": "ai-04", "type": "heading", "text": "진행 방법" },
+        {
+          "id": "ai-05",
+          "type": "numbered_list",
+          "text": "최소 30분 이상 시간을 내서 대화합니다."
+        },
+        {
+          "id": "ai-06",
+          "type": "checklist",
+          "text": "10분에 한 번씩 지금까지의 대화를 HTML 형식으로 정리해 달라고 요청합니다."
+        },
+        {
+          "id": "ai-07",
+          "type": "checklist",
+          "text": "대화 내용을 빠뜨리지 않고 충실하게 저장하는 것이 중요하다고 강조합니다."
+        },
+        {
+          "id": "ai-08",
+          "type": "paragraph",
+          "text": "30분 동안 진행하면 3개 이상의 대화 정리 문서가 만들어집니다. 이 기록은 앞으로의 공부 과정에 중요한 자료가 됩니다."
+        },
+        { "id": "ai-09", "type": "heading", "text": "주의사항" },
+        {
+          "id": "ai-10",
+          "type": "quote",
+          "text": "AI는 답변 마지막에 ‘무엇을 해드릴까요?’ 같은 CTA(call to action)를 자주 붙입니다. 그 메시지에 끌려가기보다 스스로 다음 대화를 선택하세요."
+        },
+        {
+          "id": "ai-11",
+          "type": "bullet_list",
+          "text": "어떤 대화를 해야 할지 모르겠다면 그냥 모른다고 입력해도 됩니다. 앞선 대화를 바탕으로 AI가 새로운 방향을 제안할 수 있습니다."
+        },
+        {
+          "id": "ai-12",
+          "type": "bullet_list",
+          "text": "아무 생각도 나지 않을 때는 지금의 상황을 설명하고 ‘grill me’라고 입력해 보세요."
+        },
+        {
+          "id": "ai-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-tools",
+    "versionId": "version-tools-1",
+    "sourceDate": "2026-08-13",
+    "snapshot": {
+      "title": "툴과 친해지기",
+      "summary": "ChatGPT와 Claude의 플러그인·코워크 기능, NotebookLM의 주요 기능을 직접 경험합니다.",
+      "category": "AI 도구 활용",
+      "difficulty": "beginner",
+      "estimatedMinutes": 90,
+      "tags": ["플러그인", "코워크", "NotebookLM", "2026-08-13"],
+      "learningObjectives": [
+        "AI 데스크톱 앱에 외부 서비스를 연결할 수 있다.",
+        "코워크에서 폴더 자료를 읽고 새 문서를 만들 수 있다.",
+        "NotebookLM의 소스와 스튜디오 기능을 실행할 수 있다."
+      ],
+      "prerequisites": [
+        "ChatGPT와 Claude 데스크톱 앱",
+        "Google 계정",
+        "실습용 빈 폴더",
+        "관심 있는 YouTube 링크 또는 문서 자료"
+      ],
+      "submissionRequirements": [
+        "Gmail·Google Drive 연결 테스트 결과",
+        "코워크로 만든 HTML 설명 문서",
+        "NotebookLM 스튜디오 기능 실행 결과"
+      ],
+      "completionCriteria": [
+        "플러그인 한 개 이상을 연결하고 테스트했다.",
+        "코워크 폴더에서 파일 읽기와 문서 생성을 완료했다.",
+        "NotebookLM 스튜디오의 9개 메뉴를 모두 실행했다."
+      ],
+      "blocks": [
+        {
+          "id": "tools-01",
+          "type": "heading",
+          "text": "1. 데스크톱 앱과 플러그인"
+        },
+        {
+          "id": "tools-02",
+          "type": "paragraph",
+          "text": "ChatGPT와 Claude 데스크톱 앱을 모두 설치하고 다음 기능을 경험합니다."
+        },
+        {
+          "id": "tools-03",
+          "type": "checklist",
+          "text": "플러그인 탭에서 Google Drive와 Gmail을 연결합니다."
+        },
+        {
+          "id": "tools-04",
+          "type": "code",
+          "language": "text",
+          "text": "가장 최근 지메일 3건을 찾아서 내용을 정리해줘"
+        },
+        {
+          "id": "tools-05",
+          "type": "code",
+          "language": "text",
+          "text": "구글 드라이브에서 가장 최근 문서 2건을 찾아서 제목을 알려줘\n\n문서가 없다면: 구글 드라이브 연결이 제대로 됐는지 테스트해줘"
+        },
+        {
+          "id": "tools-06",
+          "type": "checklist",
+          "text": "플러그인 목록을 둘러보고 관심 있는 플러그인을 추가로 설치해 테스트합니다. Notion처럼 확인하기 쉬운 서비스를 골라도 좋습니다."
+        },
+        {
+          "id": "tools-img-01",
+          "type": "image",
+          "text": "ChatGPT 플러그인 연결 화면",
+          "asset": {
+            "id": "asset-tools-01",
+            "name": "tools-01.png",
+            "size": 147344,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/tools-01.png"
+          }
+        },
+        {
+          "id": "tools-img-02",
+          "type": "image",
+          "text": "Claude 플러그인 연결 화면",
+          "asset": {
+            "id": "asset-tools-02",
+            "name": "tools-02.png",
+            "size": 150064,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/tools-02.png"
+          }
+        },
+        { "id": "tools-07", "type": "heading", "text": "2. 코워크 기능" },
+        {
+          "id": "tools-08",
+          "type": "paragraph",
+          "text": "일반 채팅과 코워크·협업 탭의 차이는 AI가 파일을 인식하는 방법입니다. 코워크에서는 지정한 폴더의 파일을 별도 업로드 없이 참고 자료로 활용할 수 있고, 문서를 읽거나 작성·정리할 수 있습니다."
+        },
+        {
+          "id": "tools-09",
+          "type": "numbered_list",
+          "text": "새 폴더를 만들고 코워크에 연결합니다."
+        },
+        {
+          "id": "tools-10",
+          "type": "code",
+          "language": "text",
+          "text": "엑셀문서 통합 테스트를 해보고 싶어. 목적에 맞는 예제 문서 3개를 만들고, 통합문서를 추가로 만들어줘. 전체 과정에 대해서 내가 공부할 수 있게 설명 문서를 HTML로 만들어서 폴더에 저장해줘."
+        },
+        {
+          "id": "tools-11",
+          "type": "numbered_list",
+          "text": "관심 있는 논문이나 자료를 이미지, PDF, 문서 등 다양한 형식으로 수집합니다. 한글 문서는 제외합니다."
+        },
+        {
+          "id": "tools-12",
+          "type": "code",
+          "language": "text",
+          "text": "폴더에 있는 문서들을 리뷰하고 어떤 내용인지 알려주는 HTML 문서를 만들어줘. 각 자료에 대한 간략한 요약도 포함해줘.\n\n이 문서들을 토대로 [하고 싶은 것]을 어떻게 하면 좋을지 좋은 방법을 추천해줘.\n\n(ChatGPT 한정) 이 주제를 압축하는 [추가 프롬프트] 이미지를 만들어줘."
+        },
+        {
+          "id": "tools-img-03",
+          "type": "image",
+          "text": "코워크 폴더 연결 화면",
+          "asset": {
+            "id": "asset-tools-03",
+            "name": "tools-03.png",
+            "size": 131584,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/tools-03.png"
+          }
+        },
+        {
+          "id": "tools-img-04",
+          "type": "image",
+          "text": "코워크에서 자료를 활용하는 화면",
+          "asset": {
+            "id": "asset-tools-04",
+            "name": "tools-04.png",
+            "size": 115047,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/tools-04.png"
+          }
+        },
+        { "id": "tools-13", "type": "heading", "text": "3. NotebookLM" },
+        {
+          "id": "tools-14",
+          "type": "checklist",
+          "text": "소스 추가에서 평소 관심 있는 YouTube 링크를 입력합니다."
+        },
+        {
+          "id": "tools-15",
+          "type": "checklist",
+          "text": "주요 내용을 원하는 형식으로 정리해 달라고 요청합니다."
+        },
+        {
+          "id": "tools-16",
+          "type": "checklist",
+          "text": "오른쪽 스튜디오의 9개 메뉴를 한 번씩 모두 실행합니다."
+        },
+        {
+          "id": "tools-img-05",
+          "type": "image",
+          "text": "NotebookLM 스튜디오 메뉴",
+          "asset": {
+            "id": "asset-tools-05",
+            "name": "tools-05.png",
+            "size": 59848,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/tools-05.png"
+          }
+        },
+        {
+          "id": "tools-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-work",
+    "versionId": "version-work-1",
+    "sourceDate": "2026-08-14",
+    "snapshot": {
+      "title": "업무 해체하기",
+      "summary": "불편한 반복 업무를 클릭 단위로 나누고, 가장 먼저 효율화할 한 지점을 찾습니다.",
+      "category": "업무 자동화",
+      "difficulty": "beginner",
+      "estimatedMinutes": 50,
+      "tags": ["업무분석", "자동화", "프로세스", "2026-08-14"],
+      "learningObjectives": [
+        "반복 업무를 관찰 가능한 작은 단계로 나눌 수 있다.",
+        "AI와 함께 자동화 후보를 찾고 우선순위를 정할 수 있다."
+      ],
+      "prerequisites": ["자주 하지만 불편하다고 느끼는 실제 업무 한 가지"],
+      "submissionRequirements": [
+        "클릭 단위로 나눈 전체 업무 단계",
+        "가장 먼저 적용할 효율화 방법 한 가지와 구체적인 실행 방법"
+      ],
+      "completionCriteria": [
+        "업무 시작부터 끝까지 빠짐없이 단계화했다.",
+        "바로 적용할 우선 과제 한 가지를 선택했다."
+      ],
+      "blocks": [
+        {
+          "id": "work-01",
+          "type": "paragraph",
+          "text": "오늘 할 일은 개인 차원의 업무 효율화입니다."
+        },
+        {
+          "id": "work-02",
+          "type": "numbered_list",
+          "text": "가장 빈번하게 하지만 ‘이걸 내가 왜 하나?’ 싶을 만큼 불편한 업무를 하나 고릅니다."
+        },
+        {
+          "id": "work-03",
+          "type": "numbered_list",
+          "text": "전체 과정을 클릭 단위 수준으로 최대한 잘게 나눕니다."
+        },
+        {
+          "id": "work-04",
+          "type": "quote",
+          "text": "예: 메일 열기 → 첨부문서 다운로드 → 다운로드 폴더에서 문서 열기 → 내용 읽기 → 다른 양식 문서 열기 → 읽은 내용 정리해 넣기 → 한글 파일로 저장 → 출력과 동시에 PDF 저장"
+        },
+        {
+          "id": "work-05",
+          "type": "numbered_list",
+          "text": "나눈 결과를 ChatGPT에 입력하고 업무 자동화 또는 효율화 방법을 질문합니다."
+        },
+        {
+          "id": "work-06",
+          "type": "numbered_list",
+          "text": "가장 먼저 적용할 수 있는 방법 하나만 뽑아 구체적인 실행 방법을 요청합니다."
+        },
+        {
+          "id": "work-07",
+          "type": "paragraph",
+          "text": "첫날 과제가 목표를 찾기 위한 대화였다면, 이번 과제는 실제 업무에 적용하기 위한 대화입니다. 내용이 일부 겹쳐도 괜찮습니다."
+        },
+        {
+          "id": "work-pdf",
+          "type": "link",
+          "text": "참고 PPT: vibe-coding-work-efficiency-opening.pdf (Notion에서 열기)",
+          "url": "https://app.notion.com/p/3bc4a8670bd480b19ff2c20c26ce022c"
+        },
+        {
+          "id": "work-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-web",
+    "versionId": "version-web-1",
+    "sourceDate": "2026-08-16",
+    "snapshot": {
+      "title": "HTML+CSS로 웹페이지 만들기",
+      "summary": "AI 코딩 도구를 이용해 반응형 단일 정적 웹페이지를 index.html 한 파일로 완성합니다.",
+      "category": "바이브 코딩",
+      "difficulty": "beginner",
+      "estimatedMinutes": 90,
+      "tags": ["HTML", "CSS", "Codex", "Claude Code", "2026-08-16"],
+      "learningObjectives": [
+        "단일 HTML 파일의 기본 구조와 CSS 포함 방식을 이해한다.",
+        "AI에게 구현 조건과 출력 형식을 구체적으로 전달할 수 있다.",
+        "모바일과 데스크톱에서 동작하는 정적 페이지를 만들 수 있다."
+      ],
+      "prerequisites": [
+        "Codex 또는 Claude Code",
+        "코드 작업을 위한 새 폴더",
+        "만들고 싶은 페이지 주제"
+      ],
+      "submissionRequirements": [
+        "완성된 index.html 파일",
+        "데스크톱과 모바일에서 실행한 화면"
+      ],
+      "completionCriteria": [
+        "외부 라이브러리 없이 index.html 한 파일로 완성했다.",
+        "모바일과 데스크톱에서 내용이 정상적으로 보인다.",
+        "요구된 헤더·메인·카드·푸터 영역이 포함되어 있다."
+      ],
+      "blocks": [
+        {
+          "id": "web-01",
+          "type": "paragraph",
+          "text": "이번 과제는 바이브 코딩 기본기입니다. 오늘의 할 일, 포트폴리오, 외국어 학습 페이지 등 어떤 주제도 좋습니다."
+        },
+        {
+          "id": "web-02",
+          "type": "paragraph",
+          "text": "HTML과 CSS로 구성된 단일 정적 페이지를 만듭니다. 향후 웹에 쉽게 배포할 수 있도록 새 폴더에서 작업하고 파일명은 index.html로 정합니다."
+        },
+        {
+          "id": "web-03",
+          "type": "paragraph",
+          "text": "ChatGPT는 Codex에서, Claude는 Claude Code에서 각각 새 폴더를 열어 작업합니다. 자체 배포 기능도 있지만 이번 과제에서는 전통적인 파일 제작 방식부터 연습합니다."
+        },
+        {
+          "id": "web-04",
+          "type": "heading",
+          "text": "복사해서 사용할 프롬프트"
+        },
+        {
+          "id": "web-05",
+          "type": "code",
+          "language": "markdown",
+          "text": "[주제]에 대한 단일 정적 웹페이지를 HTML+CSS로 만들어줘.\n\n요구사항:\n- 결과물은 한 개의 `index.html` 파일로만 구성해줘(외부 라이브러리/프레임워크 없이).\n- `<style>` 태그에 CSS를 포함해서 별도 css 파일을 만들지 말아줘.\n- 반응형으로 만들어줘(모바일/데스크톱 모두 보기 좋게).\n- 깔끔한 타이포그래피와 간단한 컬러 팔레트로 ‘완성된 느낌’이 나게 해줘.\n- 섹션 구성은 다음을 포함해줘:\n  1) 헤더(제목/한 줄 소개)\n  2) 메인 섹션(핵심 기능/내용)\n  3) 보조 섹션(카드 3개 정도의 정보 영역)\n  4) 푸터(연락처/링크 자리표시자)\n- 이미지가 필요하면 실제 파일 대신 CSS 그라데이션/도형으로 대체해줘.\n- 접근성 기본을 지켜줘(적절한 heading 구조, 대비, 버튼/링크 구분).\n\n출력 형식:\n- 최종 답변은 `index.html` 전체 코드만 코드블록으로 제공해줘.\n- 설명은 최소화하고, 주석은 필요한 곳에만 짧게 넣어줘.\n\n그리고 이 파일을 ‘현재 폴더’에 저장할 수 있게 `index.html`로 제공해줘."
+        },
+        {
+          "id": "web-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-automation",
+    "versionId": "version-automation-1",
+    "sourceDate": "2026-08-18",
+    "snapshot": {
+      "title": "자동화 기본기",
+      "summary": "관심 주제의 뉴스를 정해진 시간에 자동으로 정리하고 이메일 등 원하는 채널로 받는 예약 작업을 만듭니다.",
+      "category": "업무 자동화",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 70,
+      "tags": ["예약작업", "뉴스", "이메일", "2026-08-18"],
+      "learningObjectives": [
+        "생성 내용뿐 아니라 실행 시점과 전달 방식을 설계할 수 있다.",
+        "ChatGPT 또는 Claude에서 반복 예약 작업을 만들 수 있다.",
+        "이메일·메신저 등 결과 수신 채널의 차이를 이해한다."
+      ],
+      "prerequisites": [
+        "ChatGPT 또는 Claude 데스크톱 앱",
+        "자동으로 받아보고 싶은 뉴스 주제",
+        "결과를 받을 이메일 계정"
+      ],
+      "submissionRequirements": [
+        "생성한 예약 작업의 설정 화면",
+        "자동 생성된 뉴스 정리 결과",
+        "이메일로 수신한 결과 화면"
+      ],
+      "completionCriteria": [
+        "뉴스 주제와 실행 주기를 정했다.",
+        "예약 작업을 생성해 한 번 이상 실행했다.",
+        "결과를 이메일로 받는 흐름을 확인했다."
+      ],
+      "blocks": [
+        {
+          "id": "automation-01",
+          "type": "paragraph",
+          "text": "이번 과제는 ChatGPT와 Claude 데스크톱 앱으로 하는 자동화 기본기입니다. 특정 주제의 뉴스를 매일 정리하고 내 이메일로 발송하는 예약 작업을 만듭니다."
+        },
+        {
+          "id": "automation-02",
+          "type": "numbered_list",
+          "text": "ChatGPT 또는 Claude에서 새 예약 작업을 만듭니다."
+        },
+        {
+          "id": "automation-03",
+          "type": "numbered_list",
+          "text": "AI와 대화하면서 뉴스 주제, 실행 시간, 결과 형식을 정합니다."
+        },
+        {
+          "id": "automation-04",
+          "type": "numbered_list",
+          "text": "완성된 뉴스 정리를 내 이메일로 발송하도록 연결합니다."
+        },
+        {
+          "id": "automation-img-01",
+          "type": "image",
+          "text": "ChatGPT 예약 작업 설정 예시",
+          "asset": {
+            "id": "asset-automation-01",
+            "name": "automation-01.png",
+            "size": 102324,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/automation-01.png"
+          }
+        },
+        {
+          "id": "automation-img-02",
+          "type": "image",
+          "text": "Claude 예약 작업 설정 예시",
+          "asset": {
+            "id": "asset-automation-02",
+            "name": "automation-02.png",
+            "size": 130412,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/automation-02.png"
+          }
+        },
+        {
+          "id": "automation-05",
+          "type": "quote",
+          "text": "무엇을 생성할지 만큼 언제, 어떤 방식으로 생성할지도 중요합니다. 내가 직접 실행하지 않아도 일이 돌아가게 만드는 것이 다음 단계입니다."
+        },
+        {
+          "id": "automation-06",
+          "type": "paragraph",
+          "text": "결과는 채팅 화면, 이메일, SNS 등 여러 곳에서 받을 수 있습니다. Slack, Telegram, Discord처럼 자주 쓰는 도구가 있다면 다음 단계에서 그 서비스와 연결해 보세요."
+        },
+        {
+          "id": "automation-link",
+          "type": "link",
+          "text": "카카오톡 나챗방으로 메시지 받기 강의",
+          "url": "https://vibecoding.gqai.kr/lecture/lecture-14"
+        },
+        {
+          "id": "automation-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-first-deploy",
+    "versionId": "version-first-deploy-1",
+    "sourceDate": "2026-08-19",
+    "snapshot": {
+      "title": "첫 배포",
+      "summary": "앞서 만든 HTML 페이지를 GitHub 저장소에 올리고 Vercel로 배포해 공개 주소를 만듭니다.",
+      "category": "배포",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 90,
+      "tags": ["Git", "GitHub", "Vercel", "배포", "2026-08-19"],
+      "learningObjectives": [
+        "Git의 커밋과 푸시 개념을 이해한다.",
+        "로컬 파일을 GitHub 저장소에 올릴 수 있다.",
+        "GitHub 저장소를 Vercel에 연결해 배포할 수 있다."
+      ],
+      "prerequisites": [
+        "8월 16일 과제에서 만든 index.html",
+        "GitHub 가입에 사용할 Google 계정",
+        "Vercel 계정",
+        "Windows 사용자는 Git 설치"
+      ],
+      "submissionRequirements": [
+        "GitHub 저장소 링크",
+        "정상 접속되는 vercel.app 배포 주소",
+        "배포 완료 화면"
+      ],
+      "completionCriteria": [
+        "index.html을 GitHub에 커밋·푸시했다.",
+        "Vercel 배포가 성공했다.",
+        "공개 도메인에서 페이지가 정상적으로 열린다."
+      ],
+      "blocks": [
+        {
+          "id": "deploy-01",
+          "type": "paragraph",
+          "text": "8월 16일 과제에서 만든 HTML 페이지를 GitHub에 올리고 Vercel로 배포합니다."
+        },
+        {
+          "id": "deploy-02",
+          "type": "heading",
+          "text": "1. Git과 GitHub 준비"
+        },
+        {
+          "id": "deploy-03",
+          "type": "code",
+          "language": "text",
+          "text": "git과 github에 대해서 초보자가 쉽게 이해할 수 있게 알려줘"
+        },
+        {
+          "id": "deploy-04",
+          "type": "paragraph",
+          "text": "Windows에서는 Git을 먼저 설치해야 GitHub와 연동할 수 있습니다."
+        },
+        {
+          "id": "deploy-git-link",
+          "type": "link",
+          "text": "Git for Windows 설치",
+          "url": "https://git-scm.com/install/windows"
+        },
+        {
+          "id": "deploy-img-01",
+          "type": "image",
+          "text": "Git 설치 안내 화면",
+          "asset": {
+            "id": "asset-deploy-01",
+            "name": "deploy-01.png",
+            "size": 356470,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-01.png"
+          }
+        },
+        {
+          "id": "deploy-05",
+          "type": "numbered_list",
+          "text": "GitHub에 Google 계정으로 가입하고 새 저장소(repository)를 만듭니다. 저장소는 코드 파일을 올리는 온라인 폴더라고 이해하면 됩니다."
+        },
+        {
+          "id": "deploy-img-02",
+          "type": "image",
+          "text": "GitHub 새 저장소 만들기 메뉴",
+          "asset": {
+            "id": "asset-deploy-02",
+            "name": "deploy-02.png",
+            "size": 47075,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-02.png"
+          }
+        },
+        {
+          "id": "deploy-img-03",
+          "type": "image",
+          "text": "GitHub 저장소 생성 화면",
+          "asset": {
+            "id": "asset-deploy-03",
+            "name": "deploy-03.png",
+            "size": 258900,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-03.png"
+          }
+        },
+        {
+          "id": "deploy-06",
+          "type": "numbered_list",
+          "text": "저장소 이름을 입력하고 Create repository를 클릭합니다."
+        },
+        {
+          "id": "deploy-img-04",
+          "type": "image",
+          "text": "저장소 이름과 생성 버튼",
+          "asset": {
+            "id": "asset-deploy-04",
+            "name": "deploy-04.png",
+            "size": 370846,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-04.png"
+          }
+        },
+        {
+          "id": "deploy-07",
+          "type": "numbered_list",
+          "text": "생성된 저장소 주소를 복사해 둡니다. 잠시 뒤 로컬 폴더와 연결할 때 사용합니다."
+        },
+        {
+          "id": "deploy-img-05",
+          "type": "image",
+          "text": "GitHub 저장소 주소 복사",
+          "asset": {
+            "id": "asset-deploy-05",
+            "name": "deploy-05.png",
+            "size": 91044,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-05.png"
+          }
+        },
+        {
+          "id": "deploy-08",
+          "type": "heading",
+          "text": "2. HTML 파일을 GitHub에 올리기"
+        },
+        {
+          "id": "deploy-09",
+          "type": "numbered_list",
+          "text": "익숙한 위치에 새 폴더를 만들고, 앞서 만든 HTML 파일을 그 폴더에 넣습니다."
+        },
+        {
+          "id": "deploy-10",
+          "type": "numbered_list",
+          "text": "ChatGPT에서는 Codex, Claude에서는 Claude Code를 열고 새로 만들기를 선택합니다."
+        },
+        {
+          "id": "deploy-img-06",
+          "type": "image",
+          "text": "Codex에서 새 작업 시작",
+          "asset": {
+            "id": "asset-deploy-06",
+            "name": "deploy-06.png",
+            "size": 55781,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-06.png"
+          }
+        },
+        {
+          "id": "deploy-img-07",
+          "type": "image",
+          "text": "Claude Code에서 새 작업 시작",
+          "asset": {
+            "id": "asset-deploy-07",
+            "name": "deploy-07.png",
+            "size": 36629,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-07.png"
+          }
+        },
+        {
+          "id": "deploy-11",
+          "type": "numbered_list",
+          "text": "입력창 옆에서 HTML 파일이 들어 있는 폴더를 선택합니다."
+        },
+        {
+          "id": "deploy-img-08",
+          "type": "image",
+          "text": "Codex 작업 폴더 선택",
+          "asset": {
+            "id": "asset-deploy-08",
+            "name": "deploy-08.png",
+            "size": 55746,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-08.png"
+          }
+        },
+        {
+          "id": "deploy-img-09",
+          "type": "image",
+          "text": "Claude Code 작업 폴더 선택",
+          "asset": {
+            "id": "asset-deploy-09",
+            "name": "deploy-09.png",
+            "size": 32640,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-09.png"
+          }
+        },
+        {
+          "id": "deploy-12",
+          "type": "numbered_list",
+          "text": "복사해 둔 GitHub 저장소 주소를 넣어 아래와 같이 요청합니다. 예시 주소는 자신의 저장소 주소로 바꿉니다."
+        },
+        {
+          "id": "deploy-13",
+          "type": "code",
+          "language": "text",
+          "text": "https://github.com/yongkyu4803/test.git 비어 있는 레포지토리야. 지금 이 폴더에 있는 html 파일을 커밋, 푸시해줘"
+        },
+        {
+          "id": "deploy-14",
+          "type": "paragraph",
+          "text": "커밋은 저장소에 어떤 변화가 있었는지 기록하는 일이고, 푸시는 파일과 변경 기록을 실제 원격 저장소에 보내는 일입니다."
+        },
+        {
+          "id": "deploy-img-10",
+          "type": "image",
+          "text": "GitHub 커밋과 푸시 완료 화면",
+          "asset": {
+            "id": "asset-deploy-10",
+            "name": "deploy-10.png",
+            "size": 104879,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-10.png"
+          }
+        },
+        { "id": "deploy-15", "type": "heading", "text": "3. Vercel로 배포" },
+        {
+          "id": "deploy-16",
+          "type": "numbered_list",
+          "text": "Vercel에 접속해 첫 화면에서 Add New → Project를 선택합니다. GitHub에서 만든 저장소가 보이면 Import를 클릭합니다."
+        },
+        {
+          "id": "deploy-img-11",
+          "type": "image",
+          "text": "Vercel 프로젝트 가져오기",
+          "asset": {
+            "id": "asset-deploy-11",
+            "name": "deploy-11.png",
+            "size": 118046,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-11.png"
+          }
+        },
+        {
+          "id": "deploy-17",
+          "type": "numbered_list",
+          "text": "설정 화면에서 Deploy를 클릭하고 배포가 끝날 때까지 기다립니다."
+        },
+        {
+          "id": "deploy-img-12",
+          "type": "image",
+          "text": "Vercel Deploy 버튼",
+          "asset": {
+            "id": "asset-deploy-12",
+            "name": "deploy-12.png",
+            "size": 141950,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-12.png"
+          }
+        },
+        {
+          "id": "deploy-18",
+          "type": "numbered_list",
+          "text": "프로젝트 목록에서 배포 결과를 확인합니다. 프로젝트 이름 아래의 ‘—.vercel.app’ 주소가 공개 도메인입니다."
+        },
+        {
+          "id": "deploy-img-13",
+          "type": "image",
+          "text": "Vercel 배포 완료와 공개 도메인",
+          "asset": {
+            "id": "asset-deploy-13",
+            "name": "deploy-13.png",
+            "size": 120863,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/deploy-13.png"
+          }
+        },
+        {
+          "id": "deploy-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-music",
+    "versionId": "version-music-1",
+    "sourceDate": "2026-08-20",
+    "snapshot": {
+      "title": "음악 만들어보기",
+      "summary": "ChatGPT와 가사·분위기를 구체화한 뒤 Suno에서 나만의 음악을 만듭니다.",
+      "category": "생성형 AI 창작",
+      "difficulty": "beginner",
+      "estimatedMinutes": 45,
+      "tags": ["Suno", "음악", "창작", "2026-08-20"],
+      "learningObjectives": [
+        "음악의 주제와 분위기를 언어로 구체화할 수 있다.",
+        "AI와 만든 가사를 음악 생성 도구에 적용할 수 있다."
+      ],
+      "prerequisites": ["Suno 계정", "ChatGPT 계정", "만들고 싶은 음악 주제"],
+      "submissionRequirements": [
+        "완성한 Suno 음악 링크",
+        "사용한 가사와 분위기 설명"
+      ],
+      "completionCriteria": [
+        "ChatGPT와 가사·분위기를 정리했다.",
+        "Suno에서 음악 한 곡 이상을 생성했다."
+      ],
+      "blocks": [
+        {
+          "id": "music-link",
+          "type": "link",
+          "text": "Suno | AI Music Generator",
+          "url": "https://suno.com/"
+        },
+        {
+          "id": "music-01",
+          "type": "paragraph",
+          "text": "Suno는 널리 사용되는 음악 생성 서비스입니다."
+        },
+        {
+          "id": "music-02",
+          "type": "numbered_list",
+          "text": "ChatGPT와 만들고 싶은 음악의 주제, 가사, 분위기에 대해 대화합니다."
+        },
+        {
+          "id": "music-03",
+          "type": "numbered_list",
+          "text": "정리한 내용을 Suno에 입력해 음악을 만들고 결과를 공유합니다."
+        },
+        {
+          "id": "music-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-skills",
+    "versionId": "version-skills-1",
+    "sourceDate": "2026-08-25",
+    "snapshot": {
+      "title": "스킬 익히기",
+      "summary": "반복 업무를 일정한 결과물로 만드는 AI 스킬의 개념을 이해하고 첫 스킬을 제작합니다.",
+      "category": "AI 자동화",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 80,
+      "tags": ["스킬", "코워크", "반복업무", "2026-08-25"],
+      "learningObjectives": [
+        "AI 스킬이 반복 업무를 효율화하는 방식을 설명할 수 있다.",
+        "업무에 활용할 간단한 스킬을 만들 수 있다.",
+        "스킬을 반복 실행하며 개선하는 과정을 이해한다."
+      ],
+      "prerequisites": [
+        "ChatGPT 또는 Claude 데스크톱 앱",
+        "코워크 작업 환경",
+        "반복해서 처리할 업무 또는 뉴스 스크랩 주제"
+      ],
+      "submissionRequirements": [
+        "직접 만든 스킬 파일 또는 폴더",
+        "스킬 실행 결과",
+        "다음 개선 사항 한 가지"
+      ],
+      "completionCriteria": [
+        "스킬을 한 개 만들었다.",
+        "스킬 목록을 다시 실행해 새 스킬이 적용되는지 확인했다.",
+        "코워크에서 스킬을 실행해 결과를 확인했다."
+      ],
+      "blocks": [
+        {
+          "id": "skills-01",
+          "type": "paragraph",
+          "text": "스킬은 반복 작업의 효율을 높이는 도구입니다. 여러 작업을 이어서 진행하고 일정한 결과를 반복해서 받아야 할 때 특히 유용합니다."
+        },
+        {
+          "id": "skills-02",
+          "type": "paragraph",
+          "text": "스킬을 통해 업무 자동화의 가능성을 확인하고 실제 자동화로 확장할 수 있습니다. 만드는 방법보다 반복 사용하며 고도화하는 과정이 핵심입니다."
+        },
+        {
+          "id": "skills-anthropic",
+          "type": "link",
+          "text": "Skills | Claude by Anthropic",
+          "url": "https://claude.com/skills"
+        },
+        {
+          "id": "skills-guide",
+          "type": "link",
+          "text": "GQAI 스킬 기본기 강의",
+          "url": "https://vibecoding.gqai.kr/gnu_AI_part2"
+        },
+        { "id": "skills-03", "type": "heading", "text": "오늘의 실습" },
+        {
+          "id": "skills-04",
+          "type": "paragraph",
+          "text": "오늘은 스킬 하나를 만드는 데 집중합니다. 학습 페이지의 과제를 실행하거나 다른 주제를 골라도 됩니다. 가장 쉽게 시험할 수 있는 예시는 뉴스 스크랩입니다."
+        },
+        {
+          "id": "skills-05",
+          "type": "bullet_list",
+          "text": "이후 업데이트까지 이어질 수 있으므로 실제 업무 활용도를 고려해 주제를 정해도 좋습니다."
+        },
+        {
+          "id": "skills-06",
+          "type": "bullet_list",
+          "text": "스킬을 만든 뒤에는 스킬 목록을 다시 실행해야 적용됩니다."
+        },
+        {
+          "id": "skills-07",
+          "type": "bullet_list",
+          "text": "채팅 탭과 코드 탭에서 스킬을 각각 별도로 지정해야 합니다. 이번 실습은 코워크에서 진행합니다."
+        },
+        { "id": "skills-08", "type": "heading", "text": "실제 설정 과정" },
+        {
+          "id": "skills-img-01",
+          "type": "image",
+          "text": "스킬 설정 과정 1",
+          "asset": {
+            "id": "asset-skills-01",
+            "name": "skills-01.png",
+            "size": 186231,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/skills-01.png"
+          }
+        },
+        {
+          "id": "skills-img-02",
+          "type": "image",
+          "text": "스킬 설정 과정 2",
+          "asset": {
+            "id": "asset-skills-02",
+            "name": "skills-02.png",
+            "size": 207174,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/skills-02.png"
+          }
+        },
+        {
+          "id": "skills-img-03",
+          "type": "image",
+          "text": "스킬 설정 과정 3",
+          "asset": {
+            "id": "asset-skills-03",
+            "name": "skills-03.png",
+            "size": 99646,
+            "mimeType": "image/png",
+            "url": "/api/module-assets/notion/skills-03.png"
+          }
+        },
+        {
+          "id": "skills-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-share-skills",
+    "versionId": "version-share-skills-1",
+    "sourceDate": "2026-08-27",
+    "snapshot": {
+      "title": "스킬 공유하기",
+      "summary": "직접 만든 스킬을 GitHub에 올리고, 개선한 버전을 다시 배포해 다른 사람과 공유합니다.",
+      "category": "AI 자동화",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 60,
+      "tags": ["스킬", "GitHub", "공유", "2026-08-27"],
+      "learningObjectives": [
+        "스킬을 GitHub 저장소로 배포할 수 있다.",
+        "공유한 스킬을 개선하고 새 버전으로 재배포할 수 있다.",
+        "업무 매뉴얼화와 산출물 표준화에서 스킬의 역할을 이해한다."
+      ],
+      "prerequisites": [
+        "8월 25일 과제에서 만든 스킬",
+        "GitHub 계정과 저장소",
+        "ChatGPT 또는 Claude"
+      ],
+      "submissionRequirements": [
+        "스킬이 올라간 GitHub 링크",
+        "개선 전후 변경 내용",
+        "재배포한 링크를 공유한 결과"
+      ],
+      "completionCriteria": [
+        "기존 스킬을 GitHub에 업로드했다.",
+        "기능을 한 가지 이상 개선해 재배포했다.",
+        "다른 사람이 접근할 수 있는 링크를 공유했다."
+      ],
+      "blocks": [
+        {
+          "id": "share-01",
+          "type": "paragraph",
+          "text": "앞서 만든 스킬을 주변 사람들과 공유하는 방법을 연습합니다."
+        },
+        {
+          "id": "share-02",
+          "type": "paragraph",
+          "text": "현업에서는 업무를 효율화하는 스킬을 만들어 사내에 배포합니다. 이는 업무 과정의 매뉴얼화, 산출물의 표준화와 아카이빙에 기여합니다."
+        },
+        {
+          "id": "share-03",
+          "type": "numbered_list",
+          "text": "만든 스킬을 GitHub에 업로드합니다."
+        },
+        {
+          "id": "share-04",
+          "type": "numbered_list",
+          "text": "ChatGPT 또는 Claude에서 스킬의 기능을 개선합니다."
+        },
+        {
+          "id": "share-05",
+          "type": "numbered_list",
+          "text": "개선한 스킬을 GitHub에 다시 배포합니다."
+        },
+        {
+          "id": "share-06",
+          "type": "numbered_list",
+          "text": "재배포된 GitHub 링크를 단체 대화방에 공유합니다."
+        },
+        {
+          "id": "share-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-database",
+    "versionId": "version-database-1",
+    "sourceDate": "2026-08-28",
+    "snapshot": {
+      "title": "데이터베이스 입문",
+      "summary": "Supabase 기본 설정을 마치고, 스킬 결과물을 저장할 데이터베이스 테이블을 만듭니다.",
+      "category": "데이터베이스",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 70,
+      "tags": ["Supabase", "데이터베이스", "테이블", "2026-08-28"],
+      "learningObjectives": [
+        "Supabase 프로젝트의 기본 연결 절차를 수행할 수 있다.",
+        "저장할 결과물에 맞는 테이블 구조를 AI에게 요청할 수 있다.",
+        "데이터가 테이블에 저장되는 과정을 확인할 수 있다."
+      ],
+      "prerequisites": [
+        "Supabase 계정",
+        "앞서 스킬로 만든 결과물",
+        "ChatGPT 또는 Claude"
+      ],
+      "submissionRequirements": [
+        "생성한 Supabase 테이블 화면 캡처",
+        "테이블에 저장한 테스트 데이터 또는 실행 결과"
+      ],
+      "completionCriteria": [
+        "Supabase 기본 설정을 완료했다.",
+        "결과물에 맞는 테이블을 생성했다.",
+        "테이블 화면을 캡처해 제출했다."
+      ],
+      "blocks": [
+        {
+          "id": "database-01",
+          "type": "numbered_list",
+          "text": "Supabase에 로그인합니다."
+        },
+        {
+          "id": "database-link",
+          "type": "link",
+          "text": "Supabase 연결 강의",
+          "url": "https://vibecoding.gqai.kr/lecture/lecture-7"
+        },
+        {
+          "id": "database-02",
+          "type": "numbered_list",
+          "text": "연결 강의를 보고 Supabase 기본 설정을 완료합니다."
+        },
+        {
+          "id": "database-03",
+          "type": "numbered_list",
+          "text": "스킬로 만든 결과물을 Supabase에 저장할 수 있도록 ChatGPT 또는 Claude에게 적절한 테이블을 만들어 달라고 요청합니다."
+        },
+        {
+          "id": "database-04",
+          "type": "paragraph",
+          "text": "대신 강의 페이지에 있는 실습 과제를 실행해도 됩니다."
+        },
+        {
+          "id": "database-05",
+          "type": "quote",
+          "text": "산출물은 Supabase 테이블 화면 캡처입니다."
+        },
+        {
+          "id": "database-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-web-crawling",
+    "versionId": "version-web-crawling-1",
+    "sourceDate": "2026-09-01",
+    "snapshot": {
+      "title": "웹크롤링",
+      "summary": "언론사 한 곳을 골라 기사 본문을 수집하고, 요약한 뒤 데이터베이스에 저장하는 전체 흐름을 실습합니다.",
+      "category": "데이터 수집",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 90,
+      "tags": ["웹크롤링", "요약", "Supabase", "2026-09-01"],
+      "learningObjectives": [
+        "웹크롤링의 기본 흐름을 이해한다.",
+        "언론사 기사 본문을 수집하고 요약할 수 있다.",
+        "수집·요약 결과를 데이터베이스에 저장할 수 있다."
+      ],
+      "prerequisites": [
+        "크롤링할 언론사 한 곳",
+        "Supabase 프로젝트와 저장 테이블",
+        "코드 작업 환경"
+      ],
+      "submissionRequirements": [
+        "본문 크롤링 결과",
+        "기사 요약 결과",
+        "데이터베이스 저장 화면 또는 저장된 행"
+      ],
+      "completionCriteria": [
+        "언론사 한 곳에서 본문을 정상적으로 수집했다.",
+        "수집한 본문을 요약했다.",
+        "요약 결과를 데이터베이스에 저장했다."
+      ],
+      "blocks": [
+        {
+          "id": "crawl-01",
+          "type": "paragraph",
+          "text": "이번 과제는 웹크롤링 기본기입니다."
+        },
+        {
+          "id": "crawl-link",
+          "type": "link",
+          "text": "웹크롤링 기본 강의",
+          "url": "https://vibecoding.gqai.kr/lecture/lecture-8"
+        },
+        {
+          "id": "crawl-02",
+          "type": "numbered_list",
+          "text": "스크랩할 언론사 중 한 곳을 고릅니다."
+        },
+        {
+          "id": "crawl-03",
+          "type": "numbered_list",
+          "text": "선택한 언론사의 기사 본문을 크롤링합니다."
+        },
+        {
+          "id": "crawl-04",
+          "type": "numbered_list",
+          "text": "수집한 본문을 요약합니다."
+        },
+        {
+          "id": "crawl-05",
+          "type": "numbered_list",
+          "text": "본문과 요약 결과를 데이터베이스에 저장합니다."
+        },
+        {
+          "id": "crawl-source",
+          "type": "link",
+          "text": "원문: AI 공부방",
+          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
+        }
+      ]
+    }
+  }
+]

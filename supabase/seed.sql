@@ -1,0 +1,1 @@
+-- Intentionally empty. Auth users are created with `npm run setup:admin`.
