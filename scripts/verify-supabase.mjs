@@ -29,7 +29,7 @@ async function makeUser(loginId, displayName, role, createdBy) {
   });
   if (error || !data.user)
     throw new Error(error?.message || "Auth user creation failed");
-  const { error: profileError } = await service.from("profiles").insert({
+  const { error: profileError } = await service.from("gqai_aistudy_profiles").insert({
     id: data.user.id,
     role,
     login_id: loginId,
@@ -77,13 +77,13 @@ check(
 );
 
 const { data: group, error: groupError } = await admin
-  .from("groups")
+  .from("gqai_aistudy_groups")
   .insert({ name: `검증 그룹 ${stamp}`, description: "그룹 배정 검증" })
   .select("id")
   .single();
 if (groupError) throw groupError;
 const { error: memberError } = await admin
-  .from("group_members")
+  .from("gqai_aistudy_group_members")
   .insert(
     studentIds
       .slice(0, 3)
@@ -97,7 +97,7 @@ const firstSnapshot = {
   blocks: [{ id: "intro", type: "paragraph", text: "버전 1 학습 내용" }],
 };
 const { data: template, error: templateError } = await admin
-  .from("module_templates")
+  .from("gqai_aistudy_module_templates")
   .insert({
     title: `검증 모듈 ${stamp}`,
     summary: "통합 검증",
@@ -115,7 +115,7 @@ const { data: template, error: templateError } = await admin
   .single();
 if (templateError) throw templateError;
 const { error: unsafeDraftUpdateError } = await admin
-  .from("module_templates")
+  .from("gqai_aistudy_module_templates")
   .update({
     draft_content: {
       schemaVersion: 1,
@@ -132,16 +132,16 @@ const { error: unsafeDraftUpdateError } = await admin
   .eq("id", template.id);
 if (unsafeDraftUpdateError) throw unsafeDraftUpdateError;
 const { error: unsafeModuleLinkError } = await admin.rpc(
-  "publish_module_version",
+  "gqai_aistudy_publish_module_version",
   { p_module_id: template.id },
 );
 const { error: restoreDraftError } = await admin
-  .from("module_templates")
+  .from("gqai_aistudy_module_templates")
   .update({ draft_content: firstSnapshot })
   .eq("id", template.id);
 if (restoreDraftError) throw restoreDraftError;
 const { data: versionOne, error: publishError } = await admin.rpc(
-  "publish_module_version",
+  "gqai_aistudy_publish_module_version",
   { p_module_id: template.id },
 );
 if (publishError) throw publishError;
@@ -150,7 +150,7 @@ check(
   "모듈 URL 검증과 버전 1 발행",
 );
 
-const { data: batchId, error: assignError } = await admin.rpc("assign_module", {
+const { data: batchId, error: assignError } = await admin.rpc("gqai_aistudy_assign_module", {
   p_module_version_id: versionOne,
   p_target_kind: "group",
   p_student_ids: [],
@@ -160,7 +160,7 @@ const { data: batchId, error: assignError } = await admin.rpc("assign_module", {
 });
 if (assignError) throw assignError;
 const { data: assignedRows, error: rowsError } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("id, student_id, module_version_id")
   .eq("assignment_batch_id", batchId);
 if (rowsError) throw rowsError;
@@ -181,15 +181,15 @@ const cancellableAssignment = assignedRows.find(
   (row) => row.student_id === studentIds[2],
 );
 const { data: visibleAssignments } = await students[0]
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("id");
 const { data: foreignAssignment } = await students[0]
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("id")
   .eq("id", otherAssignment.id)
   .maybeSingle();
 const { data: visibleProfiles } = await students[0]
-  .from("profiles")
+  .from("gqai_aistudy_profiles")
   .select("id");
 check(
   visibleAssignments.length === 1 &&
@@ -199,14 +199,14 @@ check(
   "타 학생 카드와 프로필 0건",
 );
 
-const { error: instructionError } = await admin.rpc("manage_assignment", {
+const { error: instructionError } = await admin.rpc("gqai_aistudy_manage_assignment", {
   p_assignment_id: otherAssignment.id,
   p_action: "set_instruction",
   p_instruction: "학생별 추가 안내",
 });
 if (instructionError) throw instructionError;
 const { data: instructedAssignment } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("personal_instruction")
   .eq("id", otherAssignment.id)
   .single();
@@ -215,14 +215,14 @@ check(
   "배정 후 학생별 안내 수정",
 );
 
-const { error: cancelError } = await admin.rpc("manage_assignment", {
+const { error: cancelError } = await admin.rpc("gqai_aistudy_manage_assignment", {
   p_assignment_id: cancellableAssignment.id,
   p_action: "cancel",
   p_instruction: null,
 });
 if (cancelError) throw cancelError;
 const { error: beginOtherError } = await students[1].rpc(
-  "update_learning_state",
+  "gqai_aistudy_update_learning_state",
   {
     p_assignment_id: otherAssignment.id,
     p_action: "start",
@@ -230,14 +230,14 @@ const { error: beginOtherError } = await students[1].rpc(
   },
 );
 if (beginOtherError) throw beginOtherError;
-const { error: stopError } = await admin.rpc("manage_assignment", {
+const { error: stopError } = await admin.rpc("gqai_aistudy_manage_assignment", {
   p_assignment_id: otherAssignment.id,
   p_action: "stop",
   p_instruction: null,
 });
 if (stopError) throw stopError;
 const { data: managedAssignments } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("id, assignment_status")
   .in("id", [cancellableAssignment.id, otherAssignment.id]);
 check(
@@ -248,23 +248,23 @@ check(
   "활동 전 취소와 활동 후 중단 구분",
 );
 
-const { error: noteError } = await students[0].rpc("update_learning_state", {
+const { error: noteError } = await students[0].rpc("gqai_aistudy_update_learning_state", {
   p_assignment_id: ownAssignment.id,
   p_action: "note",
   p_note: "학생만 보는 개인 메모",
 });
 if (noteError) throw noteError;
 const { data: ownNotes } = await students[0]
-  .from("student_notes")
+  .from("gqai_aistudy_student_notes")
   .select("note");
-const { data: adminNotes } = await admin.from("student_notes").select("note");
+const { data: adminNotes } = await admin.from("gqai_aistudy_student_notes").select("note");
 check(
   ownNotes.length === 1 && adminNotes.length === 0,
   "학생 개인 메모 격리",
   "강사 조회 0건",
 );
 
-const { error: openError } = await students[0].rpc("update_learning_state", {
+const { error: openError } = await students[0].rpc("gqai_aistudy_update_learning_state", {
   p_assignment_id: ownAssignment.id,
   p_action: "start",
   p_note: null,
@@ -273,19 +273,19 @@ if (openError) throw openError;
 const objectPath = `${studentIds[0]}/${ownAssignment.id}/draft/test-${stamp}.txt`;
 const imagePath = `${studentIds[0]}/${ownAssignment.id}/draft/image-${stamp}.png`;
 const { error: uploadError } = await students[0].storage
-  .from("submission-assets")
+  .from("gqai-aistudy-submission-assets")
   .upload(objectPath, new Blob(["private verification"]), {
     contentType: "text/plain",
   });
 if (uploadError) throw uploadError;
 const { error: imageUploadError } = await students[0].storage
-  .from("submission-assets")
+  .from("gqai-aistudy-submission-assets")
   .upload(imagePath, new Blob(["image verification"]), {
     contentType: "image/png",
   });
 if (imageUploadError) throw imageUploadError;
 const { error: unsafeSubmissionUrlError } = await students[0].rpc(
-  "save_submission_draft",
+  "gqai_aistudy_save_submission_draft",
   {
     p_assignment_id: ownAssignment.id,
     p_items: [
@@ -330,14 +330,14 @@ const firstItems = [
     },
   },
 ];
-const { error: draftError } = await students[0].rpc("save_submission_draft", {
+const { error: draftError } = await students[0].rpc("gqai_aistudy_save_submission_draft", {
   p_assignment_id: ownAssignment.id,
   p_items: firstItems,
   p_based_on_submission_id: null,
 });
 if (draftError) throw draftError;
 const { data: submissionOne, error: submitError } = await students[0].rpc(
-  "submit_assignment",
+  "gqai_aistudy_submit_assignment",
   { p_assignment_id: ownAssignment.id },
 );
 if (submitError) throw submitError;
@@ -348,20 +348,20 @@ check(
 );
 
 const { error: foreignDownloadError } = await students[1].storage
-  .from("submission-assets")
+  .from("gqai-aistudy-submission-assets")
   .download(objectPath);
 check(Boolean(foreignDownloadError), "비공개 파일의 타 학생 접근 차단");
 
 const blockedObjectPath = `${studentIds[0]}/${ownAssignment.id}/draft/blocked-${stamp}.exe`;
 const { error: blockedUploadError } = await students[0].storage
-  .from("submission-assets")
+  .from("gqai-aistudy-submission-assets")
   .upload(blockedObjectPath, new Blob(["blocked executable"]), {
     contentType: "application/octet-stream",
   });
 check(Boolean(blockedUploadError), "Storage 정책의 실행 파일 업로드 차단");
 
 const { data: revisionMessage, error: feedbackError } = await admin.rpc(
-  "create_feedback_message",
+  "gqai_aistudy_create_feedback_message",
   {
     p_assignment_id: ownAssignment.id,
     p_submission_id: submissionOne,
@@ -372,7 +372,7 @@ const { data: revisionMessage, error: feedbackError } = await admin.rpc(
 );
 if (feedbackError) throw feedbackError;
 const { data: studentFeedback } = await students[0]
-  .from("feedback_messages")
+  .from("gqai_aistudy_feedback_messages")
   .select("id, kind")
   .eq("id", revisionMessage)
   .single();
@@ -381,7 +381,7 @@ check(
   "강사 재제출 요청과 학생 조회",
 );
 
-const { error: replyError } = await students[0].rpc("create_feedback_message", {
+const { error: replyError } = await students[0].rpc("gqai_aistudy_create_feedback_message", {
   p_assignment_id: ownAssignment.id,
   p_submission_id: null,
   p_kind: "student_reply",
@@ -392,19 +392,19 @@ if (replyError) throw replyError;
 const secondItems = [
   { id: "client-text-2", type: "text", order: 0, text: "보완한 두 번째 결과" },
 ];
-const { error: redraftError } = await students[0].rpc("save_submission_draft", {
+const { error: redraftError } = await students[0].rpc("gqai_aistudy_save_submission_draft", {
   p_assignment_id: ownAssignment.id,
   p_items: secondItems,
   p_based_on_submission_id: submissionOne,
 });
 if (redraftError) throw redraftError;
 const { data: submissionTwo, error: resubmitError } = await students[0].rpc(
-  "submit_assignment",
+  "gqai_aistudy_submit_assignment",
   { p_assignment_id: ownAssignment.id },
 );
 if (resubmitError) throw resubmitError;
 const { data: revisions } = await service
-  .from("submissions")
+  .from("gqai_aistudy_submissions")
   .select("revision_number, status")
   .eq("learner_assignment_id", ownAssignment.id)
   .order("revision_number");
@@ -416,7 +416,7 @@ check(
   "1차+2차",
 );
 
-const { error: approveError } = await admin.rpc("create_feedback_message", {
+const { error: approveError } = await admin.rpc("gqai_aistudy_create_feedback_message", {
   p_assignment_id: ownAssignment.id,
   p_submission_id: submissionTwo,
   p_kind: "final_approval",
@@ -425,7 +425,7 @@ const { error: approveError } = await admin.rpc("create_feedback_message", {
 });
 if (approveError) throw approveError;
 const { data: completed } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("assignment_status, completed_at")
   .eq("id", ownAssignment.id)
   .single();
@@ -435,7 +435,7 @@ check(
   "강사 최종 완료 처리",
 );
 
-const { error: reopenError } = await admin.rpc("create_feedback_message", {
+const { error: reopenError } = await admin.rpc("gqai_aistudy_create_feedback_message", {
   p_assignment_id: ownAssignment.id,
   p_submission_id: submissionTwo,
   p_kind: "completion_reopened",
@@ -444,7 +444,7 @@ const { error: reopenError } = await admin.rpc("create_feedback_message", {
 });
 if (reopenError) throw reopenError;
 const { data: reopened } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("assignment_status, completed_at")
   .eq("id", ownAssignment.id)
   .single();
@@ -453,7 +453,7 @@ check(
     reopened.completed_at === null,
   "관리자 완료 취소와 감사 이력",
 );
-const { error: reapproveError } = await admin.rpc("create_feedback_message", {
+const { error: reapproveError } = await admin.rpc("gqai_aistudy_create_feedback_message", {
   p_assignment_id: ownAssignment.id,
   p_submission_id: submissionTwo,
   p_kind: "final_approval",
@@ -463,10 +463,10 @@ const { error: reapproveError } = await admin.rpc("create_feedback_message", {
 if (reapproveError) throw reapproveError;
 
 await admin
-  .from("group_members")
+  .from("gqai_aistudy_group_members")
   .insert({ group_id: group.id, student_id: studentIds[3] });
 const { count: historicCount } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("id", { count: "exact", head: true })
   .eq("assignment_batch_id", batchId);
 check(
@@ -476,7 +476,7 @@ check(
 );
 
 await admin
-  .from("module_templates")
+  .from("gqai_aistudy_module_templates")
   .update({
     title: `검증 모듈 v2 ${stamp}`,
     draft_content: {
@@ -486,17 +486,17 @@ await admin
   })
   .eq("id", template.id);
 const { data: versionTwo, error: secondPublishError } = await admin.rpc(
-  "publish_module_version",
+  "gqai_aistudy_publish_module_version",
   { p_module_id: template.id },
 );
 if (secondPublishError) throw secondPublishError;
 const { data: originalCard } = await service
-  .from("learner_assignments")
+  .from("gqai_aistudy_learner_assignments")
   .select("module_version_id")
   .eq("id", ownAssignment.id)
   .single();
 const { error: immutableError } = await service
-  .from("module_versions")
+  .from("gqai_aistudy_module_versions")
   .update({ title_snapshot: "변조" })
   .eq("id", versionOne);
 check(

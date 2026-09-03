@@ -283,7 +283,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       } = await supabase.auth.getUser();
       if (signedInUser) {
         await supabase
-          .from("profiles")
+          .from("gqai_aistudy_profiles")
           .update({ last_login_at: new Date().toISOString() })
           .eq("id", signedInUser.id);
       }
@@ -339,7 +339,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw new Error(error.message);
       const { error: profileError } = await supabase
-        .from("profiles")
+        .from("gqai_aistudy_profiles")
         .update({ must_change_password: false })
         .eq("id", session.id);
       if (profileError) throw new Error(profileError.message);
@@ -966,20 +966,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const filename = safeFileName(file.name) || "file";
       if (scope.kind === "module") {
         return repository.upload(
-          "module-assets",
+          "gqai-aistudy-module-assets",
           `${scope.moduleId}/${assetId}/${filename}`,
           file,
         );
       }
       if (scope.kind === "submission") {
         return repository.upload(
-          "submission-assets",
+          "gqai-aistudy-submission-assets",
           `${session.id}/${scope.assignmentId}/${scope.submissionId ?? "draft"}/${assetId}/${filename}`,
           file,
         );
       }
       return repository.upload(
-        "feedback-assets",
+        "gqai-aistudy-feedback-assets",
         `${scope.assignmentId}/${scope.messageId ?? "draft"}/${assetId}/${filename}`,
         file,
       );

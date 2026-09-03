@@ -59,7 +59,7 @@ const client = createClient(url, serviceRole, {
 });
 
 let adminQuery = client
-  .from("profiles")
+  .from("gqai_aistudy_profiles")
   .select("id, login_id, display_name")
   .eq("role", "admin")
   .eq("is_active", true);
@@ -89,7 +89,7 @@ async function withPrivateAssets(snapshot, templateId) {
     const bytes = await readFile(fileUrl);
     const storagePath = `${templateId}/notion/${fileName}`;
     const { error: uploadError } = await client.storage
-      .from("module-assets")
+      .from("gqai-aistudy-module-assets")
       .upload(storagePath, bytes, {
         contentType: block.asset.mimeType || "image/png",
         cacheControl: "31536000",
@@ -100,7 +100,7 @@ async function withPrivateAssets(snapshot, templateId) {
         `${snapshot.title} 이미지 업로드 실패: ${uploadError.message}`,
       );
     }
-    const { error: assetError } = await client.from("module_assets").upsert(
+    const { error: assetError } = await client.from("gqai_aistudy_module_assets").upsert(
       {
         module_template_id: templateId,
         storage_path: storagePath,
@@ -200,7 +200,7 @@ let unchanged = 0;
 for (const lesson of modules) {
   const sourceSnapshot = lesson.snapshot;
   const { data: matches, error: matchError } = await client
-    .from("module_templates")
+    .from("gqai_aistudy_module_templates")
     .select("id, current_published_version_id")
     .eq("created_by", admin.id)
     .eq("title", sourceSnapshot.title);
@@ -217,7 +217,7 @@ for (const lesson of modules) {
   const isNewTemplate = !matches?.length;
   if (isNewTemplate) {
     const { data, error } = await client
-      .from("module_templates")
+      .from("gqai_aistudy_module_templates")
       .insert({
         ...templatePayload(sourceSnapshot),
         status: "draft",
@@ -239,7 +239,7 @@ for (const lesson of modules) {
 
   const snapshot = await withPrivateAssets(sourceSnapshot, templateId);
   const { error: draftError } = await client
-    .from("module_templates")
+    .from("gqai_aistudy_module_templates")
     .update(templatePayload(snapshot))
     .eq("id", templateId);
   if (draftError) {
@@ -249,7 +249,7 @@ for (const lesson of modules) {
   let currentVersion = null;
   if (currentVersionId) {
     const { data, error } = await client
-      .from("module_versions")
+      .from("gqai_aistudy_module_versions")
       .select(
         "title_snapshot, summary_snapshot, metadata_snapshot, content_snapshot, learning_objectives_snapshot, prerequisites_snapshot, submission_requirements_snapshot, completion_criteria_snapshot",
       )
@@ -268,7 +268,7 @@ for (const lesson of modules) {
       stableJson(comparableVersion(snapshot))
   ) {
     const { error } = await client
-      .from("module_templates")
+      .from("gqai_aistudy_module_templates")
       .update({ status: "active", updated_by: admin.id })
       .eq("id", templateId);
     if (error)
@@ -278,7 +278,7 @@ for (const lesson of modules) {
   }
 
   const { data: latestVersions, error: latestError } = await client
-    .from("module_versions")
+    .from("gqai_aistudy_module_versions")
     .select("version_number")
     .eq("module_template_id", templateId)
     .order("version_number", { ascending: false })
@@ -294,7 +294,7 @@ for (const lesson of modules) {
     .update(stableJson(versionPayload))
     .digest("hex");
   const { data: version, error: versionError } = await client
-    .from("module_versions")
+    .from("gqai_aistudy_module_versions")
     .insert({
       module_template_id: templateId,
       version_number: versionNumber,
@@ -318,7 +318,7 @@ for (const lesson of modules) {
     );
   }
   const { error: activateError } = await client
-    .from("module_templates")
+    .from("gqai_aistudy_module_templates")
     .update({
       status: "active",
       current_published_version_id: version.id,

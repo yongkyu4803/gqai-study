@@ -19,7 +19,7 @@ export async function PATCH(
     const input = actionSchema.parse(await request.json());
     const admin = createSupabaseAdminClient();
     const { data: profile, error: profileError } = await admin
-      .from("profiles")
+      .from("gqai_aistudy_profiles")
       .select("id, role, is_active")
       .eq("id", studentId)
       .single();
@@ -34,12 +34,12 @@ export async function PATCH(
       });
       if (error) throw error;
       const { error: updateError } = await admin
-        .from("profiles")
+        .from("gqai_aistudy_profiles")
         .update({ must_change_password: true })
         .eq("id", studentId);
       if (updateError) throw updateError;
       await admin
-        .from("activity_events")
+        .from("gqai_aistudy_activity_events")
         .insert({
           event_name: "student.password_reset",
           actor_id: adminUser.id,
@@ -54,7 +54,7 @@ export async function PATCH(
       });
       if (error) throw error;
       const { error: updateError } = await admin
-        .from("profiles")
+        .from("gqai_aistudy_profiles")
         .update({
           is_active: input.isActive,
           deactivated_at: input.isActive ? null : new Date().toISOString(),
@@ -67,7 +67,7 @@ export async function PATCH(
         throw updateError;
       }
       await admin
-        .from("activity_events")
+        .from("gqai_aistudy_activity_events")
         .insert({
           event_name: input.isActive
             ? "student.activated"

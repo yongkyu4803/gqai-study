@@ -15,6 +15,7 @@ import {
   Menu,
   MessageSquareText,
   Settings,
+  UserCog,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -59,6 +60,12 @@ const adminNav = [
     label: "검토 대기함",
     icon: CheckSquare,
     gqaiIcon: "status-warning",
+  },
+  {
+    href: "/admin/account",
+    label: "내 계정",
+    icon: UserCog,
+    gqaiIcon: "status-lock",
   },
   { href: "/admin/settings", label: "설정", icon: Settings },
 ];

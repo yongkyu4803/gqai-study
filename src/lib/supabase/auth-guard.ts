@@ -11,7 +11,7 @@ export async function requireAdmin() {
   } = await client.auth.getUser();
   if (userError || !user) throw new Error("UNAUTHENTICATED");
   const { data: profile, error: profileError } = await client
-    .from("profiles")
+    .from("gqai_aistudy_profiles")
     .select("id, role, is_active")
     .eq("id", user.id)
     .single();

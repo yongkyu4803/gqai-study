@@ -37,7 +37,7 @@ const { data, error } = await client.auth.admin.createUser({
 if (error || !data.user)
   throw new Error(error?.message || "관리자 Auth 계정을 만들지 못했습니다.");
 const { error: profileError } = await client
-  .from("profiles")
+  .from("gqai_aistudy_profiles")
   .insert({
     id: data.user.id,
     role: "admin",

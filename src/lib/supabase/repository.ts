@@ -107,33 +107,33 @@ export class SupabaseRepository {
       activities,
       flags,
     ] = await Promise.all([
-      this.client.from("profiles").select("*").order("display_name"),
-      this.client.from("groups").select("*").order("name"),
-      this.client.from("group_members").select("*"),
+      this.client.from("gqai_aistudy_profiles").select("*").order("display_name"),
+      this.client.from("gqai_aistudy_groups").select("*").order("name"),
+      this.client.from("gqai_aistudy_group_members").select("*"),
       this.client
-        .from("module_templates")
+        .from("gqai_aistudy_module_templates")
         .select("*")
         .order("updated_at", { ascending: false }),
-      this.client.from("module_versions").select("*").order("version_number"),
+      this.client.from("gqai_aistudy_module_versions").select("*").order("version_number"),
       this.client
-        .from("assignment_batches")
+        .from("gqai_aistudy_assignment_batches")
         .select("*")
         .order("assigned_at", { ascending: false }),
       this.client
-        .from("learner_assignments")
+        .from("gqai_aistudy_learner_assignments")
         .select("*")
         .order("created_at", { ascending: false }),
-      this.client.from("student_notes").select("learner_assignment_id, note"),
-      this.client.from("submissions").select("*").order("created_at"),
-      this.client.from("submission_items").select("*").order("sort_order"),
-      this.client.from("feedback_messages").select("*").order("created_at"),
-      this.client.from("feedback_attachments").select("*"),
+      this.client.from("gqai_aistudy_student_notes").select("learner_assignment_id, note"),
+      this.client.from("gqai_aistudy_submissions").select("*").order("created_at"),
+      this.client.from("gqai_aistudy_submission_items").select("*").order("sort_order"),
+      this.client.from("gqai_aistudy_feedback_messages").select("*").order("created_at"),
+      this.client.from("gqai_aistudy_feedback_attachments").select("*"),
       this.client
-        .from("activity_events")
+        .from("gqai_aistudy_activity_events")
         .select("*")
         .order("created_at", { ascending: false })
         .limit(200),
-      this.client.from("feature_flags").select("*"),
+      this.client.from("gqai_aistudy_feature_flags").select("*"),
     ]);
 
     const firstError = [
@@ -294,31 +294,31 @@ export class SupabaseRepository {
       })),
     };
     const assets: Array<{
-      bucket: "module-assets" | "submission-assets" | "feedback-assets";
+      bucket: "gqai-aistudy-module-assets" | "gqai-aistudy-submission-assets" | "gqai-aistudy-feedback-assets";
       asset: FileAsset;
     }> = [];
     for (const template of state.modules) {
       for (const block of template.draft.blocks) {
         if (block.asset?.storagePath)
-          assets.push({ bucket: "module-assets", asset: block.asset });
+          assets.push({ bucket: "gqai-aistudy-module-assets", asset: block.asset });
       }
     }
     for (const version of state.versions) {
       for (const block of version.snapshot.blocks) {
         if (block.asset?.storagePath)
-          assets.push({ bucket: "module-assets", asset: block.asset });
+          assets.push({ bucket: "gqai-aistudy-module-assets", asset: block.asset });
       }
     }
     for (const submission of state.submissions) {
       for (const item of submission.items) {
         if (item.asset?.storagePath)
-          assets.push({ bucket: "submission-assets", asset: item.asset });
+          assets.push({ bucket: "gqai-aistudy-submission-assets", asset: item.asset });
       }
     }
     for (const message of state.feedback) {
       for (const asset of message.attachments) {
         if (asset.storagePath)
-          assets.push({ bucket: "feedback-assets", asset });
+          assets.push({ bucket: "gqai-aistudy-feedback-assets", asset });
       }
     }
     await Promise.all(
@@ -339,7 +339,7 @@ export class SupabaseRepository {
     memberIds: string[];
   }) {
     const { data, error } = await this.client
-      .from("groups")
+      .from("gqai_aistudy_groups")
       .insert({ name: input.name, description: input.description })
       .select("id")
       .single();
@@ -347,7 +347,7 @@ export class SupabaseRepository {
     if (!data) throw new Error("그룹 생성 결과가 없습니다.");
     if (input.memberIds.length) {
       const { error: memberError } = await this.client
-        .from("group_members")
+        .from("gqai_aistudy_group_members")
         .insert(
           input.memberIds.map((studentId) => ({
             group_id: data.id,
@@ -364,18 +364,18 @@ export class SupabaseRepository {
     input: { name: string; description: string; memberIds: string[] },
   ) {
     const { error } = await this.client
-      .from("groups")
+      .from("gqai_aistudy_groups")
       .update({ name: input.name, description: input.description })
       .eq("id", id);
     assertOk(error);
     const { error: deleteError } = await this.client
-      .from("group_members")
+      .from("gqai_aistudy_group_members")
       .delete()
       .eq("group_id", id);
     assertOk(deleteError);
     if (input.memberIds.length) {
       const { error: insertError } = await this.client
-        .from("group_members")
+        .from("gqai_aistudy_group_members")
         .insert(
           input.memberIds.map((studentId) => ({
             group_id: id,
@@ -388,7 +388,7 @@ export class SupabaseRepository {
 
   async archiveGroup(id: string, archived: boolean) {
     const { error } = await this.client
-      .from("groups")
+      .from("gqai_aistudy_groups")
       .update({ is_archived: archived })
       .eq("id", id);
     assertOk(error);
@@ -396,7 +396,7 @@ export class SupabaseRepository {
 
   async createDraftModule(snapshot: ModuleSnapshot) {
     const { data, error } = await this.client
-      .from("module_templates")
+      .from("gqai_aistudy_module_templates")
       .insert({
         title: snapshot.title,
         summary: snapshot.summary,
@@ -419,7 +419,7 @@ export class SupabaseRepository {
 
   async saveModule(id: string, snapshot: ModuleSnapshot) {
     const { error } = await this.client
-      .from("module_templates")
+      .from("gqai_aistudy_module_templates")
       .update({
         title: snapshot.title,
         summary: snapshot.summary,
@@ -438,7 +438,7 @@ export class SupabaseRepository {
   }
 
   async publishModule(id: string) {
-    const { data, error } = await this.client.rpc("publish_module_version", {
+    const { data, error } = await this.client.rpc("gqai_aistudy_publish_module_version", {
       p_module_id: id,
     });
     assertOk(error);
@@ -447,7 +447,7 @@ export class SupabaseRepository {
 
   async archiveModule(id: string, archived: boolean) {
     const { error } = await this.client
-      .from("module_templates")
+      .from("gqai_aistudy_module_templates")
       .update({
         status: archived ? "archived" : "draft",
         archived_at: archived ? new Date().toISOString() : null,
@@ -457,7 +457,7 @@ export class SupabaseRepository {
   }
 
   async assign(input: AssignmentInput, idempotencyKey = crypto.randomUUID()) {
-    const { data, error } = await this.client.rpc("assign_module", {
+    const { data, error } = await this.client.rpc("gqai_aistudy_assign_module", {
       p_module_version_id: input.moduleVersionId,
       p_target_kind: input.targetKind,
       p_student_ids: input.studentIds,
@@ -474,7 +474,7 @@ export class SupabaseRepository {
     action: AssignmentManagementAction,
     instruction = "",
   ) {
-    const { error } = await this.client.rpc("manage_assignment", {
+    const { error } = await this.client.rpc("gqai_aistudy_manage_assignment", {
       p_assignment_id: assignmentId,
       p_action: action,
       p_instruction: instruction,
@@ -487,7 +487,7 @@ export class SupabaseRepository {
     action: "open" | "start" | "toggle_complete" | "note",
     note?: string,
   ) {
-    const { error } = await this.client.rpc("update_learning_state", {
+    const { error } = await this.client.rpc("gqai_aistudy_update_learning_state", {
       p_assignment_id: assignmentId,
       p_action: action,
       p_note: note ?? null,
@@ -496,7 +496,7 @@ export class SupabaseRepository {
   }
 
   async saveDraft(input: SubmissionDraftInput) {
-    const { data, error } = await this.client.rpc("save_submission_draft", {
+    const { data, error } = await this.client.rpc("gqai_aistudy_save_submission_draft", {
       p_assignment_id: input.assignmentId,
       p_items: input.items,
       p_based_on_submission_id: input.basedOnSubmissionId ?? null,
@@ -506,7 +506,7 @@ export class SupabaseRepository {
   }
 
   async submit(assignmentId: string) {
-    const { data, error } = await this.client.rpc("submit_assignment", {
+    const { data, error } = await this.client.rpc("gqai_aistudy_submit_assignment", {
       p_assignment_id: assignmentId,
     });
     assertOk(error);
@@ -514,7 +514,7 @@ export class SupabaseRepository {
   }
 
   async createFeedback(input: FeedbackInput) {
-    const { data, error } = await this.client.rpc("create_feedback_message", {
+    const { data, error } = await this.client.rpc("gqai_aistudy_create_feedback_message", {
       p_assignment_id: input.assignmentId,
       p_submission_id: input.submissionId ?? null,
       p_kind: input.kind,
@@ -526,14 +526,14 @@ export class SupabaseRepository {
   }
 
   async markFeedbackRead(assignmentId: string) {
-    const { error } = await this.client.rpc("mark_feedback_read", {
+    const { error } = await this.client.rpc("gqai_aistudy_mark_feedback_read", {
       p_assignment_id: assignmentId,
     });
     assertOk(error);
   }
 
   async upload(
-    bucket: "module-assets" | "submission-assets" | "feedback-assets",
+    bucket: "gqai-aistudy-module-assets" | "gqai-aistudy-submission-assets" | "gqai-aistudy-feedback-assets",
     path: string,
     file: File,
   ): Promise<FileAsset> {
@@ -549,7 +549,7 @@ export class SupabaseRepository {
       storagePath: path,
     };
 
-    if (bucket === "module-assets") {
+    if (bucket === "gqai-aistudy-module-assets") {
       const moduleId = path.split("/")[0];
       const assetKind = file.type.startsWith("image/")
         ? "image"
@@ -557,7 +557,7 @@ export class SupabaseRepository {
           ? "pdf"
           : "attachment";
       const { error: metadataError } = await this.client
-        .from("module_assets")
+        .from("gqai_aistudy_module_assets")
         .insert({
           module_template_id: moduleId,
           storage_path: path,
@@ -576,7 +576,7 @@ export class SupabaseRepository {
   }
 
   async getSignedUrl(
-    bucket: "module-assets" | "submission-assets" | "feedback-assets",
+    bucket: "gqai-aistudy-module-assets" | "gqai-aistudy-submission-assets" | "gqai-aistudy-feedback-assets",
     path: string,
   ) {
     const { data, error } = await this.client.storage

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const admin = createSupabaseAdminClient();
     if (input.groupIds.length) {
       const { data: groups, error } = await admin
-        .from("groups")
+        .from("gqai_aistudy_groups")
         .select("id")
         .in("id", input.groupIds)
         .eq("is_archived", false);
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     }
     createdUserId = authResult.user.id;
     const { error: profileError } = await admin
-      .from("profiles")
+      .from("gqai_aistudy_profiles")
       .insert({
         id: createdUserId,
         role: "student",
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     if (profileError) throw profileError;
     if (input.groupIds.length) {
       const { error: memberError } = await admin
-        .from("group_members")
+        .from("gqai_aistudy_group_members")
         .insert(
           input.groupIds.map((groupId) => ({
             group_id: groupId,
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
       if (memberError) throw memberError;
     }
     await admin
-      .from("activity_events")
+      .from("gqai_aistudy_activity_events")
       .insert({
         event_name: "student.created",
         actor_id: adminUser.id,
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (createdUserId) {
       const admin = createSupabaseAdminClient();
-      await admin.from("profiles").delete().eq("id", createdUserId);
+      await admin.from("gqai_aistudy_profiles").delete().eq("id", createdUserId);
       await admin.auth.admin.deleteUser(createdUserId);
     }
     const status = adminGuardStatus(error);
