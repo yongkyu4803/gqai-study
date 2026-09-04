@@ -146,6 +146,7 @@ export function LoginView() {
 
 export function RequestAccessView() {
   const [displayName, setDisplayName] = useState("");
+  const [loginId, setLoginId] = useState("");
   const [contact, setContact] = useState("");
   const [note, setNote] = useState("");
   const [pending, setPending] = useState(false);
@@ -159,7 +160,7 @@ export function RequestAccessView() {
       const response = await fetch("/api/account-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName, contact, note }),
+        body: JSON.stringify({ displayName, loginId, contact, note }),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -193,7 +194,7 @@ export function RequestAccessView() {
               계정 발급 요청
             </CardTitle>
             <CardDescription>
-              이름과 연락처를 남기면 강사가 확인 후 계정을 만들어 전달합니다.
+              이름, 사용할 아이디와 연락처를 남기면 강사가 확인 후 계정을 만들어 전달합니다.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -218,6 +219,17 @@ export function RequestAccessView() {
                     id="requestName"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestLoginId">사이트에서 사용할 아이디</Label>
+                  <Input
+                    id="requestLoginId"
+                    value={loginId}
+                    onChange={(e) => setLoginId(e.target.value)}
+                    autoCapitalize="none"
+                    placeholder="영문 소문자, 숫자, 점, 밑줄, 하이픈"
                     required
                   />
                 </div>

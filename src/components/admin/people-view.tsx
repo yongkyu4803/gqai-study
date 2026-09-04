@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import {
   Archive,
@@ -45,6 +45,7 @@ import { formatDate } from "@/lib/domain/status";
 
 export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { state, createStudent } = useApp();
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -58,7 +59,8 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
-  if (createOnly)
+  if (createOnly) {
+    const prefillLoginId = searchParams.get("loginId") || "";
     return (
       <div className="mx-auto max-w-2xl space-y-6">
         <PageHeader
@@ -68,6 +70,9 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
         />
         <StudentForm
           groups={state.groups.filter((g) => !g.isArchived)}
+          initialDisplayName={searchParams.get("displayName") || ""}
+          initialLoginId={prefillLoginId}
+          initialPassword={prefillLoginId ? `${prefillLoginId}A123!` : ""}
           onCancel={() => router.push("/admin/students")}
           onCreate={async (input) => {
             const id = await createStudent(input);
@@ -79,6 +84,7 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
         />
       </div>
     );
+  }
   return (
     <div className="space-y-7">
       <PageHeader
@@ -205,10 +211,16 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
 
 function StudentForm({
   groups,
+  initialDisplayName = "",
+  initialLoginId = "",
+  initialPassword = "",
   onCancel,
   onCreate,
 }: {
   groups: ReturnType<typeof useApp>["state"]["groups"];
+  initialDisplayName?: string;
+  initialLoginId?: string;
+  initialPassword?: string;
   onCancel: () => void;
   onCreate: (input: {
     displayName: string;
@@ -217,9 +229,9 @@ function StudentForm({
     groupIds: string[];
   }) => Promise<void>;
 }) {
-  const [displayName, setDisplayName] = useState("");
-  const [loginId, setLoginId] = useState("");
-  const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState(initialDisplayName);
+  const [loginId, setLoginId] = useState(initialLoginId);
+  const [password, setPassword] = useState(initialPassword);
   const [groupIds, setGroupIds] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");

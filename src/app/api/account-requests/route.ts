@@ -8,6 +8,7 @@ export async function POST(request: Request) {
     const admin = createSupabaseAdminClient();
     const { error } = await admin.from("gqai_aistudy_account_requests").insert({
       display_name: input.displayName,
+      requested_login_id: input.loginId,
       contact: input.contact,
       note: input.note || null,
     });

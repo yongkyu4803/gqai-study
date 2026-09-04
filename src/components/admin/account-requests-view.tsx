@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/domain/status";
 interface AccountRequest {
   id: string;
   displayName: string;
+  requestedLoginId: string | null;
   contact: string;
   note: string | null;
   status: "pending" | "approved" | "dismissed";
@@ -78,6 +79,7 @@ export function AccountRequestsView() {
                 <div>
                   <p className="font-medium">{item.displayName}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
+                    {item.requestedLoginId ? `@${item.requestedLoginId} · ` : ""}
                     {item.contact}
                   </p>
                 </div>
@@ -108,7 +110,11 @@ export function AccountRequestsView() {
                       disabled={pendingId === item.id}
                       onClick={async () => {
                         await resolve(item.id, "approved");
-                        router.push("/admin/students/new");
+                        const params = new URLSearchParams({
+                          displayName: item.displayName,
+                          loginId: item.requestedLoginId || "",
+                        });
+                        router.push(`/admin/students/new?${params.toString()}`);
                       }}
                     >
                       계정 발급하기
