@@ -1,6 +1,27 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { accountRequestSchema } from "@/lib/domain/validation";
+
+async function notifyAdminOfNewRequest(input: {
+  displayName: string;
+  loginId: string;
+  contact: string;
+  note?: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (!apiKey || !adminEmail) return;
+  const resend = new Resend(apiKey);
+  await resend.emails.send({
+    from: process.env.RESEND_FROM_ADDRESS || "GQAI Study <onboarding@resend.dev>",
+    to: adminEmail,
+    subject: `[GQAI Study] 새 계정 발급 요청: ${input.displayName}`,
+    text: `이름: ${input.displayName}\n요청 아이디: ${input.loginId}\n이메일: ${input.contact}${
+      input.note ? `\n메모: ${input.note}` : ""
+    }\n\n관리자 화면의 "계정 요청"에서 확인하세요.`,
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +34,7 @@ export async function POST(request: Request) {
       note: input.note || null,
     });
     if (error) throw error;
+    notifyAdminOfNewRequest(input).catch(() => undefined);
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {
     const validation = error instanceof Error && error.name === "ZodError";
