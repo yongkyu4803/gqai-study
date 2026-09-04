@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { adminGuardStatus, requireAdmin } from "@/lib/supabase/auth-guard";
 import { studentSchema, toAuthEmail } from "@/lib/domain/validation";
+import { sendAndLogEmail } from "@/lib/server/email";
 
 export async function POST(request: Request) {
   let createdUserId: string | undefined;
@@ -80,6 +81,25 @@ export async function POST(request: Request) {
         entity_id: createdUserId,
         metadata: { groupCount: input.groupIds.length },
       });
+    if (input.email) {
+      const origin = new URL(request.url).origin;
+      // Awaited so the serverless function stays alive until the send finishes,
+      // but never allowed to fail the request: the account already exists and
+      // the outer catch would otherwise roll it back.
+      try {
+        await sendAndLogEmail({
+          admin,
+          kind: "account_created",
+          to: input.email,
+          subject: "[GQAI Study] 학습 계정이 발급되었습니다",
+          text: `${input.displayName}님, GQAI Study 학습 계정이 발급되었습니다.\n\n로그인: ${origin}/login\n아이디: ${input.loginId}\n임시 비밀번호: ${input.password}\n\n첫 로그인 후 비밀번호를 바로 변경하게 됩니다.`,
+          studentId: createdUserId,
+          relatedId: createdUserId,
+        });
+      } catch (cause) {
+        console.error("[students] welcome email failed", cause);
+      }
+    }
     return NextResponse.json({ id: createdUserId }, { status: 201 });
   } catch (error) {
     if (createdUserId) {

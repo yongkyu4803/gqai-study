@@ -137,6 +137,14 @@ function notifyAssignmentBatch(batchId: string) {
   }).catch(() => undefined);
 }
 
+function notifyStudentEvent(type: "submitted" | "reply", assignmentId: string) {
+  fetch("/api/notifications/student-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type, assignmentId }),
+  }).catch(() => undefined);
+}
+
 function notifyFeedbackMessage(messageId: string) {
   fetch("/api/admin/notifications/feedback", {
     method: "POST",
@@ -1022,6 +1030,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (repository) {
         const id = await repository.submit(assignmentId);
         await refresh();
+        notifyStudentEvent("submitted", assignmentId);
         return id;
       }
       const result = submitDraft(state, assignmentId, session.id);
@@ -1040,6 +1049,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         await repository.saveDraft(input);
         const id = await repository.submit(input.assignmentId);
         await refresh();
+        notifyStudentEvent("submitted", input.assignmentId);
         return id;
       }
       const saved = saveSubmissionDraft(state, input, session.id);
@@ -1061,6 +1071,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const id = await repository.createFeedback(input);
         await refresh();
         if (session.role === "admin") notifyFeedbackMessage(id);
+        else notifyStudentEvent("reply", input.assignmentId);
         return id;
       }
       const result = createFeedbackState(state, input, session.id);

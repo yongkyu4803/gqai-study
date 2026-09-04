@@ -9,7 +9,7 @@ import { formatDate } from "@/lib/domain/status";
 
 interface EmailLog {
   id: string;
-  kind: "assignment" | "account_request" | "feedback";
+  kind: "assignment" | "account_request" | "feedback" | "submission" | "account_created";
   recipientEmail: string;
   subject: string;
   status: "sent" | "failed";
@@ -21,6 +21,8 @@ const kindLabel: Record<EmailLog["kind"], string> = {
   assignment: "배정 알림",
   account_request: "계정 요청",
   feedback: "피드백 알림",
+  submission: "제출 알림",
+  account_created: "로그인 안내",
 };
 
 export function EmailLogView() {

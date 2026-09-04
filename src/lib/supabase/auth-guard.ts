@@ -25,6 +25,25 @@ export async function requireAdmin() {
   return { user, client };
 }
 
+// Any signed-in, active profile (student or admin).
+export async function requireUser() {
+  const client = await createSupabaseServerClient();
+  if (!client) throw new Error("SUPABASE_NOT_CONFIGURED");
+  const {
+    data: { user },
+    error: userError,
+  } = await client.auth.getUser();
+  if (userError || !user) throw new Error("UNAUTHENTICATED");
+  const { data: profile, error: profileError } = await client
+    .from("gqai_aistudy_profiles")
+    .select("id, role, is_active, display_name")
+    .eq("id", user.id)
+    .single();
+  if (profileError || !profile || !profile.is_active)
+    throw new Error("FORBIDDEN");
+  return { user, profile, client };
+}
+
 export function adminGuardStatus(error: unknown) {
   const message = error instanceof Error ? error.message : "UNKNOWN";
   if (message === "UNAUTHENTICATED") return 401;

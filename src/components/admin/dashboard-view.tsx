@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -16,6 +17,8 @@ import { formatDate } from "@/lib/domain/status";
 
 export function AdminDashboardView() {
   const { state, session } = useApp();
+  // Captured once per mount so render stays pure; "N일 전" is a coarse figure.
+  const [now] = useState(() => Date.now());
   const students = state.profiles.filter(
     (item) => item.role === "student" && item.isActive,
   );
@@ -36,6 +39,17 @@ export function AdminDashboardView() {
   const completed = state.assignments.filter(
     (item) => item.assignmentStatus === "completed",
   );
+  const daysAgo = (iso?: string) =>
+    iso ? Math.floor((now - new Date(iso).getTime()) / 86_400_000) : null;
+  const unopened = active
+    .filter((item) => !item.firstOpenedAt)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const inactiveStudents = students
+    .filter((item) => (daysAgo(item.lastLoginAt) ?? 999) >= 7)
+    .sort(
+      (a, b) =>
+        (daysAgo(b.lastLoginAt) ?? 999) - (daysAgo(a.lastLoginAt) ?? 999),
+    );
   return (
     <div className="space-y-7">
       <PageHeader
@@ -61,6 +75,87 @@ export function AdminDashboardView() {
           value={completed.length}
         />
       </div>
+      {unopened.length || inactiveStudents.length ? (
+        <Card className="border-primary/40">
+          <CardHeader>
+            <CardTitle className="text-base">확인 필요</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-6 md:grid-cols-2">
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                아직 열어보지 않은 카드 {unopened.length}개
+              </p>
+              {unopened.length ? (
+                <div className="space-y-1">
+                  {unopened.slice(0, 6).map((assignment) => {
+                    const student = state.profiles.find(
+                      (item) => item.id === assignment.studentId,
+                    );
+                    const version = state.versions.find(
+                      (item) => item.id === assignment.moduleVersionId,
+                    );
+                    const days = daysAgo(assignment.createdAt) ?? 0;
+                    return (
+                      <Link
+                        key={assignment.id}
+                        href={`/admin/assignments/${assignment.id}`}
+                        className="flex items-center gap-3 rounded-lg border p-3 text-sm hover:bg-zinc-50"
+                      >
+                        <span className="min-w-0 flex-1 truncate">
+                          <span className="font-medium">
+                            {student?.displayName}
+                          </span>
+                          <span className="text-muted-foreground">
+                            {" "}
+                            · {version?.snapshot.title}
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          배정 {days === 0 ? "오늘" : `${days}일 전`}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="py-4 text-sm text-muted-foreground">
+                  모든 카드가 열람되었습니다.
+                </p>
+              )}
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-medium text-muted-foreground">
+                7일 이상 접속 없는 학생 {inactiveStudents.length}명
+              </p>
+              {inactiveStudents.length ? (
+                <div className="space-y-1">
+                  {inactiveStudents.slice(0, 6).map((student) => {
+                    const days = daysAgo(student.lastLoginAt);
+                    return (
+                      <Link
+                        key={student.id}
+                        href={`/admin/students/${student.id}`}
+                        className="flex items-center gap-3 rounded-lg border p-3 text-sm hover:bg-zinc-50"
+                      >
+                        <span className="min-w-0 flex-1 truncate font-medium">
+                          {student.displayName}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {days === null ? "로그인 기록 없음" : `${days}일 전 접속`}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="py-4 text-sm text-muted-foreground">
+                  모든 학생이 최근 일주일 안에 접속했습니다.
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
       <div className="grid gap-6 xl:grid-cols-[1.35fr_.65fr]">
         <Card>
           <CardHeader className="flex-row items-center justify-between">
