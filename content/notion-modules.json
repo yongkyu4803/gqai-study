@@ -74,12 +74,6 @@
           "id": "ai-12",
           "type": "bullet_list",
           "text": "아무 생각도 나지 않을 때는 지금의 상황을 설명하고 ‘grill me’라고 입력해 보세요."
-        },
-        {
-          "id": "ai-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -252,12 +246,6 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/tools-05.png"
           }
-        },
-        {
-          "id": "tools-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -327,12 +315,6 @@
           "type": "link",
           "text": "참고 PPT: vibe-coding-work-efficiency-opening.pdf (Notion에서 열기)",
           "url": "https://app.notion.com/p/3bc4a8670bd480b19ff2c20c26ce022c"
-        },
-        {
-          "id": "work-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -393,12 +375,6 @@
           "type": "code",
           "language": "markdown",
           "text": "[주제]에 대한 단일 정적 웹페이지를 HTML+CSS로 만들어줘.\n\n요구사항:\n- 결과물은 한 개의 `index.html` 파일로만 구성해줘(외부 라이브러리/프레임워크 없이).\n- `<style>` 태그에 CSS를 포함해서 별도 css 파일을 만들지 말아줘.\n- 반응형으로 만들어줘(모바일/데스크톱 모두 보기 좋게).\n- 깔끔한 타이포그래피와 간단한 컬러 팔레트로 ‘완성된 느낌’이 나게 해줘.\n- 섹션 구성은 다음을 포함해줘:\n  1) 헤더(제목/한 줄 소개)\n  2) 메인 섹션(핵심 기능/내용)\n  3) 보조 섹션(카드 3개 정도의 정보 영역)\n  4) 푸터(연락처/링크 자리표시자)\n- 이미지가 필요하면 실제 파일 대신 CSS 그라데이션/도형으로 대체해줘.\n- 접근성 기본을 지켜줘(적절한 heading 구조, 대비, 버튼/링크 구분).\n\n출력 형식:\n- 최종 답변은 `index.html` 전체 코드만 코드블록으로 제공해줘.\n- 설명은 최소화하고, 주석은 필요한 곳에만 짧게 넣어줘.\n\n그리고 이 파일을 ‘현재 폴더’에 저장할 수 있게 `index.html`로 제공해줘."
-        },
-        {
-          "id": "web-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -494,12 +470,6 @@
           "type": "link",
           "text": "카카오톡 나챗방으로 메시지 받기 강의",
           "url": "https://vibecoding.gqai.kr/lecture/lecture-14"
-        },
-        {
-          "id": "automation-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -786,12 +756,6 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/deploy-13.png"
           }
-        },
-        {
-          "id": "deploy-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -841,12 +805,6 @@
           "id": "music-03",
           "type": "numbered_list",
           "text": "정리한 내용을 Suno에 입력해 음악을 만들고 결과를 공유합니다."
-        },
-        {
-          "id": "music-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -962,12 +920,6 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/skills-03.png"
           }
-        },
-        {
-          "id": "skills-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -1033,12 +985,6 @@
           "id": "share-06",
           "type": "numbered_list",
           "text": "재배포된 GitHub 링크를 단체 대화방에 공유합니다."
-        },
-        {
-          "id": "share-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -1104,12 +1050,6 @@
           "id": "database-05",
           "type": "quote",
           "text": "산출물은 Supabase 테이블 화면 캡처입니다."
-        },
-        {
-          "id": "database-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }
@@ -1176,12 +1116,6 @@
           "id": "crawl-05",
           "type": "numbered_list",
           "text": "본문과 요약 결과를 데이터베이스에 저장합니다."
-        },
-        {
-          "id": "crawl-source",
-          "type": "link",
-          "text": "원문: AI 공부방",
-          "url": "https://app.notion.com/p/3b94a8670bd480d68db0c9f01fd31f05"
         }
       ]
     }

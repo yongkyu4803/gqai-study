@@ -57,7 +57,7 @@ import { getEmptyState, SupabaseRepository } from "@/lib/supabase/repository";
 
 // Bump when the bundled demo curriculum changes so stale browser fixtures do
 // not hide newly shipped lessons.
-const STATE_KEY = "gqai-study-demo-state-v2";
+const STATE_KEY = "gqai-study-demo-state-v3";
 const SESSION_KEY = "gqai-study-demo-session-v2";
 const CREDENTIAL_KEY = "gqai-study-demo-credentials-v2";
 
