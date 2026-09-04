@@ -119,6 +119,16 @@ interface AppContextValue {
 
 const AppContext = createContext<AppContextValue | null>(null);
 
+// Fire-and-forget: assignment notification email is best-effort and must
+// never block or fail the assignment flow itself.
+function notifyAssignmentBatch(batchId: string) {
+  fetch("/api/admin/notifications/assignment-batch", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ batchId }),
+  }).catch(() => undefined);
+}
+
 function toSession(profile: AppState["profiles"][number]): SessionUser {
   return {
     id: profile.id,
@@ -388,6 +398,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         role: "student",
         loginId: input.loginId,
         displayName: input.displayName,
+        email: input.email || undefined,
         mustChangePassword: true,
         isActive: true,
         createdAt: stamp,
@@ -628,6 +639,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (repository) {
         const id = await repository.assign(input);
         await refresh();
+        notifyAssignmentBatch(id);
         return id;
       }
       const result = createAssignmentBatch(state, input, session.id);
@@ -663,6 +675,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const createdCount = next.assignments.filter((item) =>
           batchIds.includes(item.assignmentBatchId),
         ).length;
+        batchIds.forEach(notifyAssignmentBatch);
         return { createdCount, failedCount };
       }
       // Fold sequentially over a local working copy instead of calling the

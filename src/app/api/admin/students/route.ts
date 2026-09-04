@@ -52,6 +52,7 @@ export async function POST(request: Request) {
         role: "student",
         login_id: input.loginId,
         display_name: input.displayName,
+        email: input.email || null,
         must_change_password: true,
         is_active: true,
         created_by: adminUser.id,

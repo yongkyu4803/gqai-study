@@ -39,6 +39,7 @@ export interface Profile {
   role: Role;
   loginId: string;
   displayName: string;
+  email?: string;
   mustChangePassword: boolean;
   isActive: boolean;
   lastLoginAt?: string;
@@ -218,6 +219,7 @@ export interface CreateStudentInput {
   displayName: string;
   loginId: string;
   password: string;
+  email?: string;
   groupIds: string[];
 }
 

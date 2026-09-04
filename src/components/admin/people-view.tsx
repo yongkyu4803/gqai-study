@@ -73,6 +73,7 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
           initialDisplayName={searchParams.get("displayName") || ""}
           initialLoginId={prefillLoginId}
           initialPassword={prefillLoginId ? `${prefillLoginId}A123!` : ""}
+          initialEmail={searchParams.get("email") || ""}
           onCancel={() => router.push("/admin/students")}
           onCreate={async (input) => {
             const id = await createStudent(input);
@@ -214,6 +215,7 @@ function StudentForm({
   initialDisplayName = "",
   initialLoginId = "",
   initialPassword = "",
+  initialEmail = "",
   onCancel,
   onCreate,
 }: {
@@ -221,17 +223,20 @@ function StudentForm({
   initialDisplayName?: string;
   initialLoginId?: string;
   initialPassword?: string;
+  initialEmail?: string;
   onCancel: () => void;
   onCreate: (input: {
     displayName: string;
     loginId: string;
     password: string;
+    email?: string;
     groupIds: string[];
   }) => Promise<void>;
 }) {
   const [displayName, setDisplayName] = useState(initialDisplayName);
   const [loginId, setLoginId] = useState(initialLoginId);
   const [password, setPassword] = useState(initialPassword);
+  const [email, setEmail] = useState(initialEmail);
   const [groupIds, setGroupIds] = useState<string[]>([]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -240,7 +245,7 @@ function StudentForm({
     setPending(true);
     setError("");
     try {
-      await onCreate({ displayName, loginId, password, groupIds });
+      await onCreate({ displayName, loginId, password, email, groupIds });
     } catch (cause) {
       const message =
         cause instanceof Error ? cause.message : "학생을 만들지 못했습니다.";
@@ -271,6 +276,15 @@ function StudentForm({
             required
           />
         </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="studentEmail">이메일 (배정 알림 발송용)</Label>
+        <Input
+          id="studentEmail"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="tempPassword">임시 비밀번호</Label>

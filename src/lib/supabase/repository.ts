@@ -160,6 +160,7 @@ export class SupabaseRepository {
         role: row.role,
         loginId: row.login_id,
         displayName: row.display_name,
+        email: row.email ?? undefined,
         mustChangePassword: row.must_change_password,
         isActive: row.is_active,
         lastLoginAt: row.last_login_at ?? undefined,

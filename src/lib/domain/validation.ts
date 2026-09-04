@@ -23,6 +23,14 @@ export const studentSchema = z.object({
   displayName: z.string().trim().min(1, "학생 이름을 입력하세요.").max(50),
   loginId: loginIdSchema,
   password: passwordSchema,
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("올바른 이메일 주소를 입력하세요.")
+    .max(100)
+    .optional()
+    .or(z.literal("")),
   groupIds: z.array(z.string()),
 });
 

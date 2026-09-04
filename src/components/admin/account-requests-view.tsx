@@ -113,6 +113,7 @@ export function AccountRequestsView() {
                         const params = new URLSearchParams({
                           displayName: item.displayName,
                           loginId: item.requestedLoginId || "",
+                          email: item.contact,
                         });
                         router.push(`/admin/students/new?${params.toString()}`);
                       }}
