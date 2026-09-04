@@ -33,9 +33,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useApp } from "@/components/providers/app-provider";
+import { isPublicPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
-const publicPaths = new Set(["/", "/login", "/forbidden", "/request-access"]);
 const adminNav = [
   {
     href: "/admin",
@@ -249,7 +249,7 @@ export function ApplicationFrame({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { ready, session } = useApp();
-  const isPublic = publicPaths.has(pathname);
+  const isPublic = isPublicPath(pathname);
   useEffect(() => {
     if (!ready || isPublic) return;
     if (!session) {

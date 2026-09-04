@@ -149,6 +149,8 @@ export function RequestAccessView() {
   const [loginId, setLoginId] = useState("");
   const [contact, setContact] = useState("");
   const [note, setNote] = useState("");
+  // Honeypot — hidden from people, filled only by form-stuffing bots.
+  const [website, setWebsite] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
@@ -160,7 +162,7 @@ export function RequestAccessView() {
       const response = await fetch("/api/account-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName, loginId, contact, note }),
+        body: JSON.stringify({ displayName, loginId, contact, note, website }),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -242,6 +244,21 @@ export function RequestAccessView() {
                     onChange={(e) => setContact(e.target.value)}
                     placeholder="학습 알림을 받을 이메일 주소"
                     required
+                  />
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}
+                >
+                  <label htmlFor="requestWebsite">Website</label>
+                  <input
+                    id="requestWebsite"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">

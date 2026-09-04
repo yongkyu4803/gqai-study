@@ -3,10 +3,47 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { accountRequestSchema } from "@/lib/domain/validation";
 import { sendAndLogEmail } from "@/lib/server/email";
 
+const ENDPOINT = "account-requests";
+const WINDOW_MINUTES = 10;
+const MAX_HITS_PER_WINDOW = 5;
+
+function clientIp(request: Request) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  return (
+    forwarded?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request: Request) {
   try {
-    const input = accountRequestSchema.parse(await request.json());
+    const raw = (await request.json()) as Record<string, unknown>;
+    // Honeypot: real users never see or fill this field. Bots that do get a
+    // convincing success response and nothing is stored or emailed.
+    if (typeof raw.website === "string" && raw.website.trim()) {
+      return NextResponse.json({ ok: true }, { status: 201 });
+    }
+    const input = accountRequestSchema.parse(raw);
     const admin = createSupabaseAdminClient();
+    const ip = clientIp(request);
+
+    const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
+    const { count: recentHits } = await admin
+      .from("gqai_aistudy_public_request_hits")
+      .select("id", { count: "exact", head: true })
+      .eq("endpoint", ENDPOINT)
+      .eq("ip", ip)
+      .gte("created_at", since);
+    if ((recentHits ?? 0) >= MAX_HITS_PER_WINDOW) {
+      return NextResponse.json(
+        { error: "요청이 너무 많습니다. 잠시 후 다시 시도하세요." },
+        { status: 429 },
+      );
+    }
+    await admin
+      .from("gqai_aistudy_public_request_hits")
+      .insert({ ip, endpoint: ENDPOINT });
 
     const { data: existingRequest } = await admin
       .from("gqai_aistudy_account_requests")
