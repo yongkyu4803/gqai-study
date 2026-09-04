@@ -35,7 +35,11 @@ export async function POST(request: Request) {
       note: input.note || null,
     });
     if (error) throw error;
-    notifyAdminOfNewRequest(input).catch(() => undefined);
+    // Awaited (not fire-and-forget): a detached promise can be cut off once
+    // the response is sent, before the serverless function finishes it.
+    await notifyAdminOfNewRequest(input).catch((cause) =>
+      console.error("[account-requests] admin notify threw", cause),
+    );
     return NextResponse.json({ ok: true }, { status: 201 });
   } catch (error) {
     const validation = error instanceof Error && error.name === "ZodError";
