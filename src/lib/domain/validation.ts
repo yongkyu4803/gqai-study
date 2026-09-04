@@ -29,7 +29,12 @@ export const studentSchema = z.object({
 export const accountRequestSchema = z.object({
   displayName: z.string().trim().min(1, "이름을 입력하세요.").max(50),
   loginId: loginIdSchema,
-  contact: z.string().trim().min(1, "연락처를 입력하세요.").max(100),
+  contact: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email("올바른 이메일 주소를 입력하세요.")
+    .max(100),
   note: z.string().trim().max(300).optional(),
 });
 

@@ -194,7 +194,7 @@ export function RequestAccessView() {
               계정 발급 요청
             </CardTitle>
             <CardDescription>
-              이름, 사용할 아이디와 연락처를 남기면 강사가 확인 후 계정을 만들어 전달합니다.
+              이름, 사용할 아이디와 이메일을 남기면 강사가 확인 후 계정을 만들어 전달합니다.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -234,12 +234,13 @@ export function RequestAccessView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="requestContact">연락처</Label>
+                  <Label htmlFor="requestContact">이메일</Label>
                   <Input
                     id="requestContact"
+                    type="email"
                     value={contact}
                     onChange={(e) => setContact(e.target.value)}
-                    placeholder="이메일 또는 전화번호"
+                    placeholder="학습 알림을 받을 이메일 주소"
                     required
                   />
                 </div>
