@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   ArrowRight,
-  Clock3,
   FileText,
   MessageSquareText,
   Send,
@@ -997,7 +996,7 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
 }
 
 export function SettingsView() {
-  const { mode, state, resetDemo } = useApp();
+  const { mode, resetDemo } = useApp();
   const [emailStatus, setEmailStatus] = useState<{
     hasApiKey: boolean;
     domainVerified: boolean;
@@ -1098,58 +1097,10 @@ export function SettingsView() {
           )}
         </CardContent>
       </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">향후 기능 위치</CardTitle>
-          <CardDescription>
-            기능 구현이나 외부 API 호출 없이 위치만 확보했습니다.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-2">
-          {state.featureFlags.map((flag) => (
-            <div key={flag.key} className="rounded-lg border p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">{flag.key}</p>
-                <Badge variant="secondary">꺼짐</Badge>
-              </div>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {flag.description}
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
     </div>
   );
 }
 
-export function FutureSlotView({ kind }: { kind: "schedule" | "payments" }) {
-  return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <PageHeader
-        eyebrow="향후 확장"
-        title={kind === "schedule" ? "일정 관리" : "결제 관리"}
-        description="MVP에서는 기능을 구현하지 않고 안전한 연결 위치만 확보했습니다."
-      />
-      <Alert>
-        <Clock3 className="size-4" />
-        <AlertTitle>준비 중</AlertTitle>
-        <AlertDescription>
-          {kind === "schedule"
-            ? "캘린더, 출석, 리마인더 API는 연결되어 있지 않습니다."
-            : "결제사 SDK, 거래, 환불 데이터는 생성하지 않습니다."}
-        </AlertDescription>
-      </Alert>
-      <Button
-        variant="outline"
-        render={<Link href="/admin/settings" />}
-        className="w-full"
-      >
-        설정으로 돌아가기
-      </Button>
-    </div>
-  );
-}
 
 function Summary({ label, value }: { label: string; value: string }) {
   return (

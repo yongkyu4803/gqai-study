@@ -8,7 +8,8 @@ export type EmailKind =
   | "account_request"
   | "feedback"
   | "submission"
-  | "account_created";
+  | "account_created"
+  | "password_reset";
 
 export async function sendAndLogEmail(params: {
   admin: SupabaseClient;

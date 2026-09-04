@@ -1218,28 +1218,6 @@ export function AccountView() {
   );
 }
 
-export function NotificationsSlotView() {
-  return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <PageHeader
-        eyebrow="향후 확장"
-        title="알림"
-        description="실제 알림 발송 없이 화면 위치와 도메인 이벤트만 준비했습니다."
-      />
-      <Alert>
-        <MessageSquareText className="size-4" />
-        <AlertTitle>준비 중</AlertTitle>
-        <AlertDescription>
-          이메일, 문자, 카카오 알림 API는 연결되어 있지 않습니다. 현재 새
-          피드백은 학습 카드와 피드백 화면에서 확인합니다.
-        </AlertDescription>
-      </Alert>
-      <Button render={<Link href="/learn" />} className="w-full">
-        내 학습으로
-      </Button>
-    </div>
-  );
-}
 
 function SubmissionItemView({ item }: { item: SubmissionItem }) {
   if (item.type === "text")
