@@ -26,7 +26,8 @@ export async function proxy(request: NextRequest) {
   const publicPath =
     request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname === "/login" ||
-    request.nextUrl.pathname === "/forbidden";
+    request.nextUrl.pathname === "/forbidden" ||
+    request.nextUrl.pathname === "/request-access";
   if (!user && !publicPath) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
