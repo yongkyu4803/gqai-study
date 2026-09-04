@@ -58,7 +58,15 @@ export async function POST(request: Request) {
         }),
       ),
     );
-    const sent = results.filter((result) => result.status === "fulfilled").length;
+    let sent = 0;
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled" && !result.value.error) {
+        sent += 1;
+      } else {
+        const reason = result.status === "fulfilled" ? result.value.error : result.reason;
+        console.error("[assignment-batch] notify failed", recipients[index].email, reason);
+      }
+    });
     return NextResponse.json({ sent, total: recipients.length });
   } catch (error) {
     return NextResponse.json(

@@ -13,7 +13,7 @@ async function notifyAdminOfNewRequest(input: {
   const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
   if (!apiKey || !adminEmail) return;
   const resend = new Resend(apiKey);
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: process.env.RESEND_FROM_ADDRESS || "GQAI Study <onboarding@resend.dev>",
     to: adminEmail,
     subject: `[GQAI Study] 새 계정 발급 요청: ${input.displayName}`,
@@ -21,6 +21,7 @@ async function notifyAdminOfNewRequest(input: {
       input.note ? `\n메모: ${input.note}` : ""
     }\n\n관리자 화면의 "계정 요청"에서 확인하세요.`,
   });
+  if (error) console.error("[account-requests] admin notify failed", error);
 }
 
 export async function POST(request: Request) {
