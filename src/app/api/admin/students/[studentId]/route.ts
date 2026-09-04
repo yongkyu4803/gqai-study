@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { adminGuardStatus, requireAdmin } from "@/lib/supabase/auth-guard";
-import { passwordSchema } from "@/lib/domain/validation";
+import { emailSchema, passwordSchema } from "@/lib/domain/validation";
 
 const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("reset_password"), password: passwordSchema }),
   z.object({ action: z.literal("set_active"), isActive: z.boolean() }),
+  z.object({ action: z.literal("set_email"), email: emailSchema.or(z.literal("")) }),
 ]);
 
 export async function PATCH(
@@ -28,7 +29,20 @@ export async function PATCH(
         { error: "학생을 찾을 수 없습니다." },
         { status: 404 },
       );
-    if (input.action === "reset_password") {
+    if (input.action === "set_email") {
+      const { error } = await admin
+        .from("gqai_aistudy_profiles")
+        .update({ email: input.email || null })
+        .eq("id", studentId);
+      if (error) throw error;
+      await admin.from("gqai_aistudy_activity_events").insert({
+        event_name: "student.email_updated",
+        actor_id: adminUser.id,
+        student_id: studentId,
+        entity_type: "student",
+        entity_id: studentId,
+      });
+    } else if (input.action === "reset_password") {
       const { error } = await admin.auth.admin.updateUserById(studentId, {
         password: input.password,
       });

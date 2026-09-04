@@ -19,6 +19,13 @@ export const passwordSchema = z
   .regex(/[A-Za-z]/, "영문자를 한 글자 이상 포함하세요.")
   .regex(/[0-9]/, "숫자를 한 글자 이상 포함하세요.");
 
+export const emailSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .email("올바른 이메일 주소를 입력하세요.")
+  .max(100);
+
 export const studentSchema = z.object({
   displayName: z.string().trim().min(1, "학생 이름을 입력하세요.").max(50),
   loginId: loginIdSchema,

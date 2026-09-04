@@ -1068,11 +1068,30 @@ export function AllFeedbackView() {
 }
 
 export function AccountView() {
-  const { session, changePassword } = useApp();
+  const { session, state, changePassword, updateMyEmail } = useApp();
+  const currentEmail =
+    state.profiles.find((item) => item.id === session?.id)?.email ?? "";
+  const [email, setEmail] = useState(currentEmail);
+  const [emailPending, setEmailPending] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  async function saveEmail() {
+    setEmailPending(true);
+    setEmailError("");
+    try {
+      await updateMyEmail(email);
+      toast.success("이메일을 저장했습니다.");
+    } catch (cause) {
+      setEmailError(
+        cause instanceof Error ? cause.message : "이메일을 저장하지 못했습니다.",
+      );
+    } finally {
+      setEmailPending(false);
+    }
+  }
   async function change() {
     if (password !== confirm) {
       setError("비밀번호 확인이 일치하지 않습니다. 두 입력값을 확인해 주세요.");
@@ -1107,6 +1126,44 @@ export function AccountView() {
         <CardContent className="space-y-3">
           <Info label="이름" value={session?.displayName ?? "—"} />
           <Info label="아이디" value={session?.loginId ?? "—"} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">알림 이메일</CardTitle>
+          <CardDescription>
+            새 학습 카드가 배정되거나 피드백이 도착하면 이 주소로 알려드립니다.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="space-y-2">
+            <Label htmlFor="account-email">이메일</Label>
+            <Input
+              id="account-email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              aria-invalid={Boolean(emailError)}
+              aria-describedby={emailError ? "account-email-error" : undefined}
+            />
+          </div>
+          {emailError ? (
+            <InlineMessage
+              id="account-email-error"
+              kind="error"
+              title="이메일을 저장하지 못했습니다"
+              description={emailError}
+            />
+          ) : null}
+          <Button
+            className="w-full"
+            onClick={saveEmail}
+            disabled={emailPending || email.trim() === currentEmail}
+            aria-busy={emailPending}
+          >
+            {emailPending ? "저장 중…" : "저장"}
+          </Button>
         </CardContent>
       </Card>
       <Card>

@@ -350,12 +350,19 @@ function StudentForm({
 }
 
 export function StudentDetailView({ studentId }: { studentId: string }) {
-  const { state, resetStudentPassword, toggleStudentActive, assignMany } =
-    useApp();
+  const {
+    state,
+    resetStudentPassword,
+    toggleStudentActive,
+    updateStudentEmail,
+    assignMany,
+  } = useApp();
   const student = state.profiles.find(
     (item) => item.id === studentId && item.role === "student",
   );
   const [password, setPassword] = useState("");
+  const [emailDraft, setEmailDraft] = useState<string | null>(null);
+  const [emailPending, setEmailPending] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [showAssignDialog, setShowAssignDialog] = useState(false);
@@ -564,6 +571,64 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <Row label="아이디" value={student.loginId} />
+              <div className="border-b py-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-muted-foreground">이메일</span>
+                  {emailDraft === null ? (
+                    <button
+                      type="button"
+                      className="text-right underline-offset-4 hover:underline"
+                      onClick={() => setEmailDraft(student.email ?? "")}
+                    >
+                      {student.email ?? "미등록 · 알림 못 받음"}
+                    </button>
+                  ) : null}
+                </div>
+                {emailDraft !== null ? (
+                  <form
+                    className="mt-2 flex gap-2"
+                    onSubmit={async (event) => {
+                      event.preventDefault();
+                      setEmailPending(true);
+                      setError("");
+                      try {
+                        await updateStudentEmail(currentStudentId, emailDraft);
+                        setEmailDraft(null);
+                        toast.success("이메일을 저장했습니다.");
+                      } catch (cause) {
+                        setError(
+                          cause instanceof Error
+                            ? cause.message
+                            : "이메일을 저장하지 못했습니다.",
+                        );
+                      } finally {
+                        setEmailPending(false);
+                      }
+                    }}
+                  >
+                    <Input
+                      type="email"
+                      value={emailDraft}
+                      onChange={(e) => setEmailDraft(e.target.value)}
+                      placeholder="알림을 받을 이메일"
+                      autoFocus
+                      disabled={emailPending}
+                    />
+                    <Button type="submit" size="sm" disabled={emailPending}>
+                      저장
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setEmailDraft(null)}
+                      disabled={emailPending}
+                    >
+                      취소
+                    </Button>
+                  </form>
+                ) : null}
+              </div>
               <Row
                 label="마지막 로그인"
                 value={formatDate(student.lastLoginAt, true)}

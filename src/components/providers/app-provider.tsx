@@ -41,6 +41,7 @@ import type {
   SubmissionDraftInput,
 } from "@/lib/domain/types";
 import {
+  emailSchema,
   groupSchema,
   loginIdSchema,
   passwordSchema,
@@ -84,6 +85,8 @@ interface AppContextValue {
   createStudent: (input: CreateStudentInput) => Promise<string>;
   resetStudentPassword: (studentId: string, password: string) => Promise<void>;
   toggleStudentActive: (studentId: string) => Promise<void>;
+  updateStudentEmail: (studentId: string, email: string) => Promise<void>;
+  updateMyEmail: (email: string) => Promise<void>;
   createGroup: (input: CreateGroupInput) => Promise<string>;
   updateGroup: (groupId: string, input: CreateGroupInput) => Promise<void>;
   archiveGroup: (groupId: string) => Promise<void>;
@@ -539,6 +542,57 @@ export function AppProvider({ children }: { children: ReactNode }) {
       commitDemo(next);
     },
     [commitDemo, mode, refresh, session, state],
+  );
+
+  const updateStudentEmail = useCallback(
+    async (studentId: string, email: string) => {
+      const normalized = email.trim() ? emailSchema.parse(email) : "";
+      if (!session || session.role !== "admin")
+        throw new Error("관리자 권한이 필요합니다.");
+      if (mode === "supabase") {
+        const response = await fetch(`/api/admin/students/${studentId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "set_email", email: normalized }),
+        });
+        const result = (await response.json()) as { error?: string };
+        if (!response.ok)
+          throw new Error(result.error ?? "이메일을 저장하지 못했습니다.");
+        await refresh();
+        return;
+      }
+      const next = structuredClone(state);
+      const target = next.profiles.find((item) => item.id === studentId);
+      if (!target) throw new Error("학생을 찾을 수 없습니다.");
+      target.email = normalized || undefined;
+      setState(next);
+      persistDemo(next);
+    },
+    [mode, persistDemo, refresh, session, state],
+  );
+
+  const updateMyEmail = useCallback(
+    async (email: string) => {
+      const normalized = email.trim() ? emailSchema.parse(email) : "";
+      if (!session) throw new Error("로그인이 필요합니다.");
+      if (mode === "supabase") {
+        if (!supabase) throw new Error("Supabase 연결 정보가 없습니다.");
+        const { error } = await supabase
+          .from("gqai_aistudy_profiles")
+          .update({ email: normalized || null })
+          .eq("id", session.id);
+        if (error) throw new Error(error.message);
+        await refresh();
+        return;
+      }
+      const next = structuredClone(state);
+      const target = next.profiles.find((item) => item.id === session.id);
+      if (!target) throw new Error("프로필을 찾을 수 없습니다.");
+      target.email = normalized || undefined;
+      setState(next);
+      persistDemo(next);
+    },
+    [mode, persistDemo, refresh, session, state, supabase],
   );
 
   const createGroup = useCallback(
@@ -1074,6 +1128,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createStudent,
       resetStudentPassword,
       toggleStudentActive,
+      updateMyEmail,
+      updateStudentEmail,
       createGroup,
       updateGroup,
       archiveGroup,
@@ -1127,6 +1183,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       state,
       submitAssignment,
       toggleStudentActive,
+      updateMyEmail,
+      updateStudentEmail,
       updateGroup,
       updateLearning,
       uploadFile,
