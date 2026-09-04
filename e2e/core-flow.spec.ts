@@ -31,6 +31,20 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
   expect(imageResponse.status()).toBe(200);
   expect(imageResponse.headers()["content-type"]).toBe("image/png");
 
+  await page.goto("/admin/modules/module-skills/preview");
+  const skillImages = page.getByRole("article").locator("img");
+  await expect(skillImages).toHaveCount(3);
+  await expect
+    .poll(async () =>
+      skillImages.evaluateAll((images) =>
+        images.every(
+          (image) =>
+            image instanceof HTMLImageElement && image.naturalWidth > 0,
+        ),
+      ),
+    )
+    .toBe(true);
+
   await page.goto("/admin/modules/new");
   await page.getByRole("button", { name: "빈 초안 만들기" }).click();
   await expect(page).toHaveURL(/\/admin\/modules\/.+\/edit/);

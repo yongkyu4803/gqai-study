@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -53,7 +54,11 @@ import {
   createSupabaseBrowserClient,
   isSupabaseConfigured,
 } from "@/lib/supabase/client";
-import { getEmptyState, SupabaseRepository } from "@/lib/supabase/repository";
+import {
+  getEmptyState,
+  SIGNED_ASSET_URL_REFRESH_INTERVAL_MS,
+  SupabaseRepository,
+} from "@/lib/supabase/repository";
 
 // Bump when the bundled demo curriculum changes so stale browser fixtures do
 // not hide newly shipped lessons.
@@ -180,6 +185,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [credentials, setCredentials] =
     useState<Record<string, string>>(demoCredentials);
   const [ready, setReady] = useState(false);
+  const lastSupabaseRefreshAtRef = useRef(0);
+  const scheduledRefreshInFlightRef = useRef(false);
 
   const persistDemo = useCallback(
     (
@@ -214,6 +221,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const profile = next.profiles.find((item) => item.id === user.id);
     if (!profile) throw new Error("프로필 정보를 찾을 수 없습니다.");
     setSession(toSession(profile));
+    lastSupabaseRefreshAtRef.current = Date.now();
   }, [repository, supabase]);
 
   useEffect(() => {
@@ -247,6 +255,47 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
     return () => {
       active = false;
+    };
+  }, [mode, refresh]);
+
+  useEffect(() => {
+    if (mode !== "supabase") return;
+
+    const refreshSignedAssetUrlsIfNeeded = () => {
+      if (
+        document.visibilityState !== "visible" ||
+        scheduledRefreshInFlightRef.current ||
+        Date.now() - lastSupabaseRefreshAtRef.current <
+          SIGNED_ASSET_URL_REFRESH_INTERVAL_MS
+      ) {
+        return;
+      }
+
+      scheduledRefreshInFlightRef.current = true;
+      void refresh()
+        .catch(() => undefined)
+        .finally(() => {
+          scheduledRefreshInFlightRef.current = false;
+        });
+    };
+
+    const intervalId = window.setInterval(
+      refreshSignedAssetUrlsIfNeeded,
+      SIGNED_ASSET_URL_REFRESH_INTERVAL_MS,
+    );
+    window.addEventListener("focus", refreshSignedAssetUrlsIfNeeded);
+    document.addEventListener(
+      "visibilitychange",
+      refreshSignedAssetUrlsIfNeeded,
+    );
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", refreshSignedAssetUrlsIfNeeded);
+      document.removeEventListener(
+        "visibilitychange",
+        refreshSignedAssetUrlsIfNeeded,
+      );
     };
   }, [mode, refresh]);
 
@@ -306,6 +355,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut();
         throw new Error("사용할 수 없는 계정입니다. 강사에게 문의하세요.");
       }
+      lastSupabaseRefreshAtRef.current = Date.now();
       const nextSession = toSession(profile);
       setState(nextState);
       setSession(nextSession);
@@ -672,6 +722,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
         const next = await repository.loadState();
         setState(next);
+        lastSupabaseRefreshAtRef.current = Date.now();
         const createdCount = next.assignments.filter((item) =>
           batchIds.includes(item.assignmentBatchId),
         ).length;

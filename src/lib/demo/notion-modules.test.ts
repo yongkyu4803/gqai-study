@@ -49,6 +49,21 @@ describe("Notion 강의 모듈 seed", () => {
     }
   });
 
+  it("스킬 익히기 설정 이미지 3개를 모두 제공한다", () => {
+    const lesson = modules.find(
+      (module) => module.snapshot.title === "스킬 익히기",
+    );
+    const images = lesson?.snapshot.blocks.filter(
+      (block) => block.type === "image",
+    );
+
+    expect(images?.map((image) => image.asset?.name)).toEqual([
+      "skills-01.png",
+      "skills-02.png",
+      "skills-03.png",
+    ]);
+  });
+
   it("상대 경로 위장이나 외부 프로토콜을 번들 자산으로 허용하지 않는다", () => {
     expect(
       isBundledModuleAssetUrl("/api/module-assets/notion/../secret.png"),

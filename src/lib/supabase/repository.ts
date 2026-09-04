@@ -28,6 +28,11 @@ const emptyState: AppState = {
   featureFlags: [],
 };
 
+// Renew private asset links before they expire so an already-open lesson does
+// not degrade into broken images during a long study session.
+export const SIGNED_ASSET_URL_TTL_SECONDS = 60 * 60;
+export const SIGNED_ASSET_URL_REFRESH_INTERVAL_MS = 50 * 60 * 1000;
+
 function snapshotFromTemplate(row: Row): ModuleSnapshot {
   return {
     title: row.title ?? "제목 없음",
@@ -322,14 +327,38 @@ export class SupabaseRepository {
           assets.push({ bucket: "gqai-aistudy-feedback-assets", asset });
       }
     }
+
+    const uniqueAssets = new Map<
+      string,
+      {
+        bucket: (typeof assets)[number]["bucket"];
+        storagePath: string;
+        assets: FileAsset[];
+      }
+    >();
+    for (const { bucket, asset } of assets) {
+      const storagePath = asset.storagePath!;
+      const key = `${bucket}:${storagePath}`;
+      const existing = uniqueAssets.get(key);
+      if (existing) {
+        existing.assets.push(asset);
+      } else {
+        uniqueAssets.set(key, { bucket, storagePath, assets: [asset] });
+      }
+    }
     await Promise.all(
-      assets.map(async ({ bucket, asset }) => {
-        try {
-          asset.url = await this.getSignedUrl(bucket, asset.storagePath!);
-        } catch {
-          // The UI still shows metadata when a missing file or RLS blocks access.
-        }
-      }),
+      Array.from(uniqueAssets.values()).map(
+        async ({ bucket, storagePath, assets: matchingAssets }) => {
+          try {
+            const url = await this.getSignedUrl(bucket, storagePath);
+            matchingAssets.forEach((asset) => {
+              asset.url = url;
+            });
+          } catch {
+            // The UI still shows metadata when a missing file or RLS blocks access.
+          }
+        },
+      ),
     );
     return state;
   }
@@ -582,7 +611,7 @@ export class SupabaseRepository {
   ) {
     const { data, error } = await this.client.storage
       .from(bucket)
-      .createSignedUrl(path, 300);
+      .createSignedUrl(path, SIGNED_ASSET_URL_TTL_SECONDS);
     assertOk(error);
     if (!data) throw new Error("서명 URL을 만들지 못했습니다.");
     return data.signedUrl;
