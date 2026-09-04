@@ -18,6 +18,21 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
 
   await page.goto("/admin/modules");
   await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(11);
+  const moduleSequenceBadges = page.getByLabel(/관리자용 모듈 순서 \d+번/);
+  await expect(moduleSequenceBadges).toHaveCount(11);
+  await expect(moduleSequenceBadges).toHaveText([
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+  ]);
   await expect(page.getByText("웹크롤링", { exact: true })).toBeVisible();
   await page.goto("/admin/modules/module-tools/preview");
   const lessonPreview = page.getByRole("article");
@@ -99,6 +114,7 @@ test("학생이 학습·재제출하고 다른 학생 카드는 볼 수 없다",
   await expect(
     page.getByRole("heading", { name: "김민지님의 학습" }),
   ).toBeVisible();
+  await expect(page.getByLabel(/관리자용 모듈 순서/)).toHaveCount(0);
 
   await page.goto("/learn/assignment-ai-junho");
   await expect(page.getByText("학습 카드를 열 수 없습니다")).toBeVisible();

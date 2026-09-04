@@ -51,6 +51,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  compareAdminModules,
+  formatAdminModuleSequence,
+  getAdminModuleSequence,
+} from "@/lib/admin/module-order";
 import { formatDate } from "@/lib/domain/status";
 import { newContentBlock } from "@/lib/domain/operations";
 import type {
@@ -125,15 +130,17 @@ export function ModulesListView() {
   );
   const modules = useMemo(
     () =>
-      state.modules.filter(
-        (item) =>
-          `${item.draft.title} ${item.draft.category} ${item.draft.tags.join(" ")}`
-            .toLowerCase()
-            .includes(query.toLowerCase()) &&
-          (status === "all" || item.status === status) &&
-          (category === "all" || item.draft.category === category) &&
-          (difficulty === "all" || item.draft.difficulty === difficulty),
-      ),
+      state.modules
+        .filter(
+          (item) =>
+            `${item.draft.title} ${item.draft.category} ${item.draft.tags.join(" ")}`
+              .toLowerCase()
+              .includes(query.toLowerCase()) &&
+            (status === "all" || item.status === status) &&
+            (category === "all" || item.draft.category === category) &&
+            (difficulty === "all" || item.draft.difficulty === difficulty),
+        )
+        .sort(compareAdminModules),
     [category, difficulty, query, state.modules, status],
   );
   async function create() {
@@ -272,11 +279,22 @@ export function ModulesListView() {
             const count = state.versions.filter(
               (version) => version.moduleTemplateId === module.id,
             ).length;
+            const sequence = getAdminModuleSequence(module.draft.title);
             return (
               <Card key={module.id} className="flex flex-col">
                 <CardHeader>
-                  <div className="mb-2 flex items-center justify-between">
-                    <StatusBadge value={module.status} kind="module" />
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      {sequence ? (
+                        <span
+                          className="inline-flex h-6 min-w-8 items-center justify-center rounded-full border border-primary/25 bg-primary/10 px-2 text-xs font-semibold tabular-nums text-primary"
+                          aria-label={`관리자용 모듈 순서 ${sequence}번`}
+                        >
+                          {formatAdminModuleSequence(sequence)}
+                        </span>
+                      ) : null}
+                      <StatusBadge value={module.status} kind="module" />
+                    </div>
                     <span className="text-xs text-muted-foreground">
                       버전 {count}개
                     </span>

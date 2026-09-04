@@ -41,6 +41,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  compareAdminModules,
+  formatAdminModuleTitle,
+} from "@/lib/admin/module-order";
 import { formatDate } from "@/lib/domain/status";
 
 export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
@@ -376,9 +380,9 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
   );
   const currentStudentId = student.id;
   const studentWasActive = student.isActive;
-  const activeModules = state.modules.filter(
-    (item) => item.status === "active" && item.currentVersionId,
-  );
+  const activeModules = state.modules
+    .filter((item) => item.status === "active" && item.currentVersionId)
+    .sort(compareAdminModules);
   function hasOpenAssignmentForModule(moduleVersionId: string) {
     return assignments.some(
       (item) =>
@@ -640,7 +644,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                     />
                     <span className="min-w-0 flex-1">
                       <span className="block [overflow-wrap:anywhere]">
-                        {module.draft.title}
+                        {formatAdminModuleTitle(module.draft.title)}
                       </span>
                       {alreadyOpen ? (
                         <span className="block text-xs font-medium text-foreground">
@@ -879,9 +883,9 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
       !earliest || item.createdAt < earliest ? item.createdAt : earliest,
     null,
   );
-  const activeModules = state.modules.filter(
-    (item) => item.status === "active" && item.currentVersionId,
-  );
+  const activeModules = state.modules
+    .filter((item) => item.status === "active" && item.currentVersionId)
+    .sort(compareAdminModules);
   function openCountForBatch(batchId: string) {
     return state.assignments.filter(
       (item) =>
@@ -1327,7 +1331,7 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
                       />
                       <span className="min-w-0 flex-1">
                         <span className="block [overflow-wrap:anywhere]">
-                          {module.draft.title}
+                          {formatAdminModuleTitle(module.draft.title)}
                         </span>
                         {alreadyOpen ? (
                           <span className="block text-xs font-medium text-foreground">

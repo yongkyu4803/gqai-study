@@ -35,6 +35,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  compareAdminModules,
+  formatAdminModuleTitle,
+} from "@/lib/admin/module-order";
+import {
   assignmentStatusLabel,
   feedbackKindLabel,
   formatDate,
@@ -214,9 +218,9 @@ export function AssignmentsView({
             onChange={(event) => setModuleFilter(event.target.value)}
           >
             <option value="all">모든 모듈</option>
-            {state.modules.map((module) => (
+            {[...state.modules].sort(compareAdminModules).map((module) => (
               <option key={module.id} value={module.id}>
-                {module.draft.title}
+                {formatAdminModuleTitle(module.draft.title)}
               </option>
             ))}
           </select>
