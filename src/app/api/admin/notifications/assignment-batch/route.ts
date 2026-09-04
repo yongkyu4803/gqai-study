@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
 import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { adminGuardStatus, requireAdmin } from "@/lib/supabase/auth-guard";
+import { sendAndLogEmail } from "@/lib/server/email";
 
 const bodySchema = z.object({ batchId: z.string().uuid() });
 
@@ -10,10 +10,8 @@ export async function POST(request: Request) {
   try {
     await requireAdmin();
     const { batchId } = bodySchema.parse(await request.json());
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) return NextResponse.json({ sent: 0, skipped: "no_provider" });
-
     const admin = createSupabaseAdminClient();
+
     const { data: batch, error: batchError } = await admin
       .from("gqai_aistudy_assignment_batches")
       .select("module_version_id, common_instruction")
@@ -39,34 +37,29 @@ export async function POST(request: Request) {
 
     const { data: recipients, error: profileError } = await admin
       .from("gqai_aistudy_profiles")
-      .select("email, display_name")
+      .select("id, email, display_name")
       .in("id", studentIds)
       .not("email", "is", null);
     if (profileError) throw profileError;
     if (!recipients?.length) return NextResponse.json({ sent: 0, skipped: "no_email" });
 
-    const resend = new Resend(apiKey);
-    const results = await Promise.allSettled(
+    const subject = `[GQAI Study] 새 학습 카드가 배정되었습니다: ${version.title_snapshot}`;
+    const results = await Promise.all(
       recipients.map((recipient) =>
-        resend.emails.send({
-          from: process.env.RESEND_FROM_ADDRESS || "GQAI Study <onboarding@resend.dev>",
+        sendAndLogEmail({
+          admin,
+          kind: "assignment",
           to: recipient.email as string,
-          subject: `[GQAI Study] 새 학습 카드가 배정되었습니다: ${version.title_snapshot}`,
+          subject,
           text: `${recipient.display_name}님, "${version.title_snapshot}" 학습 카드가 배정되었습니다.${
             batch.common_instruction ? `\n\n안내: ${batch.common_instruction}` : ""
           }\n\n로그인 후 확인해주세요.`,
+          studentId: recipient.id,
+          relatedId: batchId,
         }),
       ),
     );
-    let sent = 0;
-    results.forEach((result, index) => {
-      if (result.status === "fulfilled" && !result.value.error) {
-        sent += 1;
-      } else {
-        const reason = result.status === "fulfilled" ? result.value.error : result.reason;
-        console.error("[assignment-batch] notify failed", recipients[index].email, reason);
-      }
-    });
+    const sent = results.filter(Boolean).length;
     return NextResponse.json({ sent, total: recipients.length });
   } catch (error) {
     return NextResponse.json(

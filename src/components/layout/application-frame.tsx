@@ -12,6 +12,7 @@ import {
   Home,
   Layers3,
   LogOut,
+  Mail,
   Menu,
   MessageSquareText,
   Settings,
@@ -67,6 +68,11 @@ const adminNav = [
     label: "검토 대기함",
     icon: CheckSquare,
     gqaiIcon: "status-warning",
+  },
+  {
+    href: "/admin/notifications/log",
+    label: "발송 로그",
+    icon: Mail,
   },
   {
     href: "/admin/account",

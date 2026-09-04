@@ -134,6 +134,14 @@ function notifyAssignmentBatch(batchId: string) {
   }).catch(() => undefined);
 }
 
+function notifyFeedbackMessage(messageId: string) {
+  fetch("/api/admin/notifications/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messageId }),
+  }).catch(() => undefined);
+}
+
 function toSession(profile: AppState["profiles"][number]): SessionUser {
   return {
     id: profile.id,
@@ -998,6 +1006,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (repository) {
         const id = await repository.createFeedback(input);
         await refresh();
+        if (session.role === "admin") notifyFeedbackMessage(id);
         return id;
       }
       const result = createFeedbackState(state, input, session.id);
