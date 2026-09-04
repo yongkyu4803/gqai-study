@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- private signed/blob asset URLs are dynamic and short-lived */
 
 import Link from "next/link";
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   ArrowRight,
   Clock3,
@@ -998,6 +998,18 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
 
 export function SettingsView() {
   const { mode, state, resetDemo } = useApp();
+  const [emailStatus, setEmailStatus] = useState<{
+    hasApiKey: boolean;
+    domainVerified: boolean;
+    fromAddress: string | null;
+  } | null>(null);
+  useEffect(() => {
+    async function load() {
+      const response = await fetch("/api/admin/settings/email-status");
+      if (response.ok) setEmailStatus(await response.json());
+    }
+    load();
+  }, []);
   return (
     <div className="space-y-7">
       <PageHeader
@@ -1041,6 +1053,49 @@ export function SettingsView() {
               </Badge>
             )}
           </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">이메일 발송</CardTitle>
+          <CardDescription>
+            배정·피드백·계정 요청 알림 메일이 나가는 발신 상태입니다.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {emailStatus === null ? null : !emailStatus.hasApiKey ? (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                발송 서비스가 연결되지 않아 알림 메일이 나가지 않습니다.
+              </p>
+              <Badge variant="secondary">미연결</Badge>
+            </div>
+          ) : !emailStatus.domainVerified ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">테스트 발신 주소 사용 중</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  발신 도메인을 인증하기 전까지는 관리자 본인 이메일로만 실제
+                  전송됩니다. 학생에게 보내려면 발신 도메인 인증 후
+                  RESEND_FROM_ADDRESS를 설정하세요.
+                </p>
+              </div>
+              <Badge variant="secondary">미인증</Badge>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {emailStatus.fromAddress}에서 발송됩니다.
+              </p>
+              <Badge>
+                <span
+                  aria-hidden="true"
+                  className="size-1.5 rounded-full bg-foreground"
+                />
+                인증됨
+              </Badge>
+            </div>
+          )}
         </CardContent>
       </Card>
       <Card>

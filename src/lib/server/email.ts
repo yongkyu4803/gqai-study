@@ -3,7 +3,7 @@ import "server-only";
 import { Resend } from "resend";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-type EmailKind = "assignment" | "account_request" | "feedback";
+export type EmailKind = "assignment" | "account_request" | "feedback";
 
 export async function sendAndLogEmail(params: {
   admin: SupabaseClient;
@@ -42,6 +42,7 @@ export async function sendAndLogEmail(params: {
     recipient_email: to,
     student_id: studentId ?? null,
     subject,
+    body: text,
     status,
     error_message: errorMessage,
     related_id: relatedId ?? null,

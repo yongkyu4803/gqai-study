@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { EmptyState, PageHeader } from "@/components/common/page-parts";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/domain/status";
 
 interface EmailLog {
@@ -24,19 +25,41 @@ const kindLabel: Record<EmailLog["kind"], string> = {
 
 export function EmailLogView() {
   const [logs, setLogs] = useState<EmailLog[] | null>(null);
+  const [resendingId, setResendingId] = useState<string | null>(null);
+
+  async function load() {
+    const response = await fetch("/api/admin/notifications/log");
+    if (!response.ok) {
+      toast.error("발송 로그를 불러오지 못했습니다.");
+      return;
+    }
+    const body = await response.json();
+    setLogs(body.logs);
+  }
 
   useEffect(() => {
-    async function load() {
-      const response = await fetch("/api/admin/notifications/log");
-      if (!response.ok) {
-        toast.error("발송 로그를 불러오지 못했습니다.");
-        return;
-      }
-      const body = await response.json();
-      setLogs(body.logs);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch on mount from the server, not a render-triggered cascade
     load();
   }, []);
+
+  async function resend(id: string) {
+    setResendingId(id);
+    try {
+      const response = await fetch(`/api/admin/notifications/log/${id}/resend`, {
+        method: "POST",
+      });
+      const body = await response.json();
+      if (!response.ok) throw new Error(body?.error);
+      toast[body.sent ? "success" : "error"](
+        body.sent ? "다시 보냈습니다." : "다시 보냈지만 실패했습니다. 목록에서 사유를 확인하세요.",
+      );
+      await load();
+    } catch (cause) {
+      toast.error(cause instanceof Error ? cause.message : "다시 보내지 못했습니다.");
+    } finally {
+      setResendingId(null);
+    }
+  }
 
   return (
     <div className="space-y-7">
@@ -69,9 +92,21 @@ export function EmailLogView() {
                 >
                   {item.status === "sent" ? "발송됨" : "실패"}
                 </Badge>
-                <span className="text-xs text-muted-foreground justify-self-end">
-                  {formatDate(item.createdAt, true)}
-                </span>
+                <div className="flex items-center justify-end gap-3">
+                  <span className="text-xs text-muted-foreground">
+                    {formatDate(item.createdAt, true)}
+                  </span>
+                  {item.status === "failed" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={resendingId === item.id}
+                      onClick={() => resend(item.id)}
+                    >
+                      {resendingId === item.id ? "재발송 중…" : "재발송"}
+                    </Button>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>

@@ -378,6 +378,9 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
   const assignments = state.assignments.filter(
     (item) => item.studentId === student.id,
   );
+  const studentActivities = state.activities.filter(
+    (item) => item.studentId === student.id,
+  );
   const currentStudentId = student.id;
   const studentWasActive = student.isActive;
   const activeModules = state.modules
@@ -600,6 +603,30 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
               >
                 {pending ? "재설정 중…" : "재설정"}
               </Button>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">최근 활동</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {studentActivities.length ? (
+                studentActivities.slice(0, 10).map((event) => (
+                  <div
+                    key={event.id}
+                    className="flex items-center justify-between gap-3 text-sm"
+                  >
+                    <span>{activityLabel(event.eventName)}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">
+                      {formatDate(event.createdAt, true)}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="py-4 text-center text-sm text-muted-foreground">
+                  활동 기록이 없습니다.
+                </p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -1384,6 +1411,27 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
       </div>
     </div>
   );
+}
+
+const activityLabels: Record<string, string> = {
+  "assignment.created": "카드 배정",
+  "assignment.set_instruction": "안내 문구 수정",
+  "assignment.cancel": "배정 취소",
+  "assignment.stop": "배정 중단",
+  "learning.open": "학습 카드 열람",
+  "learning.start": "학습 시작",
+  "learning.toggle_complete": "학습 완료 처리",
+  "learning.note": "메모 작성",
+  "submission.submitted": "제출함",
+  "feedback.feedback": "피드백 등록",
+  "feedback.revision_request": "보완 요청 등록",
+  "feedback.student_reply": "학생 답글",
+  "feedback.final_approval": "최종 승인",
+  "feedback.completion_reopened": "재제출 요청",
+};
+
+function activityLabel(eventName: string) {
+  return activityLabels[eventName] || eventName;
 }
 
 function Row({ label, value }: { label: string; value: string }) {

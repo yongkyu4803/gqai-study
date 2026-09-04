@@ -7,6 +7,31 @@ export async function POST(request: Request) {
   try {
     const input = accountRequestSchema.parse(await request.json());
     const admin = createSupabaseAdminClient();
+
+    const { data: existingRequest } = await admin
+      .from("gqai_aistudy_account_requests")
+      .select("id")
+      .eq("contact", input.contact)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (existingRequest) {
+      return NextResponse.json(
+        { error: "이미 접수된 요청입니다. 강사의 확인을 기다려주세요." },
+        { status: 409 },
+      );
+    }
+    const { data: existingProfile } = await admin
+      .from("gqai_aistudy_profiles")
+      .select("id")
+      .eq("login_id", input.loginId)
+      .maybeSingle();
+    if (existingProfile) {
+      return NextResponse.json(
+        { error: "이미 사용 중인 아이디입니다. 다른 아이디를 입력하세요." },
+        { status: 409 },
+      );
+    }
+
     const { data, error } = await admin
       .from("gqai_aistudy_account_requests")
       .insert({
