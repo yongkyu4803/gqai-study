@@ -16,6 +16,7 @@ import {
   MessageSquareText,
   Settings,
   UserCog,
+  UserPlus,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -33,7 +34,7 @@ import {
 import { useApp } from "@/components/providers/app-provider";
 import { cn } from "@/lib/utils";
 
-const publicPaths = new Set(["/", "/login", "/forbidden"]);
+const publicPaths = new Set(["/", "/login", "/forbidden", "/request-access"]);
 const adminNav = [
   {
     href: "/admin",
@@ -49,6 +50,12 @@ const adminNav = [
   },
   { href: "/admin/students", label: "학생", icon: UserRound },
   { href: "/admin/groups", label: "그룹", icon: UsersRound },
+  {
+    href: "/admin/account-requests",
+    label: "계정 요청",
+    icon: UserPlus,
+    gqaiIcon: "status-info",
+  },
   {
     href: "/admin/assignments",
     label: "배정 현황",

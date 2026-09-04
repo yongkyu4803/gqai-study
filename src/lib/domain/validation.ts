@@ -26,6 +26,12 @@ export const studentSchema = z.object({
   groupIds: z.array(z.string()),
 });
 
+export const accountRequestSchema = z.object({
+  displayName: z.string().trim().min(1, "이름을 입력하세요.").max(50),
+  contact: z.string().trim().min(1, "연락처를 입력하세요.").max(100),
+  note: z.string().trim().max(300).optional(),
+});
+
 export const groupSchema = z.object({
   name: z.string().trim().min(1, "그룹 이름을 입력하세요.").max(80),
   description: z.string().trim().max(300),

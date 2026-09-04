@@ -33,14 +33,19 @@ export default function HomePage() {
             강사가 직접 만든 실습 카드를 개인 또는 그룹에 배정하고, 학생별 학습
             기록과 결과물에 구체적인 피드백을 남기는 프라이빗 과외 공간입니다.
           </p>
-          <Button
-            size="lg"
-            render={<Link href="/login" />}
-            className="mt-8 gap-2"
-          >
-            학습 공간 들어가기
-            <ArrowRight className="size-4" />
-          </Button>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Button size="lg" render={<Link href="/login" />} className="gap-2">
+              학습 공간 들어가기
+              <ArrowRight className="size-4" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              render={<Link href="/request-access" />}
+            >
+              계정 발급 요청
+            </Button>
+          </div>
         </div>
         <div className="focus-card overflow-hidden">
           <div className="border-b bg-zinc-50 px-5 py-4">

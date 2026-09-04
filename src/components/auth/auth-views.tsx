@@ -131,6 +131,125 @@ export function LoginView() {
                 <p>최초 변경 체험: suyeon / student1234</p>
               </div>
             ) : null}
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              계정이 없으신가요?{" "}
+              <Link href="/request-access" className="font-medium text-foreground underline underline-offset-4">
+                계정 발급 요청
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
+}
+
+export function RequestAccessView() {
+  const [displayName, setDisplayName] = useState("");
+  const [contact, setContact] = useState("");
+  const [note, setNote] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setPending(true);
+    setError("");
+    try {
+      const response = await fetch("/api/account-requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName, contact, note }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.error || "요청을 접수하지 못했습니다.");
+      }
+      setDone(true);
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "요청을 접수하지 못했습니다.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+  return (
+    <main className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 py-12">
+      <div className="w-full max-w-md">
+        <Link
+          href="/"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          처음으로
+        </Link>
+        <Card>
+          <CardHeader className="space-y-3">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-[#171717] text-white">
+              <LockKeyhole className="size-5" />
+            </div>
+            <CardTitle className="text-2xl tracking-tight">
+              계정 발급 요청
+            </CardTitle>
+            <CardDescription>
+              이름과 연락처를 남기면 강사가 확인 후 계정을 만들어 전달합니다.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {done ? (
+              <InlineMessage
+                kind="success"
+                title="요청을 접수했습니다"
+                description="강사가 확인 후 아이디와 임시 비밀번호를 전달할 예정입니다."
+              />
+            ) : (
+              <form onSubmit={submit} className="space-y-5">
+                {error ? (
+                  <Alert variant="destructive">
+                    <GqaiIcon name="status-error" />
+                    <AlertTitle>요청을 접수하지 못했습니다</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                ) : null}
+                <div className="space-y-2">
+                  <Label htmlFor="requestName">이름</Label>
+                  <Input
+                    id="requestName"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestContact">연락처</Label>
+                  <Input
+                    id="requestContact"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    placeholder="이메일 또는 전화번호"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestNote">메모 (선택)</Label>
+                  <Input
+                    id="requestNote"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="소속 반, 요청 사유 등"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="h-11 w-full"
+                  disabled={pending}
+                  aria-busy={pending}
+                >
+                  {pending ? "접수 중…" : "요청 보내기"}
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
       </div>
