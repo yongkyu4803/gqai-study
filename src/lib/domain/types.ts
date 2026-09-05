@@ -196,7 +196,19 @@ export interface FeatureFlag {
   description: string;
 }
 
+export interface Announcement {
+  id: string;
+  scope: "all" | "student" | "group";
+  targetId?: string;
+  title: string;
+  body: string;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppState {
+  announcements?: Announcement[];
   profiles: Profile[];
   groups: Group[];
   modules: ModuleTemplate[];

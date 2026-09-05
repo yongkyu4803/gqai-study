@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { AnnouncementInput } from "@/lib/domain/announcements";
 import type {
   AppState,
   AssignmentInput,
@@ -111,6 +112,7 @@ export class SupabaseRepository {
       feedbackAttachments,
       activities,
       flags,
+      announcements,
     ] = await Promise.all([
       this.client.from("gqai_aistudy_profiles").select("*").order("display_name"),
       this.client.from("gqai_aistudy_groups").select("*").order("name"),
@@ -139,6 +141,7 @@ export class SupabaseRepository {
         .order("created_at", { ascending: false })
         .limit(200),
       this.client.from("gqai_aistudy_feature_flags").select("*"),
+      this.client.from("gqai_aistudy_announcements").select("*").order("created_at", { ascending: false }),
     ]);
 
     const firstError = [
@@ -156,10 +159,16 @@ export class SupabaseRepository {
       feedbackAttachments.error,
       activities.error,
       flags.error,
+      announcements.error,
     ].find(Boolean);
     assertOk(firstError);
 
     const state: AppState = {
+      announcements: (announcements.data ?? []).map((row: Row) => ({
+        id: row.id, scope: row.scope, targetId: row.student_id ?? row.group_id ?? undefined,
+        title: row.title, body: row.body, archived: row.archived,
+        createdAt: row.created_at, updatedAt: row.updated_at,
+      })),
       profiles: (profiles.data ?? []).map((row: Row) => ({
         id: row.id,
         role: row.role,
@@ -499,6 +508,14 @@ export class SupabaseRepository {
     });
     assertOk(error);
     return data as string;
+  }
+
+  async saveAnnouncement(input: AnnouncementInput) {
+    const { error } = await this.client.rpc("gqai_aistudy_save_announcement", {
+      p_id: input.id ?? null, p_scope: input.scope, p_target_id: input.targetId ?? null,
+      p_title: input.title, p_body: input.body, p_archived: input.archived ?? false,
+    });
+    assertOk(error);
   }
 
   async reorderAssignments(kind: "student" | "group", targetId: string, ids: string[]) {

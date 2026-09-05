@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AnnouncementsPanel } from "@/components/common/announcements-panel";
 import { useState } from "react";
 import {
   ArrowRight,
@@ -75,6 +76,7 @@ export function AdminDashboardView() {
           value={completed.length}
         />
       </div>
+      <AnnouncementsPanel scope="all" />
       {unopened.length || inactiveStudents.length ? (
         <Card className="border-primary/40">
           <CardHeader>

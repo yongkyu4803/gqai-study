@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- private signed/blob asset URLs are dynamic and short-lived */
 
 import Link from "next/link";
+import { AnnouncementsPanel } from "@/components/common/announcements-panel";
 import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
@@ -104,6 +105,7 @@ export function LearningHomeView({
             : "관리자가 정한 카드 순서대로 학습을 시작하세요."
         }
       />
+      {!historyOnly ? <AnnouncementsPanel /> : null}
       <div className="max-w-md space-y-2">
         <Label htmlFor="learning-search">학습 카드 검색</Label>
         <Input

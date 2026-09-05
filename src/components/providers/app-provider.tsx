@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { nanoid } from "nanoid";
+import { validateAnnouncement, type AnnouncementInput } from "@/lib/domain/announcements";
 import { reorderAssignments as reorderAssignmentsState } from "@/lib/domain/assignment-order";
 import { createDemoSeed, demoCredentials } from "@/lib/demo/seed";
 import {
@@ -74,6 +75,7 @@ type UploadScope =
   | { kind: "feedback"; assignmentId: string; messageId?: string };
 
 interface AppContextValue {
+  saveAnnouncement: (input: AnnouncementInput) => Promise<void>;
   reorderAssignments: (
     kind: "student" | "group",
     targetId: string,
@@ -1144,11 +1146,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [repository, session],
   );
 
+  const saveAnnouncement = useCallback(async (input: AnnouncementInput) => {
+    if (session?.role !== "admin") throw new Error("관리자 권한이 필요합니다.");
+    const valid = validateAnnouncement(input);
+    if (repository) {
+      await repository.saveAnnouncement(valid);
+      await refresh();
+      return;
+    }
+    if (valid.scope === "student" && !state.profiles.some((p) => p.id === valid.targetId && p.role === "student")) throw new Error("학생을 찾을 수 없습니다.");
+    if (valid.scope === "group" && !state.groups.some((g) => g.id === valid.targetId)) throw new Error("그룹을 찾을 수 없습니다.");
+    const notices = state.announcements ?? [];
+    const existing = notices.find((n) => n.id === valid.id);
+    if (valid.id && !existing) throw new Error("공지를 찾을 수 없습니다.");
+    const now = new Date().toISOString();
+    const notice = { ...valid, id: valid.id ?? nanoid(), archived: valid.archived ?? false, createdAt: existing?.createdAt ?? now, updatedAt: now };
+    commitDemo({ ...state, announcements: [notice, ...notices.filter((n) => n.id !== notice.id)] });
+  }, [session, repository, refresh, state, commitDemo]);
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
       session,
       ready,
+      saveAnnouncement,
       mode,
       refresh,
       login,
@@ -1185,6 +1206,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }),
     [
       archiveGroup,
+      saveAnnouncement,
       archiveModule,
       assign,
       assignMany,

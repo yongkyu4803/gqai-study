@@ -1,4 +1,5 @@
 "use client";
+import { AnnouncementsPanel } from "@/components/common/announcements-panel";
 import { AssignmentOrderControls } from "./assignment-order-controls";
 import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 
@@ -515,6 +516,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
           description={error}
         />
       ) : null}
+      <AnnouncementsPanel key={student.id} scope="student" targetId={student.id} />
       <div className="grid gap-6 lg:grid-cols-[1.7fr_.85fr] lg:items-start">
         <Card>
           <CardHeader>
@@ -1157,6 +1159,7 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
           </Button>
         }
       />
+      <AnnouncementsPanel key={group.id} scope="group" targetId={group.id} />
       {actionError ? (
         <InlineMessage
           kind="error"
