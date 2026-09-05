@@ -178,9 +178,9 @@ function Sidebar() {
               {session?.role === "admin" ? "강사" : "학생"}
             </Badge>
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            {mode === "demo" ? "데모 데이터" : "Supabase 연결"}
-          </p>
+          {mode === "demo" ? (
+            <p className="mt-1 text-xs text-muted-foreground">데모 데이터</p>
+          ) : null}
         </div>
         <Button
           variant="ghost"
