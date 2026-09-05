@@ -202,6 +202,7 @@ export class SupabaseRepository {
         publishedAt: row.published_at,
       })),
       batches: (batches.data ?? []).map((row: Row) => ({
+        sortOrder: row.sort_order ?? undefined,
         id: row.id,
         moduleVersionId: row.module_version_id,
         targetKind: row.target_kind,
@@ -213,6 +214,7 @@ export class SupabaseRepository {
         assignedAt: row.assigned_at,
       })),
       assignments: (assignments.data ?? []).map((row: Row) => ({
+        sortOrder: row.sort_order ?? undefined,
         id: row.id,
         assignmentBatchId: row.assignment_batch_id,
         moduleVersionId: row.module_version_id,
@@ -497,6 +499,15 @@ export class SupabaseRepository {
     });
     assertOk(error);
     return data as string;
+  }
+
+  async reorderAssignments(kind: "student" | "group", targetId: string, ids: string[]) {
+    const { error } = await this.client.rpc("gqai_aistudy_reorder_assignments", {
+      p_kind: kind,
+      p_target_id: targetId,
+      p_ids: ids,
+    });
+    assertOk(error);
   }
 
   async manageAssignment(

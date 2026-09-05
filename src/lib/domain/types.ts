@@ -111,6 +111,7 @@ export interface ModuleVersion {
 }
 
 export interface AssignmentBatch {
+  sortOrder?: number;
   id: string;
   moduleVersionId: string;
   targetKind: "students" | "group";
@@ -123,6 +124,7 @@ export interface AssignmentBatch {
 }
 
 export interface LearnerAssignment {
+  sortOrder?: number;
   id: string;
   assignmentBatchId: string;
   moduleVersionId: string;

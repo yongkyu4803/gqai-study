@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element -- private signed/blob asset URLs are dynamic and short-lived */
 
 import Link from "next/link";
+import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
@@ -48,7 +49,6 @@ import {
   feedbackKindLabel,
   formatDate,
   formatFileSize,
-  studentPriority,
 } from "@/lib/domain/status";
 import type {
   FileAsset,
@@ -86,11 +86,7 @@ export function LearningHomeView({
             ?.snapshot.title.toLowerCase()
             .includes(query.toLowerCase()),
         )
-        .sort(
-          (a, b) =>
-            studentPriority[a.assignmentStatus] -
-            studentPriority[b.assignmentStatus],
-        ),
+        .sort(compareAssignmentOrder),
     [historyOnly, query, session?.id, state],
   );
   return (
@@ -105,7 +101,7 @@ export function LearningHomeView({
         description={
           historyOnly
             ? "최종 완료한 실습과 제출·피드백 이력을 다시 확인할 수 있습니다."
-            : "지금 필요한 행동이 있는 카드부터 정리했습니다."
+            : "관리자가 정한 카드 순서대로 학습을 시작하세요."
         }
       />
       <div className="max-w-md space-y-2">
@@ -1086,7 +1082,9 @@ export function AccountView() {
       toast.success("이메일을 저장했습니다.");
     } catch (cause) {
       setEmailError(
-        cause instanceof Error ? cause.message : "이메일을 저장하지 못했습니다.",
+        cause instanceof Error
+          ? cause.message
+          : "이메일을 저장하지 못했습니다.",
       );
     } finally {
       setEmailPending(false);
@@ -1217,7 +1215,6 @@ export function AccountView() {
     </div>
   );
 }
-
 
 function SubmissionItemView({ item }: { item: SubmissionItem }) {
   if (item.type === "text")

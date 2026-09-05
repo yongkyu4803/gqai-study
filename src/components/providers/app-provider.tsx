@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { nanoid } from "nanoid";
+import { reorderAssignments as reorderAssignmentsState } from "@/lib/domain/assignment-order";
 import { createDemoSeed, demoCredentials } from "@/lib/demo/seed";
 import {
   archiveModule as archiveModuleState,
@@ -73,6 +74,11 @@ type UploadScope =
   | { kind: "feedback"; assignmentId: string; messageId?: string };
 
 interface AppContextValue {
+  reorderAssignments: (
+    kind: "student" | "group",
+    targetId: string,
+    ids: string[],
+  ) => Promise<void>;
   state: AppState;
   session: SessionUser | null;
   ready: boolean;
@@ -821,6 +827,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [commitDemo, repository, session, state],
   );
 
+  const reorderAssignments = useCallback(
+    async (kind: "student" | "group", targetId: string, ids: string[]) => {
+      if (session?.role !== "admin")
+        throw new Error("관리자 권한이 필요합니다.");
+      const next = reorderAssignmentsState(state, kind, targetId, ids);
+      if (repository) {
+        await repository.reorderAssignments(kind, targetId, ids);
+        await refresh();
+      } else commitDemo(next);
+    },
+    [commitDemo, refresh, repository, session, state],
+  );
+
   const manageAssignment = useCallback(
     async (
       assignmentId: string,
@@ -924,13 +943,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
         )!;
         const hasActivity = Boolean(
           assignment.firstOpenedAt ||
-            assignment.startedAt ||
-            assignment.courseCompletedAt ||
-            state.submissions.some(
-              (submission) =>
-                submission.assignmentId === assignmentId &&
-                submission.status !== "draft",
-            ),
+          assignment.startedAt ||
+          assignment.courseCompletedAt ||
+          state.submissions.some(
+            (submission) =>
+              submission.assignmentId === assignmentId &&
+              submission.status !== "draft",
+          ),
         );
         return hasActivity ? "stop" : "cancel";
       }
@@ -1152,6 +1171,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       assign,
       assignMany,
       manageAssignment,
+      reorderAssignments,
       setBatchInstruction,
       closeBatch,
       openAssignment,
@@ -1169,6 +1189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       assign,
       assignMany,
       manageAssignment,
+      reorderAssignments,
       setBatchInstruction,
       closeBatch,
       changePassword,

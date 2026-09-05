@@ -1,4 +1,6 @@
 "use client";
+import { AssignmentOrderControls } from "./assignment-order-controls";
+import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -382,9 +384,9 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
   const groups = state.groups.filter((group) =>
     group.memberIds.includes(student.id),
   );
-  const assignments = state.assignments.filter(
-    (item) => item.studentId === student.id,
-  );
+  const assignments = state.assignments
+    .filter((item) => item.studentId === student.id)
+    .sort(compareAssignmentOrder);
   const studentActivities = state.activities.filter(
     (item) => item.studentId === student.id,
   );
@@ -397,9 +399,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
     return assignments.some(
       (item) =>
         item.moduleVersionId === moduleVersionId &&
-        !["completed", "cancelled", "stopped"].includes(
-          item.assignmentStatus,
-        ),
+        !["completed", "cancelled", "stopped"].includes(item.assignmentStatus),
     );
   }
   function toggleAssignModule(versionId: string) {
@@ -533,6 +533,16 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
             </CardAction>
           </CardHeader>
           <CardContent className="space-y-2">
+            <AssignmentOrderControls
+              kind="student"
+              targetId={student.id}
+              rows={assignments.map((a) => ({
+                id: a.id,
+                title:
+                  state.versions.find((v) => v.id === a.moduleVersionId)
+                    ?.snapshot.title ?? "학습 카드",
+              }))}
+            />
             {assignments.length ? (
               assignments.map((assignment) => {
                 const version = state.versions.find(
@@ -710,8 +720,8 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
           <DialogHeader>
             <DialogTitle>모듈 배정</DialogTitle>
             <DialogDescription>
-              게시된 모듈을 선택해 {student.displayName}님에게 배정합니다.
-              여러 개를 한 번에 선택할 수 있습니다.
+              게시된 모듈을 선택해 {student.displayName}님에게 배정합니다. 여러
+              개를 한 번에 선택할 수 있습니다.
             </DialogDescription>
           </DialogHeader>
           {activeModules.length ? (
@@ -960,9 +970,9 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
     );
   const currentGroupId = group.id;
   const groupWasArchived = group.isArchived;
-  const batches = state.batches.filter(
-    (item) => item.sourceGroupId === group.id,
-  );
+  const batches = state.batches
+    .filter((item) => item.sourceGroupId === group.id)
+    .sort(compareAssignmentOrder);
   // A group is its own entity, not just a label over individuals: when
   // people who were already studying on their own are gathered into a
   // group, the group's start date is whichever of them started earliest —
@@ -1334,6 +1344,16 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
             </CardAction>
           </CardHeader>
           <CardContent className="space-y-3">
+            <AssignmentOrderControls
+              kind="group"
+              targetId={group.id}
+              rows={batches.map((b) => ({
+                id: b.id,
+                title:
+                  state.versions.find((v) => v.id === b.moduleVersionId)
+                    ?.snapshot.title ?? "학습 카드",
+              }))}
+            />
             {batches.length ? (
               batches.map((batch) => {
                 const version = state.versions.find(
