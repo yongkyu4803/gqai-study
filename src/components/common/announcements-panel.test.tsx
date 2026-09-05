@@ -25,6 +25,10 @@ describe("announcement panel", () => {
     app.session.role = "student";
     render(<AnnouncementsPanel />);
     expect(screen.getByText("개별 안내")).toBeVisible();
+    expect(screen.getByText("안내 내용")).not.toBeVisible();
+    const row = screen.getByText("개별 안내").closest("details")!;
+    row.open = true;
+    expect(screen.getByText("안내 내용")).toBeVisible();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
   it("keeps the draft when saving fails", async () => {

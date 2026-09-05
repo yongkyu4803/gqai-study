@@ -1,10 +1,13 @@
 "use client";
 
-import { useId, useState } from "react";
-import { Megaphone, Plus } from "lucide-react";
+import { useEffect, useId, useState } from "react";
+import { ChevronDown, Megaphone, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/components/providers/app-provider";
-import { studentAnnouncements } from "@/lib/domain/announcements";
+import {
+  isNewAnnouncement,
+  studentAnnouncements,
+} from "@/lib/domain/announcements";
 import type { Announcement } from "@/lib/domain/types";
 import { formatDate } from "@/lib/domain/status";
 import {
@@ -36,6 +39,16 @@ export function AnnouncementsPanel({
   const [body, setBody] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60_000);
+    const update = () => setNow(Date.now());
+    window.addEventListener("focus", update);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", update);
+    };
+  }, []);
   const notices = admin
     ? (state.announcements ?? [])
         .filter((n) => n.scope === scope && n.targetId === targetId)
@@ -176,54 +189,101 @@ export function AnnouncementsPanel({
           </p>
         ) : null}
         {notices.length ? (
-          notices.map((notice) => (
-            <article
-              key={notice.id}
-              className={`space-y-2 rounded-lg border p-4 ${notice.archived ? "bg-zinc-50 text-muted-foreground" : ""}`}
+          <div className="overflow-hidden rounded-lg border">
+            <div
+              className="hidden grid-cols-[3rem_minmax(0,1fr)_7rem_1rem] gap-3 border-b bg-zinc-50 px-4 py-3 text-xs text-muted-foreground sm:grid"
+              aria-hidden="true"
             >
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">
-                  {notice.scope === "all"
-                    ? "전체"
-                    : notice.scope === "student"
-                      ? "개별"
-                      : (state.groups.find((g) => g.id === notice.targetId)
-                          ?.name ?? "그룹")}
-                </Badge>
-                {notice.archived ? <Badge variant="outline">숨김</Badge> : null}
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(notice.createdAt)}
-                  {notice.updatedAt !== notice.createdAt ? " · 수정됨" : ""}
-                </span>
-              </div>
-              <h3 className="font-medium [overflow-wrap:anywhere]">
-                {notice.title}
-              </h3>
-              <p className="whitespace-pre-wrap text-sm leading-6 [overflow-wrap:anywhere]">
-                {notice.body}
-              </p>
-              {admin ? (
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={pending || editing !== null}
-                    onClick={() => edit(notice)}
+              <span className="text-center">번호</span>
+              <span>제목 / 대상</span>
+              <span>등록일</span>
+              <span />
+            </div>
+            {notices.map((notice, index) => (
+              <details
+                key={notice.id}
+                className={`group border-b last:border-b-0 ${notice.archived ? "bg-zinc-50 text-muted-foreground" : ""}`}
+              >
+                <summary className="grid cursor-pointer list-none grid-cols-[minmax(0,1fr)_1rem] items-center gap-3 px-4 py-4 hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-blue-500 sm:grid-cols-[3rem_minmax(0,1fr)_7rem_1rem] [&::-webkit-details-marker]:hidden">
+                  <span className="hidden text-center text-xs text-muted-foreground sm:block">
+                    {notices.length - index}
+                  </span>
+                  <span className="min-w-0 space-y-1.5">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-sm font-medium">
+                        {notice.title}
+                      </span>
+                      {isNewAnnouncement(notice.createdAt, now) ? (
+                        <span
+                          className="shrink-0 rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-orange-700"
+                          aria-label="등록 후 3일 이내 새 공지"
+                        >
+                          NEW
+                        </span>
+                      ) : null}
+                    </span>
+                    <span className="flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary">
+                        {notice.scope === "all"
+                          ? "전체"
+                          : notice.scope === "student"
+                            ? "개별"
+                            : (state.groups.find(
+                                (g) => g.id === notice.targetId,
+                              )?.name ?? "그룹")}
+                      </Badge>
+                      {notice.archived ? (
+                        <Badge variant="outline">숨김</Badge>
+                      ) : null}
+                      <time
+                        className="text-xs text-muted-foreground sm:hidden"
+                        dateTime={notice.createdAt}
+                      >
+                        {formatDate(notice.createdAt)}
+                      </time>
+                    </span>
+                  </span>
+                  <time
+                    className="hidden text-xs text-muted-foreground sm:block"
+                    dateTime={notice.createdAt}
                   >
-                    수정
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={pending || editing !== null}
-                    onClick={() => void submit(notice)}
-                  >
-                    {notice.archived ? "다시 게시" : "숨기기"}
-                  </Button>
+                    {formatDate(notice.createdAt)}
+                  </time>
+                  <ChevronDown className="size-4 text-muted-foreground transition-transform group-open:rotate-180" />
+                </summary>
+                <div className="space-y-3 border-t bg-zinc-50/50 px-4 py-5 sm:pl-19">
+                  {notice.updatedAt !== notice.createdAt ? (
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(notice.updatedAt)} 수정
+                    </p>
+                  ) : null}
+                  <p className="whitespace-pre-wrap text-sm leading-6 [overflow-wrap:anywhere]">
+                    {notice.body}
+                  </p>
+                  {admin ? (
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={pending || editing !== null}
+                        onClick={() => edit(notice)}
+                      >
+                        수정
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={pending || editing !== null}
+                        onClick={() => void submit(notice)}
+                      >
+                        {notice.archived ? "다시 게시" : "숨기기"}
+                      </Button>
+                    </div>
+                  ) : null}
                 </div>
-              ) : null}
-            </article>
-          ))
+              </details>
+            ))}
+          </div>
         ) : (
           <p className="py-3 text-sm text-muted-foreground">
             등록된 공지사항이 없습니다.

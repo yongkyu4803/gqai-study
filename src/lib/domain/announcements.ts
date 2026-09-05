@@ -1,5 +1,10 @@
 import type { Announcement, AppState } from "./types";
 
+export function isNewAnnouncement(createdAt: string, now: number) {
+  const age = now - Date.parse(createdAt);
+  return age >= 0 && age < 3 * 24 * 60 * 60 * 1000;
+}
+
 export type AnnouncementInput = Pick<
   Announcement,
   "scope" | "targetId" | "title" | "body"
