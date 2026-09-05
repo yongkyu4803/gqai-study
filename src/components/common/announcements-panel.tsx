@@ -195,7 +195,7 @@ export function AnnouncementsPanel({
               aria-hidden="true"
             >
               <span className="text-center">번호</span>
-              <span>제목 / 대상</span>
+              <span>{admin ? "제목 / 대상" : "제목"}</span>
               <span>등록일</span>
               <span />
             </div>
@@ -222,16 +222,20 @@ export function AnnouncementsPanel({
                         </span>
                       ) : null}
                     </span>
-                    <span className="flex flex-wrap items-center gap-2">
-                      <Badge variant="secondary">
-                        {notice.scope === "all"
-                          ? "전체"
-                          : notice.scope === "student"
-                            ? "개별"
-                            : (state.groups.find(
-                                (g) => g.id === notice.targetId,
-                              )?.name ?? "그룹")}
-                      </Badge>
+                    <span
+                      className={`flex-wrap items-center gap-2 ${admin ? "flex" : "flex sm:hidden"}`}
+                    >
+                      {admin ? (
+                        <Badge variant="secondary">
+                          {notice.scope === "all"
+                            ? "전체"
+                            : notice.scope === "student"
+                              ? "개별"
+                              : (state.groups.find(
+                                  (g) => g.id === notice.targetId,
+                                )?.name ?? "그룹")}
+                        </Badge>
+                      ) : null}
                       {notice.archived ? (
                         <Badge variant="outline">숨김</Badge>
                       ) : null}
