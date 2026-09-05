@@ -542,36 +542,37 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                   state.versions.find((v) => v.id === a.moduleVersionId)
                     ?.snapshot.title ?? "학습 카드",
               }))}
-            />
-            {assignments.length ? (
-              assignments.map((assignment) => {
-                const version = state.versions.find(
-                  (item) => item.id === assignment.moduleVersionId,
-                );
-                return (
-                  <Link
-                    key={assignment.id}
-                    href={`/admin/assignments/${assignment.id}`}
-                    className="flex items-center gap-3 rounded-lg border p-3 hover:bg-zinc-50"
-                  >
-                    <p className="min-w-0 flex-1 truncate text-sm">
-                      <span className="font-medium">
-                        {version?.snapshot.title}
-                      </span>
-                      <span className="text-muted-foreground">
-                        {" "}
-                        · {formatDate(assignment.createdAt)} 배정
-                      </span>
-                    </p>
-                    <StatusBadge value={assignment.assignmentStatus} />
-                  </Link>
-                );
-              })
-            ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                배정된 카드가 없습니다.
-              </p>
-            )}
+            >
+              {assignments.length ? (
+                assignments.map((assignment) => {
+                  const version = state.versions.find(
+                    (item) => item.id === assignment.moduleVersionId,
+                  );
+                  return (
+                    <Link
+                      key={assignment.id}
+                      href={`/admin/assignments/${assignment.id}`}
+                      className="flex items-center gap-3 rounded-lg border p-3 hover:bg-zinc-50"
+                    >
+                      <p className="min-w-0 flex-1 truncate text-sm">
+                        <span className="font-medium">
+                          {version?.snapshot.title}
+                        </span>
+                        <span className="text-muted-foreground">
+                          {" "}
+                          · {formatDate(assignment.createdAt)} 배정
+                        </span>
+                      </p>
+                      <StatusBadge value={assignment.assignmentStatus} />
+                    </Link>
+                  );
+                })
+              ) : (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  배정된 카드가 없습니다.
+                </p>
+              )}
+            </AssignmentOrderControls>
           </CardContent>
         </Card>
         <div className="space-y-5">
@@ -1353,54 +1354,55 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
                   state.versions.find((v) => v.id === b.moduleVersionId)
                     ?.snapshot.title ?? "학습 카드",
               }))}
-            />
-            {batches.length ? (
-              batches.map((batch) => {
-                const version = state.versions.find(
-                  (item) => item.id === batch.moduleVersionId,
-                );
-                const openCount = openCountForBatch(batch.id);
-                return (
-                  <div
-                    key={batch.id}
-                    className="flex items-center justify-between gap-3 rounded-lg border p-4"
-                  >
-                    <Link
-                      href={`/admin/assignments/batch/${batch.id}`}
-                      className="min-w-0 flex-1 hover:underline"
+            >
+              {batches.length ? (
+                batches.map((batch) => {
+                  const version = state.versions.find(
+                    (item) => item.id === batch.moduleVersionId,
+                  );
+                  const openCount = openCountForBatch(batch.id);
+                  return (
+                    <div
+                      key={batch.id}
+                      className="flex items-center justify-between gap-3 rounded-lg border p-4"
                     >
-                      <p className="text-sm font-medium [overflow-wrap:anywhere]">
-                        {version?.snapshot.title}
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {formatDate(batch.assignedAt)} · 당시{" "}
-                        {batch.recipientCount}명
-                        {openCount
-                          ? ` · 진행 중 ${openCount}명`
-                          : " · 모두 종료됨"}
-                      </p>
-                    </Link>
-                    {openCount ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        disabled={actionPending}
-                        aria-busy={actionPending}
-                        onClick={() => deleteBatch(batch.id)}
+                      <Link
+                        href={`/admin/assignments/batch/${batch.id}`}
+                        className="min-w-0 flex-1 hover:underline"
                       >
-                        <Trash2 />
-                        {actionPending ? "삭제 중…" : "삭제"}
-                      </Button>
-                    ) : null}
-                  </div>
-                );
-              })
-            ) : (
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                그룹 배정 이력이 없습니다.
-              </p>
-            )}
+                        <p className="text-sm font-medium [overflow-wrap:anywhere]">
+                          {version?.snapshot.title}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {formatDate(batch.assignedAt)} · 당시{" "}
+                          {batch.recipientCount}명
+                          {openCount
+                            ? ` · 진행 중 ${openCount}명`
+                            : " · 모두 종료됨"}
+                        </p>
+                      </Link>
+                      {openCount ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          disabled={actionPending}
+                          aria-busy={actionPending}
+                          onClick={() => deleteBatch(batch.id)}
+                        >
+                          <Trash2 />
+                          {actionPending ? "삭제 중…" : "삭제"}
+                        </Button>
+                      ) : null}
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  그룹 배정 이력이 없습니다.
+                </p>
+              )}
+            </AssignmentOrderControls>
           </CardContent>
         </Card>
         <Dialog
