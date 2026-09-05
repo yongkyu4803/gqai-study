@@ -19,7 +19,8 @@ const korean = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   title: { default: "GQAI Study", template: "%s · GQAI Study" },
-  description: "강사가 직접 설계하고 학생별로 피드백하는 프라이빗 과외 공간",
+  description:
+    "내 업무와 관심사에 AI를 접목하는 개인 맞춤형 스터디. 기초 학습부터 업무 효율화와 사이드 프로젝트까지, 개인 또는 그룹으로 무료 온라인 학습을 이어갑니다.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

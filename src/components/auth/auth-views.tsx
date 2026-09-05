@@ -404,6 +404,11 @@ export function RequestAccessView() {
               />
             ) : (
               <form onSubmit={submit} className="space-y-5">
+                <div className="rounded-lg border bg-zinc-50 p-4 text-sm leading-6">
+                  <p className="font-medium">신청 전 참여 안내</p>
+                  <p className="mt-2 text-muted-foreground">온라인 학습은 무료이며, 오프라인 강의는 희망자에 한해 별도 협의로 유료 진행합니다. 일정 기간 학습 진도가 진행되지 않으면 계정이 비활성화됩니다.</p>
+                  <Link href="/#before-joining" className="mt-2 inline-block underline underline-offset-4">학습 방식과 운영 원칙 자세히 보기</Link>
+                </div>
                 {error ? (
                   <Alert variant="destructive">
                     <GqaiIcon name="status-error" />
