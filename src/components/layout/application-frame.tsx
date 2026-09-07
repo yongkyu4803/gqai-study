@@ -187,7 +187,7 @@ function Sidebar() {
             </p>
             <Badge
               variant="outline"
-              className="rounded-md px-1.5 py-0 text-[10px]"
+              className="rounded-md px-1.5 py-0 text-[0.625rem]"
             >
               {session?.role === "admin" ? "강사" : "학생"}
             </Badge>

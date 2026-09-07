@@ -99,8 +99,8 @@ export function ModuleReader({
 // single list vocabulary, matching the "bullet points only" simplification.
 function ListItemView({ block }: { block: ContentBlock }) {
   return (
-    <div className="flex gap-3 text-[15px] leading-7">
-      <span className="mt-[11px] size-1.5 shrink-0 rounded-full bg-muted-foreground" />
+    <div className="flex gap-3 text-[0.9375rem] leading-7">
+      <span className="mt-[0.6875rem] size-1.5 shrink-0 rounded-full bg-muted-foreground" />
       {block.text}
     </div>
   );
@@ -199,7 +199,7 @@ function ContentBlockView({ block }: { block: ContentBlock }) {
       </div>
     );
   return (
-    <p className="whitespace-pre-wrap text-[15px] leading-7 text-zinc-700">
+    <p className="whitespace-pre-wrap text-[0.9375rem] leading-7 text-zinc-700">
       {block.text}
     </p>
   );

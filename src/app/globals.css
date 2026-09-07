@@ -78,6 +78,7 @@
   }
   html {
     @apply bg-background font-sans text-foreground;
+    font-size: 110%;
   }
   body {
     @apply min-h-dvh bg-background text-foreground antialiased;
@@ -107,7 +108,7 @@
     @apply rounded-lg border bg-card shadow-[0_1px_3px_rgba(0,0,0,0.06)];
   }
   .eyebrow {
-    @apply text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground;
+    @apply text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted-foreground;
   }
   .native-select {
     @apply h-10 rounded-sm border border-input bg-white px-3 text-sm outline-none transition-[border-color,box-shadow,background-color] focus:border-ring focus:ring-3 focus:ring-primary/20 disabled:cursor-not-allowed disabled:border-border disabled:bg-muted disabled:text-muted-foreground;

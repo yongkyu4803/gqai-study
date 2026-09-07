@@ -783,7 +783,7 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
                   ) : null}
                 </div>
               )}
-              <span className="mt-2 block text-right text-[10px] text-muted-foreground">
+              <span className="mt-2 block text-right text-[0.625rem] text-muted-foreground">
                 항목 {index + 1}
               </span>
             </div>

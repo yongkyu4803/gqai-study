@@ -215,7 +215,7 @@ export function AnnouncementsPanel({
                       </span>
                       {isNewAnnouncement(notice.createdAt, now) ? (
                         <span
-                          className="shrink-0 rounded bg-orange-50 px-1.5 py-0.5 text-[10px] font-bold text-orange-700"
+                          className="shrink-0 rounded bg-orange-50 px-1.5 py-0.5 text-[0.625rem] font-bold text-orange-700"
                           aria-label="등록 후 3일 이내 새 공지"
                         >
                           NEW

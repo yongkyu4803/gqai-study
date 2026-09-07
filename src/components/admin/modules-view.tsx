@@ -831,7 +831,7 @@ export function ModuleEditorView({ moduleId }: { moduleId: string }) {
                 </select>
               </label>
             </div>
-            <p className="mt-3 flex items-center gap-2 text-[11px] text-muted-foreground">
+            <p className="mt-3 flex items-center gap-2 text-[0.6875rem] text-muted-foreground">
               <Code2 className="size-3.5" />
               Ctrl/⌘ + Enter 저장 · Alt + ↑↓ 블록 이동
             </p>
@@ -852,7 +852,7 @@ export function ModuleEditorView({ moduleId }: { moduleId: string }) {
                         onKeyDown={(event) => handleBlockKeyDown(event, index)}
                       >
                         <div className="flex flex-wrap items-center gap-2 border-b bg-zinc-50/80 px-3 py-2">
-                          <span className="flex size-6 items-center justify-center rounded-md border bg-white text-[11px] tabular-nums text-muted-foreground">
+                          <span className="flex size-6 items-center justify-center rounded-md border bg-white text-[0.6875rem] tabular-nums text-muted-foreground">
                             {index + 1}
                           </span>
                           <select
@@ -875,7 +875,7 @@ export function ModuleEditorView({ moduleId }: { moduleId: string }) {
                               ),
                             )}
                           </select>
-                          <span className="text-[11px] text-muted-foreground">
+                          <span className="text-[0.6875rem] text-muted-foreground">
                             {index + 1} / {draft.blocks.length}
                           </span>
                           <div className="ml-auto flex gap-1">
@@ -936,7 +936,7 @@ export function ModuleEditorView({ moduleId }: { moduleId: string }) {
                                   block.type === "heading"
                                     ? "min-h-14 text-lg font-medium"
                                     : block.type === "code"
-                                      ? "min-h-32 font-mono text-[13px]"
+                                      ? "min-h-32 font-mono text-[0.8125rem]"
                                       : "min-h-24 leading-6"
                                 }
                                 onChange={(event) =>
