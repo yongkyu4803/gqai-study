@@ -78,7 +78,7 @@
   }
   html {
     @apply bg-background font-sans text-foreground;
-    font-size: 110%;
+    font-size: 19px;
   }
   body {
     @apply min-h-dvh bg-background text-foreground antialiased;
