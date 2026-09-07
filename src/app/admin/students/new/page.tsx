@@ -1,9 +1,5 @@
-import { Suspense } from "react";
-import { StudentsView } from "@/components/admin/people-view";
+import { redirect } from "next/navigation";
+
 export default function NewStudentPage() {
-  return (
-    <Suspense>
-      <StudentsView createOnly />
-    </Suspense>
-  );
+  redirect("/admin/account-requests");
 }

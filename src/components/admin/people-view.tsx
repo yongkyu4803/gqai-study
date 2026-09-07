@@ -4,7 +4,6 @@ import { AssignmentOrderControls } from "./assignment-order-controls";
 import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import {
   Archive,
@@ -62,13 +61,10 @@ import {
 import type { SurveyAnswers } from "@/lib/domain/types";
 import { getLearningPaths } from "@/lib/domain/learning-paths";
 
-export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { state, createStudent } = useApp();
+export function StudentsView() {
+  const { state } = useApp();
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
-  const [showForm, setShowForm] = useState(createOnly);
   const students = state.profiles.filter(
     (item) =>
       item.role === "student" &&
@@ -78,33 +74,6 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
-  if (createOnly) {
-    const prefillLoginId = searchParams.get("loginId") || "";
-    return (
-      <div className="mx-auto max-w-2xl space-y-6">
-        <PageHeader
-          eyebrow="학생 관리"
-          title="학생 계정 발급"
-          description="아이디와 임시 비밀번호를 강사가 직접 정합니다."
-        />
-        <StudentForm
-          groups={state.groups.filter((g) => !g.isArchived)}
-          initialDisplayName={searchParams.get("displayName") || ""}
-          initialLoginId={prefillLoginId}
-          initialPassword={prefillLoginId ? `${prefillLoginId}A123!` : ""}
-          initialEmail={searchParams.get("email") || ""}
-          onCancel={() => router.push("/admin/students")}
-          onCreate={async (input) => {
-            const id = await createStudent(input);
-            toast.success(
-              "학생 계정을 발급했습니다. 임시 비밀번호는 지금 안전하게 전달하세요.",
-            );
-            router.push(`/admin/students/${id}`);
-          }}
-        />
-      </div>
-    );
-  }
   return (
     <div className="space-y-7">
       <PageHeader
@@ -112,33 +81,12 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
         title="학생"
         description="계정 상태, 소속 그룹과 학생별 학습 기록을 관리합니다."
         action={
-          <Button onClick={() => setShowForm((value) => !value)}>
+          <Button render={<Link href="/admin/account-requests" />}>
             <Plus className="size-4" />
-            학생 추가
+            계정 요청 승인
           </Button>
         }
       />
-      {showForm ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">새 학생 계정</CardTitle>
-            <CardDescription>
-              저장 후 비밀번호는 다시 표시하지 않습니다.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StudentForm
-              groups={state.groups.filter((g) => !g.isArchived)}
-              onCancel={() => setShowForm(false)}
-              onCreate={async (input) => {
-                await createStudent(input);
-                toast.success("학생 계정을 발급했습니다.");
-                setShowForm(false);
-              }}
-            />
-          </CardContent>
-        </Card>
-      ) : null}
       <div className="grid gap-3 sm:max-w-2xl sm:grid-cols-[minmax(260px,1fr)_180px]">
         <div className="space-y-2">
           <Label htmlFor="student-search">학생 검색</Label>
@@ -222,145 +170,10 @@ export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
       ) : (
         <EmptyState
           title="학생이 없습니다"
-          description="첫 학생 계정을 발급하세요."
+          description="계정 요청에서 신청 내용을 확인하고 첫 계정을 승인하세요."
         />
       )}
     </div>
-  );
-}
-
-function StudentForm({
-  groups,
-  initialDisplayName = "",
-  initialLoginId = "",
-  initialPassword = "",
-  initialEmail = "",
-  onCancel,
-  onCreate,
-}: {
-  groups: ReturnType<typeof useApp>["state"]["groups"];
-  initialDisplayName?: string;
-  initialLoginId?: string;
-  initialPassword?: string;
-  initialEmail?: string;
-  onCancel: () => void;
-  onCreate: (input: {
-    displayName: string;
-    loginId: string;
-    password: string;
-    email?: string;
-    groupIds: string[];
-  }) => Promise<void>;
-}) {
-  const [displayName, setDisplayName] = useState(initialDisplayName);
-  const [loginId, setLoginId] = useState(initialLoginId);
-  const [password, setPassword] = useState(initialPassword);
-  const [email, setEmail] = useState(initialEmail);
-  const [groupIds, setGroupIds] = useState<string[]>([]);
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
-  async function submit(event: FormEvent) {
-    event.preventDefault();
-    setPending(true);
-    setError("");
-    try {
-      await onCreate({ displayName, loginId, password, email, groupIds });
-    } catch (cause) {
-      const message =
-        cause instanceof Error ? cause.message : "학생을 만들지 못했습니다.";
-      setError(`${message} 입력 내용은 유지됐습니다. 다시 시도하세요.`);
-    } finally {
-      setPending(false);
-    }
-  }
-  return (
-    <form onSubmit={submit} className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="displayName">이름</Label>
-          <Input
-            id="displayName"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="studentLoginId">로그인 아이디</Label>
-          <Input
-            id="studentLoginId"
-            value={loginId}
-            onChange={(e) => setLoginId(e.target.value)}
-            autoCapitalize="none"
-            required
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="studentEmail">이메일 (배정 알림 발송용)</Label>
-        <Input
-          id="studentEmail"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="tempPassword">임시 비밀번호</Label>
-        <Input
-          id="tempPassword"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
-          required
-        />
-        <p className="text-xs text-muted-foreground">
-          8자 이상, 영문과 숫자를 포함합니다. 학생은 첫 로그인 후 변경합니다.
-        </p>
-      </div>
-      {groups.length ? (
-        <fieldset>
-          <legend className="mb-2 text-sm font-medium">초기 그룹</legend>
-          <div className="grid gap-2 sm:grid-cols-2">
-            {groups.map((group) => (
-              <label
-                key={group.id}
-                className="flex cursor-pointer items-center gap-3 rounded-md border p-3 text-sm"
-              >
-                <input
-                  type="checkbox"
-                  checked={groupIds.includes(group.id)}
-                  onChange={() =>
-                    setGroupIds((current) =>
-                      current.includes(group.id)
-                        ? current.filter((id) => id !== group.id)
-                        : [...current, group.id],
-                    )
-                  }
-                />
-                {group.name}
-              </label>
-            ))}
-          </div>
-        </fieldset>
-      ) : null}
-      {error ? (
-        <InlineMessage
-          kind="error"
-          title="학생 계정을 발급하지 못했습니다"
-          description={error}
-        />
-      ) : null}
-      <div className="flex justify-end gap-2">
-        <Button type="button" variant="ghost" onClick={onCancel}>
-          취소
-        </Button>
-        <Button type="submit" disabled={pending} aria-busy={pending}>
-          {pending ? "발급 중…" : "계정 발급"}
-        </Button>
-      </div>
-    </form>
   );
 }
 
@@ -612,7 +425,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                       className="text-right underline-offset-4 hover:underline"
                       onClick={() => setEmailDraft(student.email ?? "")}
                     >
-                      {student.email ?? "미등록 · 알림 못 받음"}
+                      {student.email ?? "이메일 등록 필요"}
                     </button>
                   ) : null}
                 </div>
@@ -645,6 +458,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                       placeholder="알림을 받을 이메일"
                       autoFocus
                       disabled={emailPending}
+                      required
                     />
                     <Button type="submit" size="sm" disabled={emailPending}>
                       저장
@@ -679,7 +493,8 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                 임시 비밀번호 재설정
               </CardTitle>
               <CardDescription>
-                재설정하면 다음 로그인에서 학생이 다시 변경해야 합니다.
+                재설정하면 다음 로그인에서 학생이 다시 변경해야 합니다. 8자 이상
+                72자 이하이며 영문 대문자와 숫자를 각각 1개 이상 포함하세요.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -689,7 +504,7 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="예: study2026"
+                placeholder="예: Study2026"
                 disabled={pending}
               />
               <Button
@@ -1571,7 +1386,9 @@ function labelFor<T extends string | number>(
   options: { value: T; label: string }[],
   value: T,
 ) {
-  return options.find((option) => option.value === value)?.label ?? String(value);
+  return (
+    options.find((option) => option.value === value)?.label ?? String(value)
+  );
 }
 
 function SurveyAnswerSummary({ answers }: { answers: SurveyAnswers }) {
@@ -1588,8 +1405,9 @@ function SurveyAnswerSummary({ answers }: { answers: SurveyAnswers }) {
       <Row
         label="주로 쓰는 AI"
         value={
-          answers.aiTools.map((tool) => labelFor(aiToolOptions, tool)).join(", ") ||
-          "응답 없음"
+          answers.aiTools
+            .map((tool) => labelFor(aiToolOptions, tool))
+            .join(", ") || "응답 없음"
         }
       />
       <Row label="유료 구독" value={answers.aiSubscription || "없음"} />
@@ -1603,7 +1421,10 @@ function SurveyAnswerSummary({ answers }: { answers: SurveyAnswers }) {
           {SURVEY_TOOLS.map((tool) => (
             <Badge key={tool} variant="outline" className="font-normal">
               {toolLabels[tool]} ·{" "}
-              {labelFor(toolFamiliarityOptions, answers.toolFamiliarity[tool] ?? "none")}
+              {labelFor(
+                toolFamiliarityOptions,
+                answers.toolFamiliarity[tool] ?? "none",
+              )}
             </Badge>
           ))}
         </div>

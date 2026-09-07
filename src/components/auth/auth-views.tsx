@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PASSWORD_GUIDANCE } from "@/lib/domain/account-policy";
 
 function safeNext(value: string | null, role: "admin" | "student") {
   const fallback = role === "admin" ? "/admin" : "/learn";
@@ -75,7 +76,7 @@ export function LoginView() {
               학습 공간 로그인
             </CardTitle>
             <CardDescription>
-              강사가 전달한 아이디와 비밀번호를 입력하세요.
+              계정 신청 때 직접 정한 아이디와 비밀번호를 입력하세요.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -133,11 +134,17 @@ export function LoginView() {
             ) : null}
             <p className="mt-6 text-center text-sm text-muted-foreground">
               계정이 없으신가요?{" "}
-              <Link href="/request-access" className="font-medium text-foreground underline underline-offset-4">
+              <Link
+                href="/request-access"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
                 계정 발급 요청
               </Link>
               <span className="mx-2">·</span>
-              <Link href="/forgot-password" className="font-medium text-foreground underline underline-offset-4">
+              <Link
+                href="/forgot-password"
+                className="font-medium text-foreground underline underline-offset-4"
+              >
                 비밀번호 찾기
               </Link>
             </p>
@@ -199,10 +206,13 @@ export function ForgotPasswordView() {
         body: JSON.stringify({ loginId, email }),
       });
       const body = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(body?.error || "요청을 처리하지 못했습니다.");
+      if (!response.ok)
+        throw new Error(body?.error || "요청을 처리하지 못했습니다.");
       setMessage(body.message);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "요청을 처리하지 못했습니다.");
+      setError(
+        cause instanceof Error ? cause.message : "요청을 처리하지 못했습니다.",
+      );
     } finally {
       setPending(false);
     }
@@ -213,7 +223,11 @@ export function ForgotPasswordView() {
       description="아이디와 계정에 등록된 이메일을 입력하면 재설정 링크를 보내드립니다."
     >
       {message ? (
-        <InlineMessage kind="success" title="요청을 접수했습니다" description={message} />
+        <InlineMessage
+          kind="success"
+          title="요청을 접수했습니다"
+          description={message}
+        />
       ) : (
         <form onSubmit={submit} className="space-y-5">
           {error ? (
@@ -248,7 +262,12 @@ export function ForgotPasswordView() {
               이메일을 등록하지 않았다면 강사에게 재설정을 요청하세요.
             </p>
           </div>
-          <Button type="submit" className="h-11 w-full" disabled={pending} aria-busy={pending}>
+          <Button
+            type="submit"
+            className="h-11 w-full"
+            disabled={pending}
+            aria-busy={pending}
+          >
             {pending ? "보내는 중…" : "재설정 링크 보내기"}
           </Button>
         </form>
@@ -280,20 +299,22 @@ export function ResetPasswordView() {
         body: JSON.stringify({ token, password }),
       });
       const body = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(body?.error || "비밀번호를 변경하지 못했습니다.");
+      if (!response.ok)
+        throw new Error(body?.error || "비밀번호를 변경하지 못했습니다.");
       toast.success("비밀번호를 변경했습니다. 새 비밀번호로 로그인하세요.");
       router.replace("/login");
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "비밀번호를 변경하지 못했습니다.");
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "비밀번호를 변경하지 못했습니다.",
+      );
     } finally {
       setPending(false);
     }
   }
   return (
-    <PublicCard
-      title="새 비밀번호 설정"
-      description="8자 이상, 영문과 숫자를 포함한 비밀번호를 입력하세요."
-    >
+    <PublicCard title="새 비밀번호 설정" description={PASSWORD_GUIDANCE}>
       {!token ? (
         <InlineMessage
           kind="error"
@@ -331,7 +352,12 @@ export function ResetPasswordView() {
               required
             />
           </div>
-          <Button type="submit" className="h-11 w-full" disabled={pending} aria-busy={pending}>
+          <Button
+            type="submit"
+            className="h-11 w-full"
+            disabled={pending}
+            aria-busy={pending}
+          >
             {pending ? "변경 중…" : "비밀번호 변경"}
           </Button>
         </form>
@@ -343,7 +369,10 @@ export function ResetPasswordView() {
 export function RequestAccessView() {
   const [displayName, setDisplayName] = useState("");
   const [loginId, setLoginId] = useState("");
-  const [contact, setContact] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [policyAccepted, setPolicyAccepted] = useState(false);
   const [note, setNote] = useState("");
   // Honeypot — hidden from people, filled only by form-stuffing bots.
   const [website, setWebsite] = useState("");
@@ -352,13 +381,25 @@ export function RequestAccessView() {
   const [done, setDone] = useState(false);
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (password !== confirm) {
+      setError("비밀번호 확인이 일치하지 않습니다.");
+      return;
+    }
     setPending(true);
     setError("");
     try {
       const response = await fetch("/api/account-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ displayName, loginId, contact, note, website }),
+        body: JSON.stringify({
+          displayName,
+          loginId,
+          email,
+          password,
+          policyAccepted,
+          note,
+          website,
+        }),
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -392,7 +433,8 @@ export function RequestAccessView() {
               계정 발급 요청
             </CardTitle>
             <CardDescription>
-              이름, 사용할 아이디와 이메일을 남기면 강사가 확인 후 계정을 만들어 전달합니다.
+              이메일과 사용할 아이디·비밀번호를 입력하면 관리자가 신청 내용을
+              확인하고 계정 발급만 승인합니다.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -400,14 +442,23 @@ export function RequestAccessView() {
               <InlineMessage
                 kind="success"
                 title="요청을 접수했습니다"
-                description="강사가 확인 후 아이디와 임시 비밀번호를 전달할 예정입니다."
+                description="관리자가 승인하면 이메일로 알려드립니다. 승인 후 신청할 때 정한 아이디와 비밀번호로 로그인하세요."
               />
             ) : (
               <form onSubmit={submit} className="space-y-5">
                 <div className="rounded-lg border bg-zinc-50 p-4 text-sm leading-6">
                   <p className="font-medium">신청 전 참여 안내</p>
-                  <p className="mt-2 text-muted-foreground">온라인 학습은 무료이며, 오프라인 강의는 희망자에 한해 별도 협의로 유료 진행합니다. 일정 기간 학습 진도가 진행되지 않으면 계정이 비활성화됩니다.</p>
-                  <Link href="/#before-joining" className="mt-2 inline-block underline underline-offset-4">학습 방식과 운영 원칙 자세히 보기</Link>
+                  <p className="mt-2 text-muted-foreground">
+                    온라인 학습은 무료이며, 오프라인 강의는 희망자에 한해 별도
+                    협의로 유료 진행합니다. 일정 기간 학습 진도가 진행되지
+                    않으면 계정이 비활성화됩니다.
+                  </p>
+                  <Link
+                    href="/#before-joining"
+                    className="mt-2 inline-block underline underline-offset-4"
+                  >
+                    학습 방식과 운영 원칙 자세히 보기
+                  </Link>
                 </div>
                 {error ? (
                   <Alert variant="destructive">
@@ -426,7 +477,9 @@ export function RequestAccessView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="requestLoginId">사이트에서 사용할 아이디</Label>
+                  <Label htmlFor="requestLoginId">
+                    사이트에서 사용할 아이디
+                  </Label>
                   <Input
                     id="requestLoginId"
                     value={loginId}
@@ -437,19 +490,60 @@ export function RequestAccessView() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="requestContact">이메일</Label>
+                  <Label htmlFor="requestEmail">이메일 (필수)</Label>
                   <Input
-                    id="requestContact"
+                    id="requestEmail"
                     type="email"
-                    value={contact}
-                    onChange={(e) => setContact(e.target.value)}
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="학습 알림을 받을 이메일 주소"
+                    required
+                  />
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    계정 승인, 학습 알림과 비밀번호 재설정에 사용합니다.
+                    전화번호는 수집하지 않습니다.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestPassword">사용할 비밀번호</Label>
+                  <Input
+                    id="requestPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    minLength={8}
+                    maxLength={72}
+                    required
+                  />
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {PASSWORD_GUIDANCE} 다른 서비스와 겹치지 않는 비밀번호를
+                    권장합니다. 관리자는 비밀번호를 확인할 수 없습니다.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="requestPasswordConfirm">비밀번호 확인</Label>
+                  <Input
+                    id="requestPasswordConfirm"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    minLength={8}
+                    maxLength={72}
                     required
                   />
                 </div>
                 <div
                   aria-hidden="true"
-                  style={{ position: "absolute", left: "-9999px", width: 1, height: 1, overflow: "hidden" }}
+                  style={{
+                    position: "absolute",
+                    left: "-9999px",
+                    width: 1,
+                    height: 1,
+                    overflow: "hidden",
+                  }}
                 >
                   <label htmlFor="requestWebsite">Website</label>
                   <input
@@ -471,6 +565,38 @@ export function RequestAccessView() {
                     placeholder="소속 반, 요청 사유 등"
                   />
                 </div>
+                <label className="flex items-start gap-3 rounded-lg border p-4 text-sm leading-6">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 shrink-0"
+                    checked={policyAccepted}
+                    onChange={(event) =>
+                      setPolicyAccepted(event.target.checked)
+                    }
+                    required
+                  />
+                  <span>
+                    <Link
+                      href="/policies/privacy"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium underline underline-offset-4"
+                    >
+                      개인정보 처리방침
+                    </Link>
+                    과{" "}
+                    <Link
+                      href="/policies/terms"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-medium underline underline-offset-4"
+                    >
+                      이용정책
+                    </Link>
+                    을 확인했으며 계정 신청을 위한 필수 정보 수집·이용에
+                    동의합니다.
+                  </span>
+                </label>
                 <Button
                   type="submit"
                   className="h-11 w-full"
@@ -520,10 +646,7 @@ export function ChangePasswordView() {
       <Card>
         <CardHeader>
           <CardTitle>새 비밀번호 설정</CardTitle>
-          <CardDescription>
-            8자 이상이며 영문과 숫자를 포함해 주세요. 강사가 발급한 임시
-            비밀번호는 더 이상 사용할 수 없습니다.
-          </CardDescription>
+          <CardDescription>{PASSWORD_GUIDANCE}</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={submit} className="space-y-5">

@@ -11,7 +11,10 @@ import {
   type ReactNode,
 } from "react";
 import { nanoid } from "nanoid";
-import { validateAnnouncement, type AnnouncementInput } from "@/lib/domain/announcements";
+import {
+  validateAnnouncement,
+  type AnnouncementInput,
+} from "@/lib/domain/announcements";
 import { reorderAssignments as reorderAssignmentsState } from "@/lib/domain/assignment-order";
 import { createDemoSeed, demoCredentials } from "@/lib/demo/seed";
 import {
@@ -35,7 +38,6 @@ import type {
   AssignmentInput,
   AssignmentManagementAction,
   CreateGroupInput,
-  CreateStudentInput,
   FeedbackInput,
   FileAsset,
   ModuleSnapshot,
@@ -49,7 +51,6 @@ import {
   groupSchema,
   loginIdSchema,
   passwordSchema,
-  studentSchema,
   toAuthEmail,
   validateFile,
   validateModuleSnapshot,
@@ -95,7 +96,6 @@ interface AppContextValue {
   logout: () => Promise<void>;
   changePassword: (password: string) => Promise<void>;
   resetDemo: () => void;
-  createStudent: (input: CreateStudentInput) => Promise<string>;
   resetStudentPassword: (studentId: string, password: string) => Promise<void>;
   toggleStudentActive: (studentId: string) => Promise<void>;
   updateStudentEmail: (studentId: string, email: string) => Promise<void>;
@@ -459,63 +459,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(CREDENTIAL_KEY, JSON.stringify(demoCredentials));
   }, []);
 
-  const createStudent = useCallback(
-    async (rawInput: CreateStudentInput) => {
-      const input = studentSchema.parse(rawInput);
-      if (!session || session.role !== "admin")
-        throw new Error("관리자 권한이 필요합니다.");
-      if (mode === "supabase") {
-        const response = await fetch("/api/admin/students", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(input),
-        });
-        const result = (await response.json()) as {
-          id?: string;
-          error?: string;
-        };
-        if (!response.ok || !result.id)
-          throw new Error(result.error ?? "학생을 만들지 못했습니다.");
-        await refresh();
-        return result.id;
-      }
-      if (state.profiles.some((item) => item.loginId === input.loginId))
-        throw new Error("이미 사용 중인 아이디입니다.");
-      const id = `profile-${nanoid(10)}`;
-      const stamp = new Date().toISOString();
-      const next = structuredClone(state);
-      next.profiles.push({
-        id,
-        role: "student",
-        loginId: input.loginId,
-        displayName: input.displayName,
-        email: input.email || undefined,
-        mustChangePassword: true,
-        mustCompleteSurvey: true,
-        isActive: true,
-        createdAt: stamp,
-      });
-      for (const group of next.groups) {
-        if (
-          input.groupIds.includes(group.id) &&
-          !group.memberIds.includes(id)
-        ) {
-          group.memberIds.push(id);
-          group.updatedAt = stamp;
-        }
-      }
-      const nextCredentials = {
-        ...credentials,
-        [input.loginId]: input.password,
-      };
-      setCredentials(nextCredentials);
-      setState(next);
-      persistDemo(next, session, nextCredentials);
-      return id;
-    },
-    [credentials, mode, persistDemo, refresh, session, state],
-  );
-
   const resetStudentPassword = useCallback(
     async (studentId: string, password: string) => {
       passwordSchema.parse(password);
@@ -577,7 +520,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateStudentEmail = useCallback(
     async (studentId: string, email: string) => {
-      const normalized = email.trim() ? emailSchema.parse(email) : "";
+      const normalized = emailSchema.parse(email);
       if (!session || session.role !== "admin")
         throw new Error("관리자 권한이 필요합니다.");
       if (mode === "supabase") {
@@ -595,7 +538,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const next = structuredClone(state);
       const target = next.profiles.find((item) => item.id === studentId);
       if (!target) throw new Error("학생을 찾을 수 없습니다.");
-      target.email = normalized || undefined;
+      target.email = normalized;
       setState(next);
       persistDemo(next);
     },
@@ -604,13 +547,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const updateMyEmail = useCallback(
     async (email: string) => {
-      const normalized = email.trim() ? emailSchema.parse(email) : "";
+      const normalized = emailSchema.parse(email);
       if (!session) throw new Error("로그인이 필요합니다.");
       if (mode === "supabase") {
         if (!supabase) throw new Error("Supabase 연결 정보가 없습니다.");
         const { error } = await supabase
           .from("gqai_aistudy_profiles")
-          .update({ email: normalized || null })
+          .update({ email: normalized })
           .eq("id", session.id);
         if (error) throw new Error(error.message);
         await refresh();
@@ -619,7 +562,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const next = structuredClone(state);
       const target = next.profiles.find((item) => item.id === session.id);
       if (!target) throw new Error("프로필을 찾을 수 없습니다.");
-      target.email = normalized || undefined;
+      target.email = normalized;
       setState(next);
       persistDemo(next);
     },
@@ -1161,23 +1104,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [repository, session],
   );
 
-  const saveAnnouncement = useCallback(async (input: AnnouncementInput) => {
-    if (session?.role !== "admin") throw new Error("관리자 권한이 필요합니다.");
-    const valid = validateAnnouncement(input);
-    if (repository) {
-      await repository.saveAnnouncement(valid);
-      await refresh();
-      return;
-    }
-    if (valid.scope === "student" && !state.profiles.some((p) => p.id === valid.targetId && p.role === "student")) throw new Error("학생을 찾을 수 없습니다.");
-    if (valid.scope === "group" && !state.groups.some((g) => g.id === valid.targetId)) throw new Error("그룹을 찾을 수 없습니다.");
-    const notices = state.announcements ?? [];
-    const existing = notices.find((n) => n.id === valid.id);
-    if (valid.id && !existing) throw new Error("공지를 찾을 수 없습니다.");
-    const now = new Date().toISOString();
-    const notice = { ...valid, id: valid.id ?? nanoid(), archived: valid.archived ?? false, createdAt: existing?.createdAt ?? now, updatedAt: now };
-    commitDemo({ ...state, announcements: [notice, ...notices.filter((n) => n.id !== notice.id)] });
-  }, [session, repository, refresh, state, commitDemo]);
+  const saveAnnouncement = useCallback(
+    async (input: AnnouncementInput) => {
+      if (session?.role !== "admin")
+        throw new Error("관리자 권한이 필요합니다.");
+      const valid = validateAnnouncement(input);
+      if (repository) {
+        await repository.saveAnnouncement(valid);
+        await refresh();
+        return;
+      }
+      if (
+        valid.scope === "student" &&
+        !state.profiles.some(
+          (p) => p.id === valid.targetId && p.role === "student",
+        )
+      )
+        throw new Error("학생을 찾을 수 없습니다.");
+      if (
+        valid.scope === "group" &&
+        !state.groups.some((g) => g.id === valid.targetId)
+      )
+        throw new Error("그룹을 찾을 수 없습니다.");
+      const notices = state.announcements ?? [];
+      const existing = notices.find((n) => n.id === valid.id);
+      if (valid.id && !existing) throw new Error("공지를 찾을 수 없습니다.");
+      const now = new Date().toISOString();
+      const notice = {
+        ...valid,
+        id: valid.id ?? nanoid(),
+        archived: valid.archived ?? false,
+        createdAt: existing?.createdAt ?? now,
+        updatedAt: now,
+      };
+      commitDemo({
+        ...state,
+        announcements: [notice, ...notices.filter((n) => n.id !== notice.id)],
+      });
+    },
+    [session, repository, refresh, state, commitDemo],
+  );
 
   const submitSurvey = useCallback(
     async (rawAnswers: SurveyAnswers) => {
@@ -1224,8 +1190,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (!session) throw new Error("로그인이 필요합니다.");
       const body = rawBody.trim();
       if (!body) throw new Error("문의 내용을 입력하세요.");
-      const targetStudentId =
-        session.role === "admin" ? studentId : session.id;
+      const targetStudentId = session.role === "admin" ? studentId : session.id;
       if (!targetStudentId) throw new Error("학생을 지정하세요.");
       if (repository) {
         const messageId = await repository.sendInquiryMessage(
@@ -1295,7 +1260,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       logout,
       changePassword,
       resetDemo,
-      createStudent,
       resetStudentPassword,
       toggleStudentActive,
       updateMyEmail,
@@ -1340,7 +1304,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createFeedback,
       createGroup,
       createModule,
-      createStudent,
       duplicateModule,
       login,
       logout,

@@ -249,9 +249,20 @@ export default function HomePage() {
       </section>
       <footer className="content-wrap flex flex-wrap items-center justify-between gap-3 py-7 text-xs text-muted-foreground">
         <span>GQAI Study · 나의 일에 연결하는 AI 학습</span>
-        <Link href="/login" className="hover:underline">
-          이미 계정이 있다면 로그인
-        </Link>
+        <nav
+          className="flex flex-wrap items-center gap-x-4 gap-y-2"
+          aria-label="푸터 메뉴"
+        >
+          <Link href="/policies/privacy" className="hover:underline">
+            개인정보 처리방침
+          </Link>
+          <Link href="/policies/terms" className="hover:underline">
+            이용정책
+          </Link>
+          <Link href="/login" className="hover:underline">
+            로그인
+          </Link>
+        </nav>
       </footer>
     </main>
   );

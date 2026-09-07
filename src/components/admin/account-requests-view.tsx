@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { EmptyState, PageHeader } from "@/components/common/page-parts";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +11,11 @@ interface AccountRequest {
   id: string;
   displayName: string;
   requestedLoginId: string | null;
-  contact: string;
+  email: string;
   note: string | null;
   status: "pending" | "approved" | "dismissed";
   createdAt: string;
+  credentialReady: boolean;
 }
 
 const statusLabel: Record<AccountRequest["status"], string> = {
@@ -25,7 +25,6 @@ const statusLabel: Record<AccountRequest["status"], string> = {
 };
 
 export function AccountRequestsView() {
-  const router = useRouter();
   const [requests, setRequests] = useState<AccountRequest[] | null>(null);
   const [pendingId, setPendingId] = useState<string | null>(null);
 
@@ -52,10 +51,22 @@ export function AccountRequestsView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (!response.ok) throw new Error();
+      const body = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      if (!response.ok) {
+        throw new Error(body?.error || "요청을 처리하지 못했습니다.");
+      }
       await load();
-    } catch {
-      toast.error("요청을 처리하지 못했습니다.");
+      toast.success(
+        status === "approved"
+          ? "계정을 승인하고 활성화했습니다."
+          : "요청을 무시 처리했습니다.",
+      );
+    } catch (cause) {
+      toast.error(
+        cause instanceof Error ? cause.message : "요청을 처리하지 못했습니다.",
+      );
     } finally {
       setPendingId(null);
     }
@@ -66,7 +77,7 @@ export function AccountRequestsView() {
       <PageHeader
         eyebrow="계정 관리"
         title="계정 요청"
-        description="랜딩 페이지에서 접수된 계정 발급 요청입니다."
+        description="신청자가 아이디와 비밀번호를 정합니다. 관리자는 내용을 확인하고 계정 발급을 승인합니다."
       />
       {requests === null ? null : requests.length ? (
         <div className="overflow-hidden rounded-lg border">
@@ -79,9 +90,17 @@ export function AccountRequestsView() {
                 <div>
                   <p className="font-medium">{item.displayName}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {item.requestedLoginId ? `@${item.requestedLoginId} · ` : ""}
-                    {item.contact}
+                    {item.requestedLoginId
+                      ? `@${item.requestedLoginId} · `
+                      : ""}
+                    {item.email}
                   </p>
+                  {item.status === "pending" && !item.credentialReady ? (
+                    <p className="mt-2 text-xs text-amber-700">
+                      이전 방식으로 접수된 요청 · 먼저 무시 처리한 뒤 신청자에게
+                      새 양식에서 비밀번호를 설정해 다시 신청하도록 안내하세요.
+                    </p>
+                  ) : null}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {item.note || "메모 없음"}
@@ -107,18 +126,10 @@ export function AccountRequestsView() {
                     </Button>
                     <Button
                       size="sm"
-                      disabled={pendingId === item.id}
-                      onClick={async () => {
-                        await resolve(item.id, "approved");
-                        const params = new URLSearchParams({
-                          displayName: item.displayName,
-                          loginId: item.requestedLoginId || "",
-                          email: item.contact,
-                        });
-                        router.push(`/admin/students/new?${params.toString()}`);
-                      }}
+                      disabled={pendingId === item.id || !item.credentialReady}
+                      onClick={() => resolve(item.id, "approved")}
                     >
-                      계정 발급하기
+                      승인 및 계정 활성화
                     </Button>
                   </div>
                 ) : null}

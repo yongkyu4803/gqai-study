@@ -8,6 +8,8 @@ export const PUBLIC_PATHS = [
   "/request-access",
   "/forgot-password",
   "/reset-password",
+  "/policies/privacy",
+  "/policies/terms",
 ] as const;
 
 export function isPublicPath(pathname: string) {

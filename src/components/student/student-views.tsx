@@ -46,6 +46,7 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
+import { PASSWORD_GUIDANCE } from "@/lib/domain/account-policy";
 import {
   feedbackKindLabel,
   formatDate,
@@ -1355,6 +1356,7 @@ export function AccountView() {
               placeholder="you@example.com"
               aria-invalid={Boolean(emailError)}
               aria-describedby={emailError ? "account-email-error" : undefined}
+              required
             />
           </div>
           {emailError ? (
@@ -1378,9 +1380,7 @@ export function AccountView() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">비밀번호 변경</CardTitle>
-          <CardDescription>
-            8자 이상이며 영문과 숫자를 포함하세요.
-          </CardDescription>
+          <CardDescription>{PASSWORD_GUIDANCE}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">

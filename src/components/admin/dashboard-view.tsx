@@ -143,7 +143,9 @@ export function AdminDashboardView() {
                           {student.displayName}
                         </span>
                         <span className="shrink-0 text-xs text-muted-foreground">
-                          {days === null ? "로그인 기록 없음" : `${days}일 전 접속`}
+                          {days === null
+                            ? "로그인 기록 없음"
+                            : `${days}일 전 접속`}
                         </span>
                       </Link>
                     );
@@ -211,7 +213,7 @@ export function AdminDashboardView() {
           </CardHeader>
           <CardContent className="space-y-2">
             <Quick href="/admin/modules/new" label="새 실습 모듈 만들기" />
-            <Quick href="/admin/students/new" label="학생 계정 발급하기" />
+            <Quick href="/admin/account-requests" label="계정 요청 승인하기" />
             <Quick href="/admin/groups" label="학습 그룹 관리하기" />
             <Quick href="/admin/assignments" label="전체 진행 현황 보기" />
           </CardContent>

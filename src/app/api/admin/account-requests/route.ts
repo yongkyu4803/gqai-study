@@ -8,7 +8,9 @@ export async function GET() {
     const admin = createSupabaseAdminClient();
     const { data, error } = await admin
       .from("gqai_aistudy_account_requests")
-      .select("id, display_name, requested_login_id, contact, note, status, created_at")
+      .select(
+        "id, display_name, requested_login_id, contact, note, status, created_at, auth_user_id, policy_accepted_at",
+      )
       .order("created_at", { ascending: false });
     if (error) throw error;
     return NextResponse.json({
@@ -16,10 +18,11 @@ export async function GET() {
         id: row.id,
         displayName: row.display_name,
         requestedLoginId: row.requested_login_id,
-        contact: row.contact,
+        email: row.contact,
         note: row.note,
         status: row.status,
         createdAt: row.created_at,
+        credentialReady: Boolean(row.auth_user_id && row.policy_accepted_at),
       })),
     });
   } catch (error) {

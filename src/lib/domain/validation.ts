@@ -16,7 +16,7 @@ export const passwordSchema = z
   .string()
   .min(8, "비밀번호는 8자 이상 입력하세요.")
   .max(72, "비밀번호는 72자 이하로 입력하세요.")
-  .regex(/[A-Za-z]/, "영문자를 한 글자 이상 포함하세요.")
+  .regex(/[A-Z]/, "영문 대문자를 한 글자 이상 포함하세요.")
   .regex(/[0-9]/, "숫자를 한 글자 이상 포함하세요.");
 
 export const emailSchema = z
@@ -26,30 +26,14 @@ export const emailSchema = z
   .email("올바른 이메일 주소를 입력하세요.")
   .max(100);
 
-export const studentSchema = z.object({
-  displayName: z.string().trim().min(1, "학생 이름을 입력하세요.").max(50),
-  loginId: loginIdSchema,
-  password: passwordSchema,
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email("올바른 이메일 주소를 입력하세요.")
-    .max(100)
-    .optional()
-    .or(z.literal("")),
-  groupIds: z.array(z.string()),
-});
-
 export const accountRequestSchema = z.object({
   displayName: z.string().trim().min(1, "이름을 입력하세요.").max(50),
   loginId: loginIdSchema,
-  contact: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email("올바른 이메일 주소를 입력하세요.")
-    .max(100),
+  email: emailSchema,
+  password: passwordSchema,
+  policyAccepted: z.literal(true, {
+    error: "개인정보 처리방침과 이용정책에 동의해 주세요.",
+  }),
   note: z.string().trim().max(300).optional(),
 });
 

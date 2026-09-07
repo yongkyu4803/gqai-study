@@ -7,7 +7,6 @@ test.skip(
 
 const adminPassword = "LocalAdmin1234!";
 const studentPassword = "TempStudent1234!";
-const changedPassword = "ChangedStudent1234!";
 
 async function login(page: Page, id: string, password: string) {
   await page.goto("/login");
@@ -30,26 +29,49 @@ async function logout(page: Page) {
 test("실제 Auth/API/DB를 거쳐 모듈부터 최종 완료까지 완주한다", async ({
   page,
 }, testInfo) => {
-  test.setTimeout(60_000);
+  test.setTimeout(120_000);
   const suffix = `${Date.now().toString(36)}-${testInfo.workerIndex}`;
   const studentLogin = `student.${suffix}`;
+  const studentEmail = `${studentLogin}@example.com`;
   const moduleTitle = `운영 연결 검증 ${suffix}`;
+
+  await page.goto("/request-access");
+  await page.getByLabel("이름").fill("운영 학생");
+  await page.getByLabel("사이트에서 사용할 아이디").fill(studentLogin);
+  await page.getByLabel("이메일 (필수)").fill(studentEmail);
+  await page.getByLabel("사용할 비밀번호").fill(studentPassword);
+  await page.getByLabel("비밀번호 확인").fill(studentPassword);
+  await page.getByRole("checkbox").check();
+  const accountRequestResponse = page.waitForResponse(
+    (response) =>
+      response.url().endsWith("/api/account-requests") &&
+      response.request().method() === "POST",
+  );
+  await page.getByRole("button", { name: "요청 보내기" }).click();
+  const requestResponse = await accountRequestResponse;
+  expect(requestResponse.status(), await requestResponse.text()).toBe(201);
+  await expect(page.getByText("요청을 접수했습니다")).toBeVisible();
 
   await login(page, "localadmin", adminPassword);
   await expect(page).toHaveURL(/\/admin$/);
-  await page.goto("/admin/students/new");
-  await page.getByLabel("이름").fill("운영 학생");
-  await page.getByLabel("로그인 아이디").fill(studentLogin);
-  await page.getByLabel("임시 비밀번호").fill(studentPassword);
-  const createStudentResponse = page.waitForResponse(
+  await page.goto("/admin/account-requests");
+  const requestRow = page
+    .getByText(new RegExp(`@${studentLogin}`))
+    .locator("xpath=../..");
+  const approveResponse = page.waitForResponse(
     (response) =>
-      response.url().endsWith("/api/admin/students") &&
-      response.request().method() === "POST",
+      response.url().includes("/api/admin/account-requests/") &&
+      response.request().method() === "PATCH",
   );
-  await page.getByRole("button", { name: "계정 발급" }).click();
-  const studentResponse = await createStudentResponse;
-  expect(studentResponse.status(), await studentResponse.text()).toBe(201);
-  await expect(page).toHaveURL(/\/admin\/students\/(?!new$)[^/]+$/);
+  await requestRow.getByRole("button", { name: "승인 및 계정 활성화" }).click();
+  const approval = await approveResponse;
+  expect(approval.status(), await approval.text()).toBe(200);
+  await expect(page.getByText("계정을 승인하고 활성화했습니다.")).toBeVisible();
+
+  await page.goto("/admin/students");
+  await page.getByLabel("학생 검색").fill(studentLogin);
+  await page.getByRole("link", { name: /운영 학생/ }).click();
+  await expect(page).toHaveURL(/\/admin\/students\/[^/]+$/);
   const studentDetailUrl = page.url();
   await expect(page.getByRole("heading", { name: "운영 학생" })).toBeVisible();
 
@@ -89,10 +111,12 @@ test("실제 Auth/API/DB를 거쳐 모듈부터 최종 완료까지 완주한다
 
   await logout(page);
   await login(page, studentLogin, studentPassword);
-  await expect(page).toHaveURL("/change-password");
-  await page.getByLabel("새 비밀번호", { exact: true }).fill(changedPassword);
-  await page.getByLabel("새 비밀번호 확인").fill(changedPassword);
-  await page.getByRole("button", { name: "비밀번호 변경" }).click();
+  await expect(page).toHaveURL("/survey");
+  await page.getByText("ChatGPT", { exact: true }).click();
+  await page
+    .getByLabel("구체적으로 어떻게 활용하고 계신가요?")
+    .fill("업무 관련 질문과 문서 초안 작성에 사용합니다.");
+  await page.getByRole("button", { name: "제출하고 시작하기" }).click();
   await expect(page).toHaveURL("/learn");
   await page.getByText(moduleTitle).click();
   await expect(

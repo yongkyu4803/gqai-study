@@ -210,21 +210,12 @@ export interface Announcement {
 
 export type SurveyOsChoice = "windows" | "macos" | "other";
 export type SurveyAiTool =
-  | "chatgpt"
-  | "claude"
-  | "gemini"
-  | "grok"
-  | "genspark"
-  | "other"
-  | "none";
+  "chatgpt" | "claude" | "gemini" | "grok" | "genspark" | "other" | "none";
 export type SurveyUsageFrequency = "daily" | "weekly" | "rarely";
 export type SurveyToolFamiliarity = "none" | "some" | "proficient";
 export type SurveySkillLevel = 1 | 2 | 3 | 4 | 5;
 export type SurveyLearningGoal =
-  | "automation"
-  | "side_project"
-  | "group_project"
-  | "other";
+  "automation" | "side_project" | "group_project" | "other";
 
 export interface SurveyAnswers {
   os: SurveyOsChoice;
@@ -282,14 +273,6 @@ export interface SessionUser {
   displayName: string;
   mustChangePassword: boolean;
   mustCompleteSurvey: boolean;
-}
-
-export interface CreateStudentInput {
-  displayName: string;
-  loginId: string;
-  password: string;
-  email?: string;
-  groupIds: string[];
 }
 
 export interface CreateGroupInput {

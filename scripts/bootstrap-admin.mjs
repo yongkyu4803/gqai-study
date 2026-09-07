@@ -17,11 +17,12 @@ if (!/^[a-z0-9][a-z0-9._-]{3,31}$/.test(loginId))
   throw new Error("관리자 아이디 형식을 확인하세요.");
 if (
   password.length < 8 ||
-  !/[A-Za-z]/.test(password) ||
+  password.length > 72 ||
+  !/[A-Z]/.test(password) ||
   !/[0-9]/.test(password)
 )
   throw new Error(
-    "관리자 비밀번호는 8자 이상이며 영문과 숫자를 포함해야 합니다.",
+    "관리자 비밀번호는 8자 이상 72자 이하이며 영문 대문자와 숫자를 포함해야 합니다.",
   );
 
 const client = createClient(url, serviceRole, {

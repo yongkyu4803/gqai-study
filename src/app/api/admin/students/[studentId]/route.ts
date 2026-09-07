@@ -7,7 +7,7 @@ import { emailSchema, passwordSchema } from "@/lib/domain/validation";
 const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("reset_password"), password: passwordSchema }),
   z.object({ action: z.literal("set_active"), isActive: z.boolean() }),
-  z.object({ action: z.literal("set_email"), email: emailSchema.or(z.literal("")) }),
+  z.object({ action: z.literal("set_email"), email: emailSchema }),
 ]);
 
 export async function PATCH(
@@ -32,7 +32,7 @@ export async function PATCH(
     if (input.action === "set_email") {
       const { error } = await admin
         .from("gqai_aistudy_profiles")
-        .update({ email: input.email || null })
+        .update({ email: input.email })
         .eq("id", studentId);
       if (error) throw error;
       await admin.from("gqai_aistudy_activity_events").insert({
@@ -52,15 +52,13 @@ export async function PATCH(
         .update({ must_change_password: true })
         .eq("id", studentId);
       if (updateError) throw updateError;
-      await admin
-        .from("gqai_aistudy_activity_events")
-        .insert({
-          event_name: "student.password_reset",
-          actor_id: adminUser.id,
-          student_id: studentId,
-          entity_type: "student",
-          entity_id: studentId,
-        });
+      await admin.from("gqai_aistudy_activity_events").insert({
+        event_name: "student.password_reset",
+        actor_id: adminUser.id,
+        student_id: studentId,
+        entity_type: "student",
+        entity_id: studentId,
+      });
     } else {
       const previous = profile.is_active;
       const { error } = await admin.auth.admin.updateUserById(studentId, {
@@ -80,17 +78,15 @@ export async function PATCH(
         });
         throw updateError;
       }
-      await admin
-        .from("gqai_aistudy_activity_events")
-        .insert({
-          event_name: input.isActive
-            ? "student.activated"
-            : "student.deactivated",
-          actor_id: adminUser.id,
-          student_id: studentId,
-          entity_type: "student",
-          entity_id: studentId,
-        });
+      await admin.from("gqai_aistudy_activity_events").insert({
+        event_name: input.isActive
+          ? "student.activated"
+          : "student.deactivated",
+        actor_id: adminUser.id,
+        student_id: studentId,
+        entity_type: "student",
+        entity_id: studentId,
+      });
     }
     return NextResponse.json({ ok: true });
   } catch (error) {
