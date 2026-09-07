@@ -563,18 +563,26 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
   async function save(submit: boolean) {
     const missingReflection = missingSubmissionReflectionField(reflection);
     if (submit && missingReflection) {
-      setError(`${missingReflection} 항목을 작성해 주세요.`);
+      const message = `${missingReflection} 항목을 작성해 주세요.`;
+      setError(message);
+      toast.error(message);
+      document
+        .getElementById("submission-reflection-card")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     const evidence = validItems();
     if (evidence.length !== items.length) {
-      setError("비어 있거나 올바르지 않은 항목을 확인해 주세요.");
+      const message = "비어 있거나 올바르지 않은 항목을 확인해 주세요.";
+      setError(message);
+      toast.error(message);
       return;
     }
     if (submit && !evidence.length) {
-      setError(
-        "모듈 수행 결과를 확인할 수 있는 항목을 한 개 이상 추가해 주세요.",
-      );
+      const message =
+        "모듈 수행 결과를 확인할 수 있는 항목을 한 개 이상 추가해 주세요.";
+      setError(message);
+      toast.error(message);
       return;
     }
     const cleaned: SubmissionItem[] = [
@@ -657,7 +665,7 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
           description={error}
         />
       ) : null}
-      <Card>
+      <Card id="submission-reflection-card">
         <CardHeader>
           <CardTitle className="text-base">학습 회고</CardTitle>
           <CardDescription>
