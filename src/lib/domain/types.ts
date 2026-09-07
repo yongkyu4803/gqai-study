@@ -249,9 +249,20 @@ export interface SurveyResponse {
   updatedAt: string;
 }
 
+export interface InquiryMessage {
+  id: string;
+  studentId: string;
+  authorId: string;
+  body: string;
+  readByAdminAt?: string;
+  readByStudentAt?: string;
+  createdAt: string;
+}
+
 export interface AppState {
   announcements?: Announcement[];
   surveyResponses?: SurveyResponse[];
+  inquiryMessages?: InquiryMessage[];
   profiles: Profile[];
   groups: Group[];
   modules: ModuleTemplate[];

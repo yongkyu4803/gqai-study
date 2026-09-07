@@ -79,6 +79,8 @@ type UploadScope =
 interface AppContextValue {
   saveAnnouncement: (input: AnnouncementInput) => Promise<void>;
   submitSurvey: (answers: SurveyAnswers) => Promise<void>;
+  sendInquiryMessage: (body: string, studentId?: string) => Promise<void>;
+  markInquiryRead: (studentId: string) => Promise<void>;
   reorderAssignments: (
     kind: "student" | "group",
     targetId: string,
@@ -158,6 +160,14 @@ function notifyStudentEvent(type: "submitted" | "reply", assignmentId: string) {
 
 function notifyFeedbackMessage(messageId: string) {
   fetch("/api/admin/notifications/feedback", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messageId }),
+  }).catch(() => undefined);
+}
+
+function notifyInquiryMessage(messageId: string) {
+  fetch("/api/notifications/inquiry", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messageId }),
@@ -1209,6 +1219,67 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [persistDemo, refresh, repository, session, state],
   );
 
+  const sendInquiryMessage = useCallback(
+    async (rawBody: string, studentId?: string) => {
+      if (!session) throw new Error("로그인이 필요합니다.");
+      const body = rawBody.trim();
+      if (!body) throw new Error("문의 내용을 입력하세요.");
+      const targetStudentId =
+        session.role === "admin" ? studentId : session.id;
+      if (!targetStudentId) throw new Error("학생을 지정하세요.");
+      if (repository) {
+        const messageId = await repository.sendInquiryMessage(
+          targetStudentId,
+          body,
+        );
+        await refresh();
+        notifyInquiryMessage(messageId);
+        return;
+      }
+      const now = new Date().toISOString();
+      const message = {
+        id: nanoid(),
+        studentId: targetStudentId,
+        authorId: session.id,
+        body,
+        createdAt: now,
+      };
+      commitDemo({
+        ...state,
+        inquiryMessages: [...(state.inquiryMessages ?? []), message],
+      });
+    },
+    [commitDemo, refresh, repository, session, state],
+  );
+
+  const markInquiryRead = useCallback(
+    async (studentId: string) => {
+      if (!session) return;
+      if (repository) {
+        await repository.markInquiryRead(studentId);
+        await refresh();
+        return;
+      }
+      const now = new Date().toISOString();
+      const isAdmin = session.role === "admin";
+      commitDemo({
+        ...state,
+        inquiryMessages: (state.inquiryMessages ?? []).map((message) =>
+          message.studentId !== studentId
+            ? message
+            : isAdmin
+              ? message.authorId === studentId && !message.readByAdminAt
+                ? { ...message, readByAdminAt: now }
+                : message
+              : message.authorId !== studentId && !message.readByStudentAt
+                ? { ...message, readByStudentAt: now }
+                : message,
+        ),
+      });
+    },
+    [commitDemo, refresh, repository, session, state],
+  );
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
@@ -1216,6 +1287,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ready,
       saveAnnouncement,
       submitSurvey,
+      sendInquiryMessage,
+      markInquiryRead,
       mode,
       refresh,
       login,
@@ -1254,6 +1327,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       archiveGroup,
       saveAnnouncement,
       submitSurvey,
+      sendInquiryMessage,
+      markInquiryRead,
       archiveModule,
       assign,
       assignMany,

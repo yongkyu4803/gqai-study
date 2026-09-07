@@ -1170,6 +1170,110 @@ export function AllFeedbackView() {
   );
 }
 
+export function InquiryView() {
+  const { state, session, sendInquiryMessage, markInquiryRead } = useApp();
+  const [body, setBody] = useState("");
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const messages = (state.inquiryMessages ?? [])
+    .filter((item) => item.studentId === session?.id)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const unreadCount = messages.filter(
+    (item) => item.authorId !== session?.id && !item.readByStudentAt,
+  ).length;
+  useEffect(() => {
+    if (session && unreadCount) void markInquiryRead(session.id);
+  }, [markInquiryRead, session, unreadCount]);
+  async function send() {
+    setPending(true);
+    setError("");
+    try {
+      await sendInquiryMessage(body);
+      setBody("");
+      toast.success("문의를 보냈습니다.");
+    } catch (cause) {
+      const message =
+        cause instanceof Error ? cause.message : "문의를 보내지 못했습니다.";
+      setError(`${message} 작성한 내용은 유지됐습니다. 다시 시도하세요.`);
+    } finally {
+      setPending(false);
+    }
+  }
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <PageHeader
+        eyebrow="문의"
+        title="강사에게 문의하기"
+        description="수업 중 궁금한 점이나 어려운 점을 언제든 남겨 주세요."
+      />
+      <div className="space-y-3">
+        {messages.length ? (
+          messages.map((message) => {
+            const mine = message.authorId === session?.id;
+            return (
+              <div
+                key={message.id}
+                className={`flex ${mine ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[88%] rounded-lg border p-4 ${mine ? "border-primary bg-accent text-foreground" : "bg-white"}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant={mine ? "secondary" : "outline"}>
+                      {mine ? "나" : "강사"}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(message.createdAt, true)}
+                    </span>
+                  </div>
+                  <p className="mt-3 whitespace-pre-wrap text-sm leading-6">
+                    {message.body}
+                  </p>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <EmptyState
+            title="아직 문의가 없습니다"
+            description="궁금한 점을 남기면 강사가 확인 후 답변합니다."
+          />
+        )}
+      </div>
+      {error ? (
+        <InlineMessage
+          kind="error"
+          title="문의를 보내지 못했습니다"
+          description={error}
+        />
+      ) : null}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">새 문의</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Label htmlFor="inquiry-body">문의 내용</Label>
+          <Textarea
+            id="inquiry-body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            placeholder="예: 3번째 실습에서 이 부분이 잘 안 돼요."
+          />
+          <Button
+            className="w-full"
+            disabled={pending || !body.trim()}
+            aria-busy={pending}
+            onClick={send}
+          >
+            <Send />
+            {pending ? "보내는 중…" : "문의 보내기"}
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export function AccountView() {
   const { session, state, changePassword, updateMyEmail } = useApp();
   const currentEmail =

@@ -8,6 +8,7 @@ import {
   CheckSquare,
   ChevronRight,
   ClipboardList,
+  HelpCircle,
   History,
   Home,
   Layers3,
@@ -15,6 +16,7 @@ import {
   LogOut,
   Mail,
   Menu,
+  MessageCircleQuestion,
   MessageSquareText,
   Settings,
   UserCog,
@@ -72,6 +74,11 @@ const adminNav = [
     gqaiIcon: "status-warning",
   },
   {
+    href: "/admin/inquiries",
+    label: "문의함",
+    icon: MessageCircleQuestion,
+  },
+  {
     href: "/admin/notifications/log",
     label: "발송 로그",
     icon: Mail,
@@ -102,6 +109,11 @@ const studentNav = [
     label: "완료 기록",
     icon: History,
     gqaiIcon: "content-archive",
+  },
+  {
+    href: "/inquiry",
+    label: "문의하기",
+    icon: HelpCircle,
   },
   {
     href: "/account",

@@ -115,6 +115,7 @@ export class SupabaseRepository {
       flags,
       announcements,
       surveyResponses,
+      inquiryMessages,
     ] = await Promise.all([
       this.client.from("gqai_aistudy_profiles").select("*").order("display_name"),
       this.client.from("gqai_aistudy_groups").select("*").order("name"),
@@ -145,6 +146,10 @@ export class SupabaseRepository {
       this.client.from("gqai_aistudy_feature_flags").select("*"),
       this.client.from("gqai_aistudy_announcements").select("*").order("created_at", { ascending: false }),
       this.client.from("gqai_aistudy_survey_responses").select("*"),
+      this.client
+        .from("gqai_aistudy_inquiry_messages")
+        .select("*")
+        .order("created_at", { ascending: true }),
     ]);
 
     const firstError = [
@@ -164,6 +169,7 @@ export class SupabaseRepository {
       flags.error,
       announcements.error,
       surveyResponses.error,
+      inquiryMessages.error,
     ].find(Boolean);
     assertOk(firstError);
 
@@ -179,6 +185,15 @@ export class SupabaseRepository {
         answers: row.answers,
         submittedAt: row.submitted_at,
         updatedAt: row.updated_at,
+      })),
+      inquiryMessages: (inquiryMessages.data ?? []).map((row: Row) => ({
+        id: row.id,
+        studentId: row.student_id,
+        authorId: row.author_id,
+        body: row.body,
+        readByAdminAt: row.read_by_admin_at ?? undefined,
+        readByStudentAt: row.read_by_student_at ?? undefined,
+        createdAt: row.created_at,
       })),
       profiles: (profiles.data ?? []).map((row: Row) => ({
         id: row.id,
@@ -533,6 +548,22 @@ export class SupabaseRepository {
   async submitSurvey(answers: SurveyAnswers) {
     const { error } = await this.client.rpc("gqai_aistudy_submit_survey", {
       p_answers: answers,
+    });
+    assertOk(error);
+  }
+
+  async sendInquiryMessage(studentId: string, body: string) {
+    const { data, error } = await this.client.rpc("gqai_aistudy_send_inquiry_message", {
+      p_student_id: studentId,
+      p_body: body,
+    });
+    assertOk(error);
+    return data as string;
+  }
+
+  async markInquiryRead(studentId: string) {
+    const { error } = await this.client.rpc("gqai_aistudy_mark_inquiry_read", {
+      p_student_id: studentId,
     });
     assertOk(error);
   }

@@ -9,7 +9,8 @@ export type EmailKind =
   | "feedback"
   | "submission"
   | "account_created"
-  | "password_reset";
+  | "password_reset"
+  | "inquiry";
 
 export async function sendAndLogEmail(params: {
   admin: SupabaseClient;
