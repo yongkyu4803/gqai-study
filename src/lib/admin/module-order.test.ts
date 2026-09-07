@@ -24,16 +24,16 @@ function moduleWithTitle(title: string): ModuleTemplate {
 }
 
 describe("관리자용 모듈 순서", () => {
-  it("노션 원본의 11개 순서를 그대로 사용한다", () => {
+  it("학습 모듈 원본 순서를 그대로 사용한다", () => {
     expect(ADMIN_MODULE_TITLES_IN_NOTION_ORDER).toEqual(notionTitles);
-    expect(notionTitles.map(getAdminModuleSequence)).toEqual([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-    ]);
+    expect(notionTitles.map(getAdminModuleSequence)).toEqual(
+      notionTitles.map((_, index) => index + 1),
+    );
   });
 
   it("관리자 제목에는 두 자리 번호를 붙이고 추가 모듈에는 붙이지 않는다", () => {
     expect(formatAdminModuleTitle("AI와 친해지기")).toBe("01. AI와 친해지기");
-    expect(formatAdminModuleTitle("웹크롤링")).toBe("11. 웹크롤링");
+    expect(formatAdminModuleTitle("웹크롤링")).toBe("13. 웹크롤링");
     expect(formatAdminModuleTitle("추가 모듈")).toBe("추가 모듈");
   });
 

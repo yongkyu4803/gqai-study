@@ -49,6 +49,7 @@ import {
   formatAdminModuleTitle,
 } from "@/lib/admin/module-order";
 import { formatDate } from "@/lib/domain/status";
+import { getLearningPaths } from "@/lib/domain/learning-paths";
 
 export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
   const router = useRouter();
@@ -516,7 +517,11 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
           description={error}
         />
       ) : null}
-      <AnnouncementsPanel key={student.id} scope="student" targetId={student.id} />
+      <AnnouncementsPanel
+        key={student.id}
+        scope="student"
+        targetId={student.id}
+      />
       <div className="grid gap-6 lg:grid-cols-[1.7fr_.85fr] lg:items-start">
         <Card>
           <CardHeader>
@@ -751,6 +756,11 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
                       <span className="block [overflow-wrap:anywhere]">
                         {formatAdminModuleTitle(module.draft.title)}
                       </span>
+                      {getLearningPaths(module.draft.tags).length ? (
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {getLearningPaths(module.draft.tags).join(" · ")}
+                        </span>
+                      ) : null}
                       {alreadyOpen ? (
                         <span className="block text-xs font-medium text-foreground">
                           이미 배정됨
@@ -1450,6 +1460,11 @@ export function GroupDetailView({ groupId }: { groupId: string }) {
                         <span className="block [overflow-wrap:anywhere]">
                           {formatAdminModuleTitle(module.draft.title)}
                         </span>
+                        {getLearningPaths(module.draft.tags).length ? (
+                          <span className="mt-1 block text-xs text-muted-foreground">
+                            {getLearningPaths(module.draft.tags).join(" · ")}
+                          </span>
+                        ) : null}
                         {alreadyOpen ? (
                           <span className="block text-xs font-medium text-foreground">
                             이미 배정됨

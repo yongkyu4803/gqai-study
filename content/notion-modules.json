@@ -5,11 +5,11 @@
     "sourceDate": "2026-08-12",
     "snapshot": {
       "title": "AI와 친해지기",
-      "summary": "관심 있는 주제로 AI와 30분 이상 대화하고, 과정을 HTML 기록으로 남기는 입문 실습입니다.",
+      "summary": "AI와 대화하며 내 업무·관심사에서 탐색할 주제 3개를 찾고, 한 가지 작은 실험을 시작합니다.",
       "category": "AI 기본기",
       "difficulty": "beginner",
       "estimatedMinutes": 40,
-      "tags": ["대화", "기록", "입문", "2026-08-12"],
+      "tags": ["대화", "기록", "입문", "2026-08-12", "경로: 공통 입문"],
       "learningObjectives": [
         "AI와 스스로 주제를 정해 목적 있는 대화를 이어갈 수 있다.",
         "긴 대화를 중간마다 구조화해 학습 기록으로 남길 수 있다."
@@ -19,15 +19,62 @@
         "집중해서 대화할 수 있는 30분 이상"
       ],
       "submissionRequirements": [
-        "10분 간격으로 정리한 HTML 대화 기록 3개 이상",
-        "대화에서 발견한 핵심 내용과 다음 학습 목표"
+        "관심 주제 3개와 가장 먼저 탐색할 주제 1개",
+        "선택한 주제로 실행한 작은 실험과 결과",
+        "HTML 대화 기록은 원하는 경우 선택 제출",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "AI와 30분 이상 대화했다.",
-        "충실한 대화 기록을 3개 이상 저장하고 제출했다."
+        "내 업무나 관심사와 연결된 주제 3개를 찾았다.",
+        "한 주제를 선택한 이유를 설명하고 작은 실험을 실행했다.",
+        "AI의 제안 중 내 판단으로 바꾼 내용을 한 가지 기록했다."
       ],
       "blocks": [
-        { "id": "ai-01", "type": "heading", "text": "오늘의 과제" },
+        {
+          "id": "module-ai-friend-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-ai-friend-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-ai-friend-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "ai-goal-01",
+          "type": "heading",
+          "text": "대화의 결과로 남길 것"
+        },
+        {
+          "id": "ai-goal-02",
+          "type": "numbered_list",
+          "text": "대화에서 발견한 관심 주제 또는 해결하고 싶은 문제를 3개 적습니다."
+        },
+        {
+          "id": "ai-goal-03",
+          "type": "numbered_list",
+          "text": "그중 지금 가장 해보고 싶은 것 하나를 고르고 선택한 이유를 적습니다."
+        },
+        {
+          "id": "ai-goal-04",
+          "type": "numbered_list",
+          "text": "30분 안에 해볼 수 있는 가장 작은 실험을 정해 실행합니다."
+        },
+        {
+          "id": "ai-goal-05",
+          "type": "paragraph",
+          "text": "HTML 대화 기록은 선택 사항입니다. 대화 기록보다 내가 발견한 목표와 직접 해본 작은 실험이 더 중요합니다."
+        },
+        {
+          "id": "ai-01",
+          "type": "heading",
+          "text": "오늘의 과제"
+        },
         {
           "id": "ai-02",
           "type": "bullet_list",
@@ -38,7 +85,11 @@
           "type": "bullet_list",
           "text": "효율화하고 싶은 업무, 만들고 싶은 프로젝트 등 어떤 주제도 괜찮습니다."
         },
-        { "id": "ai-04", "type": "heading", "text": "진행 방법" },
+        {
+          "id": "ai-04",
+          "type": "heading",
+          "text": "진행 방법"
+        },
         {
           "id": "ai-05",
           "type": "numbered_list",
@@ -59,7 +110,11 @@
           "type": "paragraph",
           "text": "30분 동안 진행하면 3개 이상의 대화 정리 문서가 만들어집니다. 이 기록은 앞으로의 공부 과정에 중요한 자료가 됩니다."
         },
-        { "id": "ai-09", "type": "heading", "text": "주의사항" },
+        {
+          "id": "ai-09",
+          "type": "heading",
+          "text": "주의사항"
+        },
         {
           "id": "ai-10",
           "type": "quote",
@@ -74,6 +129,31 @@
           "id": "ai-12",
           "type": "bullet_list",
           "text": "아무 생각도 나지 않을 때는 지금의 상황을 설명하고 ‘grill me’라고 입력해 보세요."
+        },
+        {
+          "id": "module-ai-friend-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-ai-friend-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-ai-friend-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-ai-friend-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-ai-friend-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -81,36 +161,47 @@
   {
     "id": "module-tools",
     "versionId": "version-tools-1",
-    "sourceDate": "2026-08-13",
+    "sourceDate": "2026-09-07",
     "snapshot": {
-      "title": "툴과 친해지기",
-      "summary": "ChatGPT와 Claude의 플러그인·코워크 기능, NotebookLM의 주요 기능을 직접 경험합니다.",
+      "title": "AI와 외부 서비스 연결하기",
+      "summary": "필요한 AI 앱 하나를 선택해 연습용 Google Drive 또는 Gmail 자료와 안전하게 연결하고 권한을 확인합니다.",
       "category": "AI 도구 활용",
       "difficulty": "beginner",
-      "estimatedMinutes": 90,
-      "tags": ["플러그인", "코워크", "NotebookLM", "2026-08-13"],
+      "estimatedMinutes": 35,
+      "tags": ["외부 서비스", "권한", "연결", "경로: 공통 입문"],
       "learningObjectives": [
-        "AI 데스크톱 앱에 외부 서비스를 연결할 수 있다.",
-        "코워크에서 폴더 자료를 읽고 새 문서를 만들 수 있다.",
-        "NotebookLM의 소스와 스튜디오 기능을 실행할 수 있다."
+        "내 목적에 필요한 AI 앱과 외부 서비스를 선택할 수 있다.",
+        "연습용 자료로 연결을 시험하고 허용한 권한을 설명할 수 있다."
       ],
       "prerequisites": [
-        "ChatGPT와 Claude 데스크톱 앱",
-        "Google 계정",
-        "실습용 빈 폴더",
-        "관심 있는 YouTube 링크 또는 문서 자료"
+        "ChatGPT 또는 Claude 중 사용할 수 있는 앱 하나",
+        "민감정보가 없는 연습용 Drive 문서 또는 이메일"
       ],
       "submissionRequirements": [
-        "Gmail·Google Drive 연결 테스트 결과",
-        "코워크로 만든 HTML 설명 문서",
-        "NotebookLM 스튜디오 기능 실행 결과"
+        "외부 서비스 한 개의 연결 테스트 결과",
+        "허용한 권한과 실제로 확인한 기능",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "플러그인 한 개 이상을 연결하고 테스트했다.",
-        "코워크 폴더에서 파일 읽기와 문서 생성을 완료했다.",
-        "NotebookLM 스튜디오의 9개 메뉴를 모두 실행했다."
+        "필요한 서비스 한 개만 연결해 연습용 자료를 조회했다.",
+        "연결 권한을 확인하고 불필요한 권한을 구분했다."
       ],
       "blocks": [
+        {
+          "id": "module-tools-connect-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-tools-connect-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-tools-connect-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
         {
           "id": "tools-01",
           "type": "heading",
@@ -167,7 +258,90 @@
             "url": "/api/module-assets/notion/tools-02.png"
           }
         },
-        { "id": "tools-07", "type": "heading", "text": "2. 코워크 기능" },
+        {
+          "id": "module-tools-connect-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-tools-connect-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-tools-connect-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-tools-connect-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-tools-connect-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
+        }
+      ]
+    },
+    "previousTitles": ["툴과 친해지기"]
+  },
+  {
+    "id": "module-folder-work",
+    "versionId": "version-folder-work-1",
+    "sourceDate": "2026-09-07",
+    "snapshot": {
+      "title": "폴더 자료를 AI와 활용하기",
+      "summary": "민감정보가 없는 여러 형식의 자료를 폴더에 모아 AI로 읽고, 출처와 내용이 맞는 설명 문서를 만듭니다.",
+      "category": "AI 도구 활용",
+      "difficulty": "beginner",
+      "estimatedMinutes": 50,
+      "tags": [
+        "폴더",
+        "자료분석",
+        "문서",
+        "경로: 자료 수집·분석",
+        "경로: 업무 효율화"
+      ],
+      "learningObjectives": [
+        "폴더의 여러 자료를 AI가 참고하도록 구성할 수 있다.",
+        "AI가 만든 설명을 원본과 대조하고 오류를 수정할 수 있다."
+      ],
+      "prerequisites": [
+        "ChatGPT 또는 Claude의 폴더 작업 환경",
+        "민감정보가 없는 연습용 문서 2개 이상"
+      ],
+      "submissionRequirements": [
+        "폴더 자료를 바탕으로 만든 설명 문서",
+        "원본과 대조해 수정한 내용 한 가지",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
+      ],
+      "completionCriteria": [
+        "자료 2개 이상을 읽어 하나의 설명 문서를 만들었다.",
+        "원본과 다른 내용을 한 가지 이상 점검하고 필요하면 수정했다."
+      ],
+      "blocks": [
+        {
+          "id": "module-folder-work-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-folder-work-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-folder-work-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "tools-07",
+          "type": "heading",
+          "text": "2. 코워크 기능"
+        },
         {
           "id": "tools-08",
           "type": "paragraph",
@@ -219,7 +393,80 @@
             "url": "/api/module-assets/notion/tools-04.png"
           }
         },
-        { "id": "tools-13", "type": "heading", "text": "3. NotebookLM" },
+        {
+          "id": "module-folder-work-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-folder-work-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-folder-work-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-folder-work-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-folder-work-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
+        }
+      ]
+    }
+  },
+  {
+    "id": "module-notebooklm",
+    "versionId": "version-notebooklm-1",
+    "sourceDate": "2026-09-07",
+    "snapshot": {
+      "title": "NotebookLM으로 자료 분석하기",
+      "summary": "관심 있는 자료를 소스로 추가하고, 필요한 스튜디오 결과 하나를 만든 뒤 원문과 비교합니다.",
+      "category": "자료 분석",
+      "difficulty": "beginner",
+      "estimatedMinutes": 35,
+      "tags": ["NotebookLM", "출처", "요약", "경로: 자료 수집·분석"],
+      "learningObjectives": [
+        "관심 자료를 NotebookLM 소스로 구성할 수 있다.",
+        "목적에 맞는 결과 형식을 선택하고 원문과 비교할 수 있다."
+      ],
+      "prerequisites": ["Google 계정", "관심 있는 YouTube 링크 또는 문서 자료"],
+      "submissionRequirements": [
+        "사용한 소스와 선택한 스튜디오 결과 한 가지",
+        "원문과 비교해 확인하거나 수정한 내용",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
+      ],
+      "completionCriteria": [
+        "소스를 추가하고 목적에 맞는 결과 하나를 만들었다.",
+        "결과의 핵심 내용을 원문 출처와 한 번 이상 대조했다."
+      ],
+      "blocks": [
+        {
+          "id": "module-notebooklm-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-notebooklm-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-notebooklm-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "tools-13",
+          "type": "heading",
+          "text": "3. NotebookLM"
+        },
         {
           "id": "tools-14",
           "type": "checklist",
@@ -246,6 +493,31 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/tools-05.png"
           }
+        },
+        {
+          "id": "module-notebooklm-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-notebooklm-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-notebooklm-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-notebooklm-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-notebooklm-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -256,25 +528,60 @@
     "sourceDate": "2026-08-14",
     "snapshot": {
       "title": "업무 해체하기",
-      "summary": "불편한 반복 업무를 클릭 단위로 나누고, 가장 먼저 효율화할 한 지점을 찾습니다.",
+      "summary": "업무·학습·생활의 반복 활동을 단계별로 나누고 시간·빈도·판단 필요성을 기준으로 첫 개선 지점을 찾습니다.",
       "category": "업무 자동화",
       "difficulty": "beginner",
       "estimatedMinutes": 50,
-      "tags": ["업무분석", "자동화", "프로세스", "2026-08-14"],
+      "tags": [
+        "업무분석",
+        "자동화",
+        "프로세스",
+        "2026-08-14",
+        "경로: 공통 입문",
+        "경로: 업무 효율화"
+      ],
       "learningObjectives": [
         "반복 업무를 관찰 가능한 작은 단계로 나눌 수 있다.",
         "AI와 함께 자동화 후보를 찾고 우선순위를 정할 수 있다."
       ],
       "prerequisites": ["자주 하지만 불편하다고 느끼는 실제 업무 한 가지"],
       "submissionRequirements": [
-        "클릭 단위로 나눈 전체 업무 단계",
-        "가장 먼저 적용할 효율화 방법 한 가지와 구체적인 실행 방법"
+        "단계별 소요 시간·반복 빈도·사람의 판단이 필요한 부분을 표시한 전체 과정",
+        "먼저 개선할 한 단계와 선택 이유",
+        "개선 전후 예상 시간 또는 불편 감소 기준",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "업무 시작부터 끝까지 빠짐없이 단계화했다.",
-        "바로 적용할 우선 과제 한 가지를 선택했다."
+        "활동의 시작부터 끝까지 관찰 가능한 단계로 나눴다.",
+        "시간·빈도·판단 필요성을 근거로 우선순위를 정했다.",
+        "작은 개선을 한 번 실행하거나 구체적인 실행 계획을 만들었다."
       ],
       "blocks": [
+        {
+          "id": "module-work-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-work-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-work-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "work-scope",
+          "type": "paragraph",
+          "text": "직장 업무가 없다면 공부 자료 정리, 여행 준비, 동호회 운영, 콘텐츠 제작처럼 반복되는 생활·관심 활동을 골라도 됩니다."
+        },
+        {
+          "id": "work-measure",
+          "type": "checklist",
+          "text": "각 단계에 걸리는 시간, 반복 빈도, 사람의 판단이 꼭 필요한지를 함께 표시합니다."
+        },
         {
           "id": "work-01",
           "type": "paragraph",
@@ -309,6 +616,31 @@
           "id": "work-07",
           "type": "paragraph",
           "text": "첫날 과제가 목표를 찾기 위한 대화였다면, 이번 과제는 실제 업무에 적용하기 위한 대화입니다. 내용이 일부 겹쳐도 괜찮습니다."
+        },
+        {
+          "id": "module-work-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-work-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-work-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-work-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-work-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -323,7 +655,14 @@
       "category": "바이브 코딩",
       "difficulty": "beginner",
       "estimatedMinutes": 90,
-      "tags": ["HTML", "CSS", "Codex", "Claude Code", "2026-08-16"],
+      "tags": [
+        "HTML",
+        "CSS",
+        "Codex",
+        "Claude Code",
+        "2026-08-16",
+        "경로: 사이드 프로젝트"
+      ],
       "learningObjectives": [
         "단일 HTML 파일의 기본 구조와 CSS 포함 방식을 이해한다.",
         "AI에게 구현 조건과 출력 형식을 구체적으로 전달할 수 있다.",
@@ -336,14 +675,46 @@
       ],
       "submissionRequirements": [
         "완성된 index.html 파일",
-        "데스크톱과 모바일에서 실행한 화면"
+        "데스크톱과 모바일 실행 화면",
+        "AI가 만든 초안에서 직접 수정한 두 가지와 수정 이유",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "외부 라이브러리 없이 index.html 한 파일로 완성했다.",
-        "모바일과 데스크톱에서 내용이 정상적으로 보인다.",
-        "요구된 헤더·메인·카드·푸터 영역이 포함되어 있다."
+        "index.html 초안을 직접 열어 확인했다.",
+        "내용·디자인·사용성 중 두 가지 이상을 내 판단으로 수정했다.",
+        "모바일과 데스크톱에서 수정 결과를 다시 확인했다."
       ],
       "blocks": [
+        {
+          "id": "module-web-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-web-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-web-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "web-revise",
+          "type": "heading",
+          "text": "초안에서 끝내지 않기"
+        },
+        {
+          "id": "web-revise-02",
+          "type": "numbered_list",
+          "text": "AI가 만든 페이지를 직접 열고, 내 목적에 맞지 않는 부분을 두 가지 고릅니다."
+        },
+        {
+          "id": "web-revise-03",
+          "type": "numbered_list",
+          "text": "내용·디자인·사용성 중 두 가지를 수정하고 모바일과 데스크톱에서 다시 확인합니다."
+        },
         {
           "id": "web-01",
           "type": "paragraph",
@@ -369,6 +740,31 @@
           "type": "code",
           "language": "markdown",
           "text": "[주제]에 대한 단일 정적 웹페이지를 HTML+CSS로 만들어줘.\n\n요구사항:\n- 결과물은 한 개의 `index.html` 파일로만 구성해줘(외부 라이브러리/프레임워크 없이).\n- `<style>` 태그에 CSS를 포함해서 별도 css 파일을 만들지 말아줘.\n- 반응형으로 만들어줘(모바일/데스크톱 모두 보기 좋게).\n- 깔끔한 타이포그래피와 간단한 컬러 팔레트로 ‘완성된 느낌’이 나게 해줘.\n- 섹션 구성은 다음을 포함해줘:\n  1) 헤더(제목/한 줄 소개)\n  2) 메인 섹션(핵심 기능/내용)\n  3) 보조 섹션(카드 3개 정도의 정보 영역)\n  4) 푸터(연락처/링크 자리표시자)\n- 이미지가 필요하면 실제 파일 대신 CSS 그라데이션/도형으로 대체해줘.\n- 접근성 기본을 지켜줘(적절한 heading 구조, 대비, 버튼/링크 구분).\n\n출력 형식:\n- 최종 답변은 `index.html` 전체 코드만 코드블록으로 제공해줘.\n- 설명은 최소화하고, 주석은 필요한 곳에만 짧게 넣어줘.\n\n그리고 이 파일을 ‘현재 폴더’에 저장할 수 있게 `index.html`로 제공해줘."
+        },
+        {
+          "id": "module-web-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-web-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-web-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-web-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-web-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -383,7 +779,14 @@
       "category": "업무 자동화",
       "difficulty": "intermediate",
       "estimatedMinutes": 70,
-      "tags": ["예약작업", "뉴스", "이메일", "2026-08-18"],
+      "tags": [
+        "예약작업",
+        "뉴스",
+        "이메일",
+        "2026-08-18",
+        "경로: 업무 효율화",
+        "경로: 자료 수집·분석"
+      ],
       "learningObjectives": [
         "생성 내용뿐 아니라 실행 시점과 전달 방식을 설계할 수 있다.",
         "ChatGPT 또는 Claude에서 반복 예약 작업을 만들 수 있다.",
@@ -395,16 +798,48 @@
         "결과를 받을 이메일 계정"
       ],
       "submissionRequirements": [
-        "생성한 예약 작업의 설정 화면",
-        "자동 생성된 뉴스 정리 결과",
-        "이메일로 수신한 결과 화면"
+        "예약 전에 수동으로 만든 결과",
+        "예약 작업의 주제·실행 시점·결과 형식 설정",
+        "한 번 이상 실행한 결과와 전달 확인",
+        "예약을 일시중지하거나 중지하는 방법",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "뉴스 주제와 실행 주기를 정했다.",
-        "예약 작업을 생성해 한 번 이상 실행했다.",
-        "결과를 이메일로 받는 흐름을 확인했다."
+        "동일한 작업을 수동으로 먼저 실행해 원하는 결과를 확인했다.",
+        "예약 작업을 만들고 한 번 이상 실행했다.",
+        "결과 전달과 예약 중지 방법을 확인했다."
       ],
       "blocks": [
+        {
+          "id": "module-automation-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-automation-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-automation-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "automation-manual",
+          "type": "numbered_list",
+          "text": "예약하기 전에 같은 요청을 수동으로 한 번 실행하고 결과 형식을 수정합니다."
+        },
+        {
+          "id": "automation-stop",
+          "type": "checklist",
+          "text": "실습이 끝나면 예약을 일시중지하거나 삭제하는 위치를 확인합니다."
+        },
+        {
+          "id": "automation-alt",
+          "type": "paragraph",
+          "text": "사용 중인 요금제에서 예약 또는 이메일 전달을 지원하지 않으면 수동 실행 결과와 설정 계획, 지원되지 않는 화면을 제출해도 됩니다."
+        },
         {
           "id": "automation-01",
           "type": "paragraph",
@@ -464,6 +899,31 @@
           "type": "link",
           "text": "카카오톡 나챗방으로 메시지 받기 강의",
           "url": "https://vibecoding.gqai.kr/lecture/lecture-14"
+        },
+        {
+          "id": "module-automation-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-automation-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-automation-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-automation-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-automation-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -478,7 +938,14 @@
       "category": "배포",
       "difficulty": "intermediate",
       "estimatedMinutes": 90,
-      "tags": ["Git", "GitHub", "Vercel", "배포", "2026-08-19"],
+      "tags": [
+        "Git",
+        "GitHub",
+        "Vercel",
+        "배포",
+        "2026-08-19",
+        "경로: 사이드 프로젝트"
+      ],
       "learningObjectives": [
         "Git의 커밋과 푸시 개념을 이해한다.",
         "로컬 파일을 GitHub 저장소에 올릴 수 있다.",
@@ -492,15 +959,52 @@
       ],
       "submissionRequirements": [
         "GitHub 저장소 링크",
-        "정상 접속되는 vercel.app 배포 주소",
-        "배포 완료 화면"
+        "정상 접속되는 vercel.app 주소",
+        "공개 파일의 개인정보·비밀키 점검 결과",
+        "문구 한 곳을 수정해 재배포한 전후 화면",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "index.html을 GitHub에 커밋·푸시했다.",
-        "Vercel 배포가 성공했다.",
-        "공개 도메인에서 페이지가 정상적으로 열린다."
+        "공개 전 개인정보와 비밀키 포함 여부를 확인했다.",
+        "첫 배포 주소에서 페이지를 열었다.",
+        "한 곳을 수정·푸시하고 자동 재배포된 결과를 확인했다."
       ],
       "blocks": [
+        {
+          "id": "module-first-deploy-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-first-deploy-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-first-deploy-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "deploy-safety",
+          "type": "heading",
+          "text": "공개 전 확인"
+        },
+        {
+          "id": "deploy-safety-02",
+          "type": "checklist",
+          "text": "이름, 연락처, 내부 문서, 비밀번호와 API 키가 파일에 포함되지 않았는지 확인합니다."
+        },
+        {
+          "id": "deploy-redeploy",
+          "type": "heading",
+          "text": "수정해서 다시 배포하기"
+        },
+        {
+          "id": "deploy-redeploy-02",
+          "type": "numbered_list",
+          "text": "공개 페이지의 문구 한 곳을 수정한 뒤 다시 커밋·푸시하고 배포 주소에 반영되는지 확인합니다."
+        },
         {
           "id": "deploy-01",
           "type": "paragraph",
@@ -699,7 +1203,11 @@
             "url": "/api/module-assets/notion/deploy-10.png"
           }
         },
-        { "id": "deploy-15", "type": "heading", "text": "3. Vercel로 배포" },
+        {
+          "id": "deploy-15",
+          "type": "heading",
+          "text": "3. Vercel로 배포"
+        },
         {
           "id": "deploy-16",
           "type": "numbered_list",
@@ -750,6 +1258,31 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/deploy-13.png"
           }
+        },
+        {
+          "id": "module-first-deploy-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-first-deploy-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-first-deploy-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-first-deploy-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-first-deploy-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -764,21 +1297,49 @@
       "category": "생성형 AI 창작",
       "difficulty": "beginner",
       "estimatedMinutes": 45,
-      "tags": ["Suno", "음악", "창작", "2026-08-20"],
+      "tags": ["Suno", "음악", "창작", "2026-08-20", "경로: 창작 탐색"],
       "learningObjectives": [
         "음악의 주제와 분위기를 언어로 구체화할 수 있다.",
         "AI와 만든 가사를 음악 생성 도구에 적용할 수 있다."
       ],
       "prerequisites": ["Suno 계정", "ChatGPT 계정", "만들고 싶은 음악 주제"],
       "submissionRequirements": [
-        "완성한 Suno 음악 링크",
-        "사용한 가사와 분위기 설명"
+        "조건을 달리해 만든 음악 링크 2개",
+        "두 결과의 차이와 선택한 버전",
+        "선택한 버전을 한 번 수정한 결과와 사용 목적",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "ChatGPT와 가사·분위기를 정리했다.",
-        "Suno에서 음악 한 곡 이상을 생성했다."
+        "분위기나 가사 조건을 달리한 두 버전을 만들었다.",
+        "두 결과를 비교해 한 버전을 선택했다.",
+        "내 사용 목적에 맞게 한 번 이상 수정했다."
       ],
       "blocks": [
+        {
+          "id": "module-music-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-music-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-music-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "music-compare",
+          "type": "numbered_list",
+          "text": "분위기·속도·가사 중 한 조건을 바꿔 두 번째 버전을 만들고 차이를 비교합니다."
+        },
+        {
+          "id": "music-revise",
+          "type": "numbered_list",
+          "text": "더 적합한 버전을 골라 개인 영상, 행사, 취미 프로젝트 등 사용 목적에 맞게 한 번 수정합니다."
+        },
         {
           "id": "music-link",
           "type": "link",
@@ -799,6 +1360,31 @@
           "id": "music-03",
           "type": "numbered_list",
           "text": "정리한 내용을 Suno에 입력해 음악을 만들고 결과를 공유합니다."
+        },
+        {
+          "id": "module-music-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-music-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-music-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-music-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-music-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -813,7 +1399,14 @@
       "category": "AI 자동화",
       "difficulty": "intermediate",
       "estimatedMinutes": 80,
-      "tags": ["스킬", "코워크", "반복업무", "2026-08-25"],
+      "tags": [
+        "스킬",
+        "코워크",
+        "반복업무",
+        "2026-08-25",
+        "경로: 업무 효율화",
+        "경로: 공유·협업"
+      ],
       "learningObjectives": [
         "AI 스킬이 반복 업무를 효율화하는 방식을 설명할 수 있다.",
         "업무에 활용할 간단한 스킬을 만들 수 있다.",
@@ -826,15 +1419,47 @@
       ],
       "submissionRequirements": [
         "직접 만든 스킬 파일 또는 폴더",
-        "스킬 실행 결과",
-        "다음 개선 사항 한 가지"
+        "서로 다른 입력 3개의 실행 결과",
+        "실패하거나 기대와 달랐던 결과 한 가지",
+        "문제를 반영해 개선한 내용",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "스킬을 한 개 만들었다.",
-        "스킬 목록을 다시 실행해 새 스킬이 적용되는지 확인했다.",
-        "코워크에서 스킬을 실행해 결과를 확인했다."
+        "스킬을 만든 뒤 서로 다른 입력 세 개로 실행했다.",
+        "실패 또는 품질이 낮은 결과 한 가지를 찾았다.",
+        "원인을 반영해 스킬을 한 번 수정하고 다시 실행했다."
       ],
       "blocks": [
+        {
+          "id": "module-skills-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-skills-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-skills-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "skills-test",
+          "type": "heading",
+          "text": "다른 입력으로 시험하기"
+        },
+        {
+          "id": "skills-test-02",
+          "type": "numbered_list",
+          "text": "형식이나 내용이 다른 입력 세 개로 스킬을 실행합니다."
+        },
+        {
+          "id": "skills-test-03",
+          "type": "numbered_list",
+          "text": "가장 좋지 않은 결과의 원인을 찾아 스킬을 수정한 뒤 다시 실행합니다."
+        },
         {
           "id": "skills-01",
           "type": "paragraph",
@@ -857,7 +1482,11 @@
           "text": "GQAI 스킬 기본기 강의",
           "url": "https://vibecoding.gqai.kr/gnu_AI_part2"
         },
-        { "id": "skills-03", "type": "heading", "text": "오늘의 실습" },
+        {
+          "id": "skills-03",
+          "type": "heading",
+          "text": "오늘의 실습"
+        },
         {
           "id": "skills-04",
           "type": "paragraph",
@@ -878,7 +1507,11 @@
           "type": "bullet_list",
           "text": "채팅 탭과 코드 탭에서 스킬을 각각 별도로 지정해야 합니다. 이번 실습은 코워크에서 진행합니다."
         },
-        { "id": "skills-08", "type": "heading", "text": "실제 설정 과정" },
+        {
+          "id": "skills-08",
+          "type": "heading",
+          "text": "실제 설정 과정"
+        },
         {
           "id": "skills-img-01",
           "type": "image",
@@ -914,6 +1547,31 @@
             "mimeType": "image/png",
             "url": "/api/module-assets/notion/skills-03.png"
           }
+        },
+        {
+          "id": "module-skills-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-skills-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-skills-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-skills-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-skills-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -928,7 +1586,7 @@
       "category": "AI 자동화",
       "difficulty": "intermediate",
       "estimatedMinutes": 60,
-      "tags": ["스킬", "GitHub", "공유", "2026-08-27"],
+      "tags": ["스킬", "GitHub", "공유", "2026-08-27", "경로: 공유·협업"],
       "learningObjectives": [
         "스킬을 GitHub 저장소로 배포할 수 있다.",
         "공유한 스킬을 개선하고 새 버전으로 재배포할 수 있다.",
@@ -940,16 +1598,48 @@
         "ChatGPT 또는 Claude"
       ],
       "submissionRequirements": [
-        "스킬이 올라간 GitHub 링크",
-        "개선 전후 변경 내용",
-        "재배포한 링크를 공유한 결과"
+        "스킬 저장소 링크와 사용법",
+        "예시 입력과 예시 결과",
+        "다른 사람 또는 새 작업 환경에서 실행한 결과",
+        "재현 과정에서 개선한 내용",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "기존 스킬을 GitHub에 업로드했다.",
-        "기능을 한 가지 이상 개선해 재배포했다.",
-        "다른 사람이 접근할 수 있는 링크를 공유했다."
+        "처음 보는 사람이 따라 할 수 있는 사용법을 작성했다.",
+        "예시 입력과 기대 결과를 제공했다.",
+        "다른 사람 또는 깨끗한 작업 환경에서 재현하고 문제를 한 가지 이상 개선했다."
       ],
       "blocks": [
+        {
+          "id": "module-share-skills-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-share-skills-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-share-skills-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "share-readme",
+          "type": "checklist",
+          "text": "저장소에 설치·사용 방법, 예시 입력, 예시 결과를 적습니다."
+        },
+        {
+          "id": "share-reproduce",
+          "type": "numbered_list",
+          "text": "다른 사람에게 부탁하거나 새로운 작업 환경에서 안내만 보고 다시 실행해 봅니다."
+        },
+        {
+          "id": "share-private",
+          "type": "checklist",
+          "text": "공유 전에 개인정보, 업무 기밀, API 키가 포함되지 않았는지 확인합니다."
+        },
         {
           "id": "share-01",
           "type": "paragraph",
@@ -979,6 +1669,31 @@
           "id": "share-06",
           "type": "numbered_list",
           "text": "재배포된 GitHub 링크를 단체 대화방에 공유합니다."
+        },
+        {
+          "id": "module-share-skills-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-share-skills-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-share-skills-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-share-skills-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-share-skills-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -993,7 +1708,14 @@
       "category": "데이터베이스",
       "difficulty": "intermediate",
       "estimatedMinutes": 70,
-      "tags": ["Supabase", "데이터베이스", "테이블", "2026-08-28"],
+      "tags": [
+        "Supabase",
+        "데이터베이스",
+        "테이블",
+        "2026-08-28",
+        "경로: 사이드 프로젝트",
+        "경로: 자료 수집·분석"
+      ],
       "learningObjectives": [
         "Supabase 프로젝트의 기본 연결 절차를 수행할 수 있다.",
         "저장할 결과물에 맞는 테이블 구조를 AI에게 요청할 수 있다.",
@@ -1005,15 +1727,52 @@
         "ChatGPT 또는 Claude"
       ],
       "submissionRequirements": [
-        "생성한 Supabase 테이블 화면 캡처",
-        "테이블에 저장한 테스트 데이터 또는 실행 결과"
+        "생성한 테이블 구조와 각 열의 의미",
+        "테스트 데이터 입력 화면",
+        "입력한 데이터를 다시 조회하고 한 항목을 수정한 결과",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "Supabase 기본 설정을 완료했다.",
-        "결과물에 맞는 테이블을 생성했다.",
-        "테이블 화면을 캡처해 제출했다."
+        "결과물에 맞는 열을 가진 테이블을 생성했다.",
+        "민감정보가 없는 테스트 데이터를 입력하고 조회했다.",
+        "데이터 한 항목을 수정한 뒤 변경 결과를 확인했다."
       ],
       "blocks": [
+        {
+          "id": "module-database-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-database-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-database-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "database-safe",
+          "type": "paragraph",
+          "text": "실습에는 실제 개인정보나 업무 자료 대신 이름과 내용을 임의로 만든 테스트 데이터를 사용합니다."
+        },
+        {
+          "id": "database-insert",
+          "type": "numbered_list",
+          "text": "테이블에 테스트 데이터 한 건을 입력하고 다시 조회합니다."
+        },
+        {
+          "id": "database-update",
+          "type": "numbered_list",
+          "text": "입력한 데이터의 한 항목을 수정하고 변경된 값을 확인합니다."
+        },
+        {
+          "id": "database-explain",
+          "type": "checklist",
+          "text": "각 열에 어떤 값을 저장하는지 자신의 말로 한 줄씩 설명합니다."
+        },
         {
           "id": "database-01",
           "type": "numbered_list",
@@ -1044,6 +1803,31 @@
           "id": "database-05",
           "type": "quote",
           "text": "산출물은 Supabase 테이블 화면 캡처입니다."
+        },
+        {
+          "id": "module-database-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-database-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-database-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-database-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-database-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }
@@ -1058,7 +1842,13 @@
       "category": "데이터 수집",
       "difficulty": "intermediate",
       "estimatedMinutes": 90,
-      "tags": ["웹크롤링", "요약", "Supabase", "2026-09-01"],
+      "tags": [
+        "웹크롤링",
+        "요약",
+        "Supabase",
+        "2026-09-01",
+        "경로: 자료 수집·분석"
+      ],
       "learningObjectives": [
         "웹크롤링의 기본 흐름을 이해한다.",
         "언론사 기사 본문을 수집하고 요약할 수 있다.",
@@ -1070,16 +1860,59 @@
         "코드 작업 환경"
       ],
       "submissionRequirements": [
-        "본문 크롤링 결과",
-        "기사 요약 결과",
-        "데이터베이스 저장 화면 또는 저장된 행"
+        "이용이 허용된 연습 자료의 본문 수집 결과",
+        "제목·본문·날짜·출처가 포함된 요약 결과",
+        "중복 또는 수집 실패 처리 결과",
+        "데이터베이스에 저장된 행",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
       ],
       "completionCriteria": [
-        "언론사 한 곳에서 본문을 정상적으로 수집했다.",
-        "수집한 본문을 요약했다.",
-        "요약 결과를 데이터베이스에 저장했다."
+        "사이트의 이용 조건과 robots.txt를 확인하고 허용된 자료를 사용했다.",
+        "제목·본문·날짜·출처를 함께 수집했다.",
+        "중복 또는 실패 상황을 한 번 시험하고 기록했다.",
+        "검증한 결과를 데이터베이스에 저장했다."
       ],
       "blocks": [
+        {
+          "id": "module-web-crawling-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-web-crawling-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-web-crawling-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "crawl-safety",
+          "type": "heading",
+          "text": "수집 전 확인"
+        },
+        {
+          "id": "crawl-safety-02",
+          "type": "checklist",
+          "text": "사이트 이용약관과 robots.txt를 확인하고 로그인이 필요하거나 수집을 금지한 페이지는 사용하지 않습니다."
+        },
+        {
+          "id": "crawl-practice",
+          "type": "paragraph",
+          "text": "처음에는 직접 만든 HTML이나 수집이 허용된 공개 연습 자료로 성공한 뒤 실제 관심 사이트로 확장합니다."
+        },
+        {
+          "id": "crawl-fields",
+          "type": "checklist",
+          "text": "기사 제목, 본문, 게시 날짜, 원문 주소를 함께 저장합니다."
+        },
+        {
+          "id": "crawl-failure",
+          "type": "checklist",
+          "text": "같은 기사를 다시 실행했을 때의 중복 처리와 본문을 찾지 못했을 때의 실패 기록을 확인합니다."
+        },
         {
           "id": "crawl-01",
           "type": "paragraph",
@@ -1110,6 +1943,31 @@
           "id": "crawl-05",
           "type": "numbered_list",
           "text": "본문과 요약 결과를 데이터베이스에 저장합니다."
+        },
+        {
+          "id": "module-web-crawling-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-web-crawling-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-web-crawling-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-web-crawling-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-web-crawling-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
         }
       ]
     }

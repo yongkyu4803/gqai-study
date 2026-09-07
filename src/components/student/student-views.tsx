@@ -57,6 +57,12 @@ import type {
   SubmissionItemType,
 } from "@/lib/domain/types";
 import { isSafeAssetUrl, isSafeHttpUrl } from "@/lib/domain/validation";
+import {
+  extractSubmissionReflection,
+  missingSubmissionReflectionField,
+  serializeSubmissionReflection,
+  type SubmissionReflection,
+} from "@/lib/domain/submission-reflection";
 
 function ownedAssignments(
   state: ReturnType<typeof useApp>["state"],
@@ -458,12 +464,20 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
       (item) => item.assignmentId === assignmentId && item.status !== "draft",
     )
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+  const sourceItems =
+    draft?.items ??
+    (latest && assignment?.assignmentStatus === "revision_requested"
+      ? latest.items.map((item) => ({ ...item, id: nanoid() }))
+      : []);
+  const initialSubmission = extractSubmissionReflection(sourceItems);
   const [items, setItems] = useState<SubmissionItem[]>(
-    () =>
-      draft?.items ??
-      (latest && assignment?.assignmentStatus === "revision_requested"
-        ? latest.items.map((item) => ({ ...item, id: nanoid() }))
-        : []),
+    initialSubmission.evidenceItems,
+  );
+  const [reflection, setReflection] = useState<SubmissionReflection>(
+    initialSubmission.reflection,
+  );
+  const [reflectionItemId] = useState(
+    initialSubmission.reflectionItemId ?? nanoid(),
   );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -530,15 +544,31 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
       .map((item, index) => ({ ...item, order: index }));
   }
   async function save(submit: boolean) {
-    const cleaned = validItems();
-    if (!cleaned.length) {
-      setError("완성된 제출 항목을 한 개 이상 추가해 주세요.");
+    const missingReflection = missingSubmissionReflectionField(reflection);
+    if (submit && missingReflection) {
+      setError(`${missingReflection} 항목을 작성해 주세요.`);
       return;
     }
-    if (cleaned.length !== items.length) {
+    const evidence = validItems();
+    if (evidence.length !== items.length) {
       setError("비어 있거나 올바르지 않은 항목을 확인해 주세요.");
       return;
     }
+    if (submit && !evidence.length) {
+      setError(
+        "모듈 수행 결과를 확인할 수 있는 항목을 한 개 이상 추가해 주세요.",
+      );
+      return;
+    }
+    const cleaned: SubmissionItem[] = [
+      {
+        id: reflectionItemId,
+        type: "text",
+        order: 0,
+        text: serializeSubmissionReflection(reflection),
+      },
+      ...evidence.map((item, index) => ({ ...item, order: index + 1 })),
+    ];
     setError("");
     setPending(true);
     try {
@@ -612,9 +642,59 @@ export function SubmissionView({ assignmentId }: { assignmentId: string }) {
       ) : null}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">제출 항목</CardTitle>
+          <CardTitle className="text-base">학습 회고</CardTitle>
           <CardDescription>
-            텍스트, 링크, 이미지와 일반 파일을 함께 제출할 수 있습니다.
+            각 항목을 한두 문장으로 작성해 주세요. 다음 모듈을 정하는 데
+            활용됩니다.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 sm:grid-cols-2">
+          {[
+            [
+              "purpose",
+              "1. 나의 목적",
+              "이번 학습을 내 업무나 관심사 어디에 활용하고 싶나요?",
+            ],
+            [
+              "choice",
+              "2. 내가 한 선택",
+              "AI의 제안 중 무엇을 선택·수정·제외했나요?",
+            ],
+            [
+              "result",
+              "3. 실행 결과",
+              "무엇이 되었고, 무엇이 잘되지 않았나요?",
+            ],
+            [
+              "nextStep",
+              "4. 다음 단계",
+              "더 배우고 싶은 것 또는 현재 막힌 점은 무엇인가요?",
+            ],
+          ].map(([key, label, placeholder]) => (
+            <div key={key} className="space-y-2">
+              <Label htmlFor={`reflection-${key}`}>{label}</Label>
+              <Textarea
+                id={`reflection-${key}`}
+                value={reflection[key as keyof SubmissionReflection]}
+                disabled={pending}
+                rows={4}
+                placeholder={placeholder}
+                onChange={(event) =>
+                  setReflection((current) => ({
+                    ...current,
+                    [key]: event.target.value,
+                  }))
+                }
+              />
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">결과물과 증빙</CardTitle>
+          <CardDescription>
+            모듈에서 요구하는 텍스트, 링크, 이미지와 파일을 추가해 주세요.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
