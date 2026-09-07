@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const { data: version, error: versionError } = await admin
       .from("gqai_aistudy_module_versions")
-      .select("title_snapshot")
+      .select("title_snapshot, summary_snapshot")
       .eq("id", batch.module_version_id)
       .single();
     if (versionError || !version) throw versionError ?? new Error("모듈 버전을 찾을 수 없습니다.");
@@ -43,7 +43,8 @@ export async function POST(request: Request) {
     if (profileError) throw profileError;
     if (!recipients?.length) return NextResponse.json({ sent: 0, skipped: "no_email" });
 
-    const subject = `[GQAI Study] 새 학습 카드가 배정되었습니다: ${version.title_snapshot}`;
+    const origin = new URL(request.url).origin;
+    const subject = `[GQAI Study] "${version.title_snapshot}" 카드가 도착했어요`;
     const results = await Promise.all(
       recipients.map((recipient) =>
         sendAndLogEmail({
@@ -51,9 +52,20 @@ export async function POST(request: Request) {
           kind: "assignment",
           to: recipient.email as string,
           subject,
-          text: `${recipient.display_name}님, "${version.title_snapshot}" 학습 카드가 배정되었습니다.${
-            batch.common_instruction ? `\n\n안내: ${batch.common_instruction}` : ""
-          }\n\n로그인 후 확인해주세요.`,
+          text: `${recipient.display_name}님, 안녕하세요!
+
+새 학습 카드 "${version.title_snapshot}"가 배정되었어요.${
+            version.summary_snapshot ? `\n${version.summary_snapshot}` : ""
+          }${
+            batch.common_instruction
+              ? `\n\n강사 안내: ${batch.common_instruction}`
+              : ""
+          }
+
+아래 링크에서 로그인하고 바로 시작해보세요.
+${origin}/login
+
+- GQAI Study`,
           studentId: recipient.id,
           relatedId: batchId,
         }),
