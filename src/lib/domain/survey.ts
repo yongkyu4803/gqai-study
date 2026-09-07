@@ -27,7 +27,8 @@ export const aiToolOptions: { value: SurveyAiTool; label: string }[] = [
   { value: "chatgpt", label: "ChatGPT" },
   { value: "claude", label: "Claude" },
   { value: "gemini", label: "Gemini" },
-  { value: "perplexity", label: "Perplexity" },
+  { value: "grok", label: "Grok" },
+  { value: "genspark", label: "Genspark" },
   { value: "other", label: "기타" },
   { value: "none", label: "사용 안 함" },
 ];
@@ -71,7 +72,7 @@ export const learningGoalOptions: { value: SurveyLearningGoal; label: string }[]
 export const surveyAnswersSchema = z.object({
   os: z.enum(["windows", "macos", "other"]),
   osDetail: z.string().trim().max(100).optional(),
-  aiTools: z.array(z.enum(["chatgpt", "claude", "gemini", "perplexity", "other", "none"])).min(1, "하나 이상 선택하세요."),
+  aiTools: z.array(z.enum(["chatgpt", "claude", "gemini", "grok", "genspark", "other", "none"])).min(1, "하나 이상 선택하세요."),
   aiToolsDetail: z.string().trim().max(200).optional(),
   aiSubscription: z.string().trim().max(200),
   aiUsageFrequency: z.enum(["daily", "weekly", "rarely"]),

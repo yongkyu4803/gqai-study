@@ -213,7 +213,8 @@ export type SurveyAiTool =
   | "chatgpt"
   | "claude"
   | "gemini"
-  | "perplexity"
+  | "grok"
+  | "genspark"
   | "other"
   | "none";
 export type SurveyUsageFrequency = "daily" | "weekly" | "rarely";
