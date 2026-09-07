@@ -34,8 +34,8 @@ function localAssetFileUrl(assetUrl) {
   );
 }
 
-if (!Array.isArray(modules) || modules.length !== 11) {
-  throw new Error("노션 강의 모듈 원본은 정확히 11개여야 합니다.");
+if (!Array.isArray(modules) || modules.length < 1) {
+  throw new Error("학습 모듈 원본이 비어 있습니다.");
 }
 
 const titles = new Set();
@@ -100,34 +100,34 @@ async function withPrivateAssets(snapshot, templateId) {
         `${snapshot.title} 이미지 업로드 실패: ${uploadError.message}`,
       );
     }
-    const { error: assetError } = await client.from("gqai_aistudy_module_assets").upsert(
-      {
-        module_template_id: templateId,
-        storage_path: storagePath,
-        asset_kind: block.type,
-        original_name: block.asset.name,
-        mime_type: block.asset.mimeType,
-        size_bytes: bytes.byteLength,
-        alt_text: block.text || block.asset.name,
-        state: "ready",
-        uploaded_by: admin.id,
-      },
-      { onConflict: "storage_path" },
-    );
+    const { error: assetError } = await client
+      .from("gqai_aistudy_module_assets")
+      .upsert(
+        {
+          module_template_id: templateId,
+          storage_path: storagePath,
+          asset_kind: block.type,
+          original_name: block.asset.name,
+          mime_type: block.asset.mimeType,
+          size_bytes: bytes.byteLength,
+          alt_text: block.text || block.asset.name,
+          state: "ready",
+          uploaded_by: admin.id,
+        },
+        { onConflict: "storage_path" },
+      );
     if (assetError) {
       throw new Error(
         `${snapshot.title} 이미지 메타데이터 저장 실패: ${assetError.message}`,
       );
     }
-    blocks.push({
-      ...block,
-      asset: {
-        ...block.asset,
-        size: bytes.byteLength,
-        url: undefined,
-        storagePath,
-      },
-    });
+    const privateAsset = {
+      ...block.asset,
+      size: bytes.byteLength,
+      storagePath,
+    };
+    delete privateAsset.url;
+    blocks.push({ ...block, asset: privateAsset });
   }
   return { ...snapshot, blocks };
 }
@@ -199,11 +199,12 @@ let unchanged = 0;
 
 for (const lesson of modules) {
   const sourceSnapshot = lesson.snapshot;
+  const matchTitles = [sourceSnapshot.title, ...(lesson.previousTitles ?? [])];
   const { data: matches, error: matchError } = await client
     .from("gqai_aistudy_module_templates")
     .select("id, current_published_version_id")
     .eq("created_by", admin.id)
-    .eq("title", sourceSnapshot.title);
+    .in("title", matchTitles);
   if (matchError)
     throw new Error(`${sourceSnapshot.title} 조회 실패: ${matchError.message}`);
   if ((matches?.length || 0) > 1) {

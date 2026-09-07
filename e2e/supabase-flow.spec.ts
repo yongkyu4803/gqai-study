@@ -76,9 +76,7 @@ test("실제 Auth/API/DB를 거쳐 모듈부터 최종 완료까지 완주한다
   const assignDialog = page.getByRole("dialog");
   await assignDialog.locator("label").filter({ hasText: moduleTitle }).click();
   await assignDialog.getByRole("button", { name: /개 모듈 배정/ }).click();
-  await expect(
-    page.getByText(/개의 학습 카드를 만들었습니다\./),
-  ).toBeVisible();
+  await expect(page.getByText(/개의 학습 카드를 만들었습니다\./)).toBeVisible();
   await page
     .locator('a[href^="/admin/assignments/"]')
     .filter({ hasText: moduleTitle })
@@ -103,6 +101,14 @@ test("실제 Auth/API/DB를 거쳐 모듈부터 최종 완료까지 완주한다
   await page.getByRole("button", { name: "학습 시작" }).click();
   await page.getByRole("button", { name: "수강 완료 기록" }).click();
   await page.getByRole("button", { name: "결과물 제출" }).click();
+  await page
+    .getByLabel("1. 나의 목적")
+    .fill("실제 업무에 적용할 방법을 찾는다.");
+  await page
+    .getByLabel("2. 내가 한 선택")
+    .fill("가장 작은 실행 단계를 골랐다.");
+  await page.getByLabel("3. 실행 결과").fill("예상한 결과를 직접 확인했다.");
+  await page.getByLabel("4. 다음 단계").fill("반복 실행하며 개선한다.");
   await page.getByRole("button", { name: "텍스트" }).click();
   await page
     .getByPlaceholder("수행 결과와 배운 점을 적어 주세요.")

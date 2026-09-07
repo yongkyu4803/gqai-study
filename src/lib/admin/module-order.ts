@@ -2,7 +2,9 @@ import type { ModuleTemplate } from "@/lib/domain/types";
 
 export const ADMIN_MODULE_TITLES_IN_NOTION_ORDER = [
   "AI와 친해지기",
-  "툴과 친해지기",
+  "AI와 외부 서비스 연결하기",
+  "폴더 자료를 AI와 활용하기",
+  "NotebookLM으로 자료 분석하기",
   "업무 해체하기",
   "HTML+CSS로 웹페이지 만들기",
   "자동화 기본기",

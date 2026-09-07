@@ -24,7 +24,7 @@
 - 학생 아이디·임시 비밀번호 발급, 비밀번호 재설정, 계정 활성/비활성
 - 학생 그룹 생성과 구성원 관리
 - 빠른 추가·유형 전환·중간 삽입·복제·키보드 단축키를 지원하는 블록 편집기로 실습 모듈 작성
-- Notion `AI 공부방`을 기준으로 구성한 발행 강의 11개와 화면 자료 23개 기본 제공
+- 초기 커리큘럼을 개선한 발행 강의 13개와 화면 자료 23개 기본 제공
 - 문단, 제목, 목록, 체크리스트, 인용, 구분선, 코드, 링크, 이미지, PDF, 첨부파일 블록 지원
 - 초안 저장, 미리보기, 불변 버전 발행, 복제, 보관
 - 학생 개인 또는 그룹 일괄 배정
@@ -88,7 +88,7 @@ npm run build            # 프로덕션 빌드
 npm run verify           # lint + typecheck + unit + 문서 링크 + build
 npm run verify:supabase  # 쓰기 허용된 전용 Supabase 환경의 데이터/RLS 검증
 npm run setup:admin      # 최초 관리자 계정 1회 생성
-npm run setup:modules    # 노션 원문 기반 강의 11개를 운영 DB에 등록·갱신
+npm run setup:modules    # 학습 경로별 강의 13개를 운영 DB에 등록·갱신
 ```
 
 로컬 Supabase의 전체 검증 명령과 필요한 환경변수는 [ENV_SETUP.md](ENV_SETUP.md)에 분리했습니다. `verify:supabase`와 Supabase E2E는 테스트 데이터를 생성하므로 운영 DB에서 실행하지 마세요.

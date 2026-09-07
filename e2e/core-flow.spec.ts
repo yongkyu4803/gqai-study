@@ -17,9 +17,9 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
   ).toBeVisible();
 
   await page.goto("/admin/modules");
-  await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(11);
+  await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(13);
   const moduleSequenceBadges = page.getByLabel(/관리자용 모듈 순서 \d+번/);
-  await expect(moduleSequenceBadges).toHaveCount(11);
+  await expect(moduleSequenceBadges).toHaveCount(13);
   await expect(moduleSequenceBadges).toHaveText([
     "01",
     "02",
@@ -32,14 +32,18 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
     "09",
     "10",
     "11",
+    "12",
+    "13",
   ]);
   await expect(page.getByText("웹크롤링", { exact: true })).toBeVisible();
   await page.goto("/admin/modules/module-tools/preview");
   const lessonPreview = page.getByRole("article");
   await expect(
-    lessonPreview.getByRole("heading", { name: "툴과 친해지기" }),
+    lessonPreview.getByRole("heading", {
+      name: "AI와 외부 서비스 연결하기",
+    }),
   ).toBeVisible();
-  await expect(lessonPreview.locator("img")).toHaveCount(5);
+  await expect(lessonPreview.locator("img")).toHaveCount(2);
   const imageResponse = await page.request.get(
     "/api/module-assets/notion/tools-01.png",
   );
@@ -123,6 +127,10 @@ test("학생이 학습·재제출하고 다른 학생 카드는 볼 수 없다",
   await expect(
     page.getByRole("heading", { name: "수정해서 재제출" }),
   ).toBeVisible();
+  await page.getByLabel("1. 나의 목적").fill("반복 업무를 더 짧게 처리한다.");
+  await page.getByLabel("2. 내가 한 선택").fill("업무 단계를 다시 나눴다.");
+  await page.getByLabel("3. 실행 결과").fill("병목이 되는 단계를 찾았다.");
+  await page.getByLabel("4. 다음 단계").fill("한 단계를 자동화해 본다.");
   await page.getByRole("button", { name: "링크" }).click();
   await page
     .getByPlaceholder("https://")

@@ -19,11 +19,11 @@ interface NotionModuleSeed {
 const modules = notionModulesJson as NotionModuleSeed[];
 
 describe("Notion 강의 모듈 seed", () => {
-  it("11개 강의를 발행 가능한 스냅샷으로 제공한다", () => {
-    expect(modules).toHaveLength(11);
-    expect(new Set(modules.map((lesson) => lesson.id)).size).toBe(11);
+  it("13개 강의를 발행 가능한 스냅샷으로 제공한다", () => {
+    expect(modules).toHaveLength(13);
+    expect(new Set(modules.map((lesson) => lesson.id)).size).toBe(13);
     expect(new Set(modules.map((lesson) => lesson.snapshot.title)).size).toBe(
-      11,
+      13,
     );
 
     for (const lesson of modules) {

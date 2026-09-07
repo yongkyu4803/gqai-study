@@ -41,6 +41,7 @@ import {
 } from "@/components/common/page-parts";
 import { ModuleReader } from "@/components/modules/module-reader";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -58,6 +59,7 @@ import {
 } from "@/lib/admin/module-order";
 import { formatDate } from "@/lib/domain/status";
 import { newContentBlock } from "@/lib/domain/operations";
+import { getLearningPaths } from "@/lib/domain/learning-paths";
 import type {
   BlockType,
   ContentBlock,
@@ -305,6 +307,15 @@ export function ModulesListView() {
                   <CardDescription className="min-h-10 [overflow-wrap:anywhere]">
                     {module.draft.summary || "한 줄 설명이 없습니다."}
                   </CardDescription>
+                  {getLearningPaths(module.draft.tags).length ? (
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {getLearningPaths(module.draft.tags).map((path) => (
+                        <Badge key={path} variant="secondary">
+                          {path}
+                        </Badge>
+                      ))}
+                    </div>
+                  ) : null}
                 </CardHeader>
                 <CardContent className="mt-auto">
                   <p className="mb-4 text-xs text-muted-foreground">

@@ -49,6 +49,11 @@ import type {
   FileAsset,
 } from "@/lib/domain/types";
 import { isSafeAssetUrl, isSafeHttpUrl } from "@/lib/domain/validation";
+import {
+  getLearningPaths,
+  getSuggestedNextModuleTitles,
+} from "@/lib/domain/learning-paths";
+import { parseSubmissionReflection } from "@/lib/domain/submission-reflection";
 
 export function AssignmentsView({
   reviewsOnly = false,
@@ -582,6 +587,12 @@ export function AssignmentDetailView({
           </Card>
         </div>
         <div className="space-y-6">
+          <NextModuleDecisionCard
+            title={version?.snapshot.title}
+            tags={version?.snapshot.tags}
+            assignHref={`/admin/students/${assignment.studentId}`}
+            assignLabel="학생 상세에서 다음 모듈 배정"
+          />
           <Card>
             <CardHeader>
               <CardTitle className="text-base">학습 정보</CardTitle>
@@ -943,6 +954,12 @@ export function BatchDetailView({ batchId }: { batchId: string }) {
           </CardContent>
         </Card>
         <div className="space-y-6">
+          <NextModuleDecisionCard
+            title={version?.snapshot.title}
+            tags={version?.snapshot.tags}
+            assignHref={`/admin/groups/${batch.sourceGroupId}`}
+            assignLabel="그룹 상세에서 다음 모듈 배정"
+          />
           <Card>
             <CardHeader>
               <CardTitle className="text-base">공통 안내 일괄 수정</CardTitle>
@@ -1101,6 +1118,74 @@ export function SettingsView() {
   );
 }
 
+function NextModuleDecisionCard({
+  title,
+  tags,
+  assignHref,
+  assignLabel,
+}: {
+  title?: string;
+  tags?: string[];
+  assignHref: string;
+  assignLabel: string;
+}) {
+  const { state } = useApp();
+  const paths = getLearningPaths(tags ?? []);
+  const nextModuleTitles = getSuggestedNextModuleTitles(
+    title ?? "",
+    paths.length ? paths : undefined,
+  ).filter((candidate) =>
+    state.modules.some(
+      (module) =>
+        module.status === "active" && module.draft.title === candidate,
+    ),
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">다음 모듈 결정</CardTitle>
+        <CardDescription>
+          제출 결과와 학습 회고를 보고 다음 방향을 선택합니다.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4 text-sm">
+        <div className="grid gap-2">
+          <p>
+            <span className="font-medium">기초 보완</span> · 실행하지 못했거나
+            핵심 과정을 설명하기 어려운 경우
+          </p>
+          <p>
+            <span className="font-medium">같은 경로 심화</span> · 결과를
+            확인했고 같은 목표를 더 발전시키려는 경우
+          </p>
+          <p>
+            <span className="font-medium">실제 프로젝트 적용</span> · 반복
+            실행이 가능하고 업무·관심사에 적용할 준비가 된 경우
+          </p>
+        </div>
+        {paths.length ? (
+          <p className="text-xs text-muted-foreground">
+            현재 경로: {paths.join(" · ")}
+          </p>
+        ) : null}
+        {nextModuleTitles.length ? (
+          <div className="rounded-lg bg-zinc-50 p-4">
+            <p className="text-xs font-medium">같은 경로의 다음 후보</p>
+            <p className="mt-2 leading-6">{nextModuleTitles.join(" · ")}</p>
+          </div>
+        ) : null}
+        <Button
+          variant="outline"
+          className="w-full"
+          render={<Link href={assignHref} />}
+        >
+          {assignLabel}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 function Summary({ label, value }: { label: string; value: string }) {
   return (
@@ -1117,10 +1202,30 @@ function SubmissionItemRow({
     typeof useApp
   >["state"]["submissions"][number]["items"][number];
 }) {
-  if (item.type === "text")
+  if (item.type === "text") {
+    const reflection = parseSubmissionReflection(item.text);
+    if (reflection)
+      return (
+        <div className="grid gap-3 rounded-md bg-zinc-50 p-4 sm:grid-cols-2">
+          {[
+            ["나의 목적", reflection.purpose],
+            ["내가 한 선택", reflection.choice],
+            ["실행 결과", reflection.result],
+            ["다음 단계", reflection.nextStep],
+          ].map(([label, value]) => (
+            <div key={label}>
+              <p className="text-xs font-medium">{label}</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+                {value}
+              </p>
+            </div>
+          ))}
+        </div>
+      );
     return (
       <p className="rounded-md bg-zinc-50 p-3 text-sm leading-6">{item.text}</p>
     );
+  }
   if (item.type === "link")
     return isSafeHttpUrl(item.url) ? (
       <a
