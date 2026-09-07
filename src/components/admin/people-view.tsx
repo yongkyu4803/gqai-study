@@ -49,6 +49,17 @@ import {
   formatAdminModuleTitle,
 } from "@/lib/admin/module-order";
 import { formatDate } from "@/lib/domain/status";
+import {
+  SURVEY_TOOLS,
+  aiToolOptions,
+  learningGoalOptions,
+  osOptions,
+  skillLevelOptions,
+  toolFamiliarityOptions,
+  toolLabels,
+  usageFrequencyOptions,
+} from "@/lib/domain/survey";
+import type { SurveyAnswers } from "@/lib/domain/types";
 
 export function StudentsView({ createOnly = false }: { createOnly?: boolean }) {
   const router = useRouter();
@@ -391,6 +402,9 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
   const studentActivities = state.activities.filter(
     (item) => item.studentId === student.id,
   );
+  const surveyResponse = (state.surveyResponses ?? []).find(
+    (item) => item.studentId === student.id,
+  );
   const currentStudentId = student.id;
   const studentWasActive = student.isActive;
   const activeModules = state.modules
@@ -703,6 +717,20 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
               ) : (
                 <p className="py-4 text-center text-sm text-muted-foreground">
                   활동 기록이 없습니다.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">사전 설문</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {surveyResponse ? (
+                <SurveyAnswerSummary answers={surveyResponse.answers} />
+              ) : (
+                <p className="py-4 text-center text-sm text-muted-foreground">
+                  아직 응답하지 않았습니다.
                 </p>
               )}
             </CardContent>
@@ -1522,6 +1550,74 @@ const activityLabels: Record<string, string> = {
 
 function activityLabel(eventName: string) {
   return activityLabels[eventName] || eventName;
+}
+
+function labelFor<T extends string | number>(
+  options: { value: T; label: string }[],
+  value: T,
+) {
+  return options.find((option) => option.value === value)?.label ?? String(value);
+}
+
+function SurveyAnswerSummary({ answers }: { answers: SurveyAnswers }) {
+  return (
+    <div className="space-y-3 text-sm">
+      <Row
+        label="운영체제"
+        value={
+          answers.os === "other"
+            ? answers.osDetail || "기타"
+            : labelFor(osOptions, answers.os)
+        }
+      />
+      <Row
+        label="주로 쓰는 AI"
+        value={
+          answers.aiTools.map((tool) => labelFor(aiToolOptions, tool)).join(", ") ||
+          "응답 없음"
+        }
+      />
+      <Row label="유료 구독" value={answers.aiSubscription || "없음"} />
+      <Row
+        label="사용 빈도"
+        value={labelFor(usageFrequencyOptions, answers.aiUsageFrequency)}
+      />
+      <div className="border-b py-2 last:border-0">
+        <p className="mb-2 text-muted-foreground">서비스 숙련도</p>
+        <div className="flex flex-wrap gap-1.5">
+          {SURVEY_TOOLS.map((tool) => (
+            <Badge key={tool} variant="outline" className="font-normal">
+              {toolLabels[tool]} ·{" "}
+              {labelFor(toolFamiliarityOptions, answers.toolFamiliarity[tool] ?? "none")}
+            </Badge>
+          ))}
+        </div>
+      </div>
+      <Row
+        label="활용 수준"
+        value={`${answers.aiSkillLevel}단계 · ${labelFor(skillLevelOptions, answers.aiSkillLevel)}`}
+      />
+      <div className="border-b py-2 last:border-0">
+        <p className="text-muted-foreground">구체적인 활용 방식</p>
+        <p className="mt-1 [overflow-wrap:anywhere]">{answers.aiSkillDetail}</p>
+      </div>
+      <Row
+        label="학습 목표"
+        value={labelFor(learningGoalOptions, answers.learningGoal)}
+      />
+      {answers.learningGoalDetail ? (
+        <div className="border-b py-2 last:border-0">
+          <p className="text-muted-foreground">목표 상세</p>
+          <p className="mt-1 [overflow-wrap:anywhere]">
+            {answers.learningGoalDetail}
+          </p>
+        </div>
+      ) : null}
+      {answers.priorEducation ? (
+        <Row label="이전 교육 경험" value={answers.priorEducation} />
+      ) : null}
+    </div>
+  );
 }
 
 function Row({ label, value }: { label: string; value: string }) {

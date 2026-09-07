@@ -41,6 +41,7 @@ export interface Profile {
   displayName: string;
   email?: string;
   mustChangePassword: boolean;
+  mustCompleteSurvey: boolean;
   isActive: boolean;
   lastLoginAt?: string;
   createdAt: string;
@@ -207,8 +208,49 @@ export interface Announcement {
   updatedAt: string;
 }
 
+export type SurveyOsChoice = "windows" | "macos" | "other";
+export type SurveyAiTool =
+  | "chatgpt"
+  | "claude"
+  | "gemini"
+  | "perplexity"
+  | "other"
+  | "none";
+export type SurveyUsageFrequency = "daily" | "weekly" | "rarely";
+export type SurveyToolFamiliarity = "none" | "some" | "proficient";
+export type SurveySkillLevel = 1 | 2 | 3 | 4 | 5;
+export type SurveyLearningGoal =
+  | "automation"
+  | "side_project"
+  | "group_project"
+  | "other";
+
+export interface SurveyAnswers {
+  os: SurveyOsChoice;
+  osDetail?: string;
+  aiTools: SurveyAiTool[];
+  aiToolsDetail?: string;
+  aiSubscription: string;
+  aiUsageFrequency: SurveyUsageFrequency;
+  toolFamiliarity: Record<string, SurveyToolFamiliarity>;
+  aiSkillLevel: SurveySkillLevel;
+  aiSkillDetail: string;
+  learningGoal: SurveyLearningGoal;
+  learningGoalDetail: string;
+  priorEducation?: string;
+}
+
+export interface SurveyResponse {
+  id: string;
+  studentId: string;
+  answers: SurveyAnswers;
+  submittedAt: string;
+  updatedAt: string;
+}
+
 export interface AppState {
   announcements?: Announcement[];
+  surveyResponses?: SurveyResponse[];
   profiles: Profile[];
   groups: Group[];
   modules: ModuleTemplate[];
@@ -227,6 +269,7 @@ export interface SessionUser {
   loginId: string;
   displayName: string;
   mustChangePassword: boolean;
+  mustCompleteSurvey: boolean;
 }
 
 export interface CreateStudentInput {

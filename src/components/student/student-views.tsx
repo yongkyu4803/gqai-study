@@ -105,6 +105,23 @@ export function LearningHomeView({
             : "관리자가 정한 카드 순서대로 학습을 시작하세요."
         }
       />
+      {!historyOnly &&
+      !(state.surveyResponses ?? []).some(
+        (item) => item.studentId === session?.id,
+      ) ? (
+        <Link
+          href="/survey"
+          className="flex items-center justify-between rounded-lg border border-dashed p-4 text-sm hover:bg-zinc-50"
+        >
+          <span>
+            <span className="font-medium">사전 설문에 참여해주세요.</span>{" "}
+            <span className="text-muted-foreground">
+              나에게 맞는 학습 카드를 배정하는 데 참고합니다.
+            </span>
+          </span>
+          <ArrowRight className="size-4 shrink-0" />
+        </Link>
+      ) : null}
       {!historyOnly ? <AnnouncementsPanel /> : null}
       <div className="max-w-md space-y-2">
         <Label htmlFor="learning-search">학습 카드 검색</Label>

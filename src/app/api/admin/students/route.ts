@@ -55,6 +55,7 @@ export async function POST(request: Request) {
         display_name: input.displayName,
         email: input.email || null,
         must_change_password: true,
+        must_complete_survey: true,
         is_active: true,
         created_by: adminUser.id,
       });

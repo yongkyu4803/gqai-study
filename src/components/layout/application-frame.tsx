@@ -11,6 +11,7 @@ import {
   History,
   Home,
   Layers3,
+  ListChecks,
   LogOut,
   Mail,
   Menu,
@@ -51,6 +52,7 @@ const adminNav = [
   },
   { href: "/admin/students", label: "학생", icon: UserRound },
   { href: "/admin/groups", label: "그룹", icon: UsersRound },
+  { href: "/admin/surveys", label: "사전 설문", icon: ListChecks },
   {
     href: "/admin/account-requests",
     label: "계정 요청",
@@ -258,6 +260,14 @@ export function ApplicationFrame({ children }: { children: ReactNode }) {
     }
     if (session.mustChangePassword && pathname !== "/change-password") {
       router.replace("/change-password");
+      return;
+    }
+    if (
+      session.role === "student" &&
+      session.mustCompleteSurvey &&
+      pathname !== "/survey"
+    ) {
+      router.replace("/survey");
       return;
     }
     if (pathname.startsWith("/admin") && session.role !== "admin")

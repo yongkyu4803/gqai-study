@@ -41,7 +41,9 @@ import type {
   ModuleSnapshot,
   SessionUser,
   SubmissionDraftInput,
+  SurveyAnswers,
 } from "@/lib/domain/types";
+import { surveyAnswersSchema } from "@/lib/domain/survey";
 import {
   emailSchema,
   groupSchema,
@@ -76,6 +78,7 @@ type UploadScope =
 
 interface AppContextValue {
   saveAnnouncement: (input: AnnouncementInput) => Promise<void>;
+  submitSurvey: (answers: SurveyAnswers) => Promise<void>;
   reorderAssignments: (
     kind: "student" | "group",
     targetId: string,
@@ -168,6 +171,7 @@ function toSession(profile: AppState["profiles"][number]): SessionUser {
     loginId: profile.loginId,
     displayName: profile.displayName,
     mustChangePassword: profile.mustChangePassword,
+    mustCompleteSurvey: profile.mustCompleteSurvey,
   };
 }
 
@@ -477,6 +481,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         displayName: input.displayName,
         email: input.email || undefined,
         mustChangePassword: true,
+        mustCompleteSurvey: true,
         isActive: true,
         createdAt: stamp,
       });
@@ -1164,12 +1169,53 @@ export function AppProvider({ children }: { children: ReactNode }) {
     commitDemo({ ...state, announcements: [notice, ...notices.filter((n) => n.id !== notice.id)] });
   }, [session, repository, refresh, state, commitDemo]);
 
+  const submitSurvey = useCallback(
+    async (rawAnswers: SurveyAnswers) => {
+      if (!session) throw new Error("로그인이 필요합니다.");
+      const answers = surveyAnswersSchema.parse(rawAnswers) as SurveyAnswers;
+      if (repository) {
+        await repository.submitSurvey(answers);
+        await refresh();
+        return;
+      }
+      const responses = state.surveyResponses ?? [];
+      const existing = responses.find((r) => r.studentId === session.id);
+      const now = new Date().toISOString();
+      const response = {
+        id: existing?.id ?? nanoid(),
+        studentId: session.id,
+        answers,
+        submittedAt: existing?.submittedAt ?? now,
+        updatedAt: now,
+      };
+      const nextProfiles = state.profiles.map((profile) =>
+        profile.id === session.id
+          ? { ...profile, mustCompleteSurvey: false }
+          : profile,
+      );
+      const nextSession = { ...session, mustCompleteSurvey: false };
+      const nextState = {
+        ...state,
+        profiles: nextProfiles,
+        surveyResponses: [
+          response,
+          ...responses.filter((r) => r.studentId !== session.id),
+        ],
+      };
+      setSession(nextSession);
+      setState(nextState);
+      persistDemo(nextState, nextSession);
+    },
+    [persistDemo, refresh, repository, session, state],
+  );
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
       session,
       ready,
       saveAnnouncement,
+      submitSurvey,
       mode,
       refresh,
       login,
@@ -1207,6 +1253,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     [
       archiveGroup,
       saveAnnouncement,
+      submitSurvey,
       archiveModule,
       assign,
       assignMany,

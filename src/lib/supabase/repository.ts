@@ -9,6 +9,7 @@ import type {
   FileAsset,
   ModuleSnapshot,
   SubmissionDraftInput,
+  SurveyAnswers,
 } from "@/lib/domain/types";
 import { isBundledModuleAssetUrl } from "@/lib/domain/validation";
 
@@ -113,6 +114,7 @@ export class SupabaseRepository {
       activities,
       flags,
       announcements,
+      surveyResponses,
     ] = await Promise.all([
       this.client.from("gqai_aistudy_profiles").select("*").order("display_name"),
       this.client.from("gqai_aistudy_groups").select("*").order("name"),
@@ -142,6 +144,7 @@ export class SupabaseRepository {
         .limit(200),
       this.client.from("gqai_aistudy_feature_flags").select("*"),
       this.client.from("gqai_aistudy_announcements").select("*").order("created_at", { ascending: false }),
+      this.client.from("gqai_aistudy_survey_responses").select("*"),
     ]);
 
     const firstError = [
@@ -160,6 +163,7 @@ export class SupabaseRepository {
       activities.error,
       flags.error,
       announcements.error,
+      surveyResponses.error,
     ].find(Boolean);
     assertOk(firstError);
 
@@ -169,6 +173,13 @@ export class SupabaseRepository {
         title: row.title, body: row.body, archived: row.archived,
         createdAt: row.created_at, updatedAt: row.updated_at,
       })),
+      surveyResponses: (surveyResponses.data ?? []).map((row: Row) => ({
+        id: row.id,
+        studentId: row.student_id,
+        answers: row.answers,
+        submittedAt: row.submitted_at,
+        updatedAt: row.updated_at,
+      })),
       profiles: (profiles.data ?? []).map((row: Row) => ({
         id: row.id,
         role: row.role,
@@ -176,6 +187,7 @@ export class SupabaseRepository {
         displayName: row.display_name,
         email: row.email ?? undefined,
         mustChangePassword: row.must_change_password,
+        mustCompleteSurvey: row.must_complete_survey,
         isActive: row.is_active,
         lastLoginAt: row.last_login_at ?? undefined,
         createdAt: row.created_at,
@@ -514,6 +526,13 @@ export class SupabaseRepository {
     const { error } = await this.client.rpc("gqai_aistudy_save_announcement", {
       p_id: input.id ?? null, p_scope: input.scope, p_target_id: input.targetId ?? null,
       p_title: input.title, p_body: input.body, p_archived: input.archived ?? false,
+    });
+    assertOk(error);
+  }
+
+  async submitSurvey(answers: SurveyAnswers) {
+    const { error } = await this.client.rpc("gqai_aistudy_submit_survey", {
+      p_answers: answers,
     });
     assertOk(error);
   }
