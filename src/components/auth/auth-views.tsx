@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PASSWORD_GUIDANCE } from "@/lib/domain/account-policy";
+import { PASSWORD_GUIDANCE, PASSWORD_RULES } from "@/lib/domain/account-policy";
 
 function safeNext(value: string | null, role: "admin" | "student") {
   const fallback = role === "admin" ? "/admin" : "/learn";
@@ -379,8 +379,16 @@ export function RequestAccessView() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const passwordValid = PASSWORD_RULES.every((rule) => rule.test(password));
+  const passwordsMatch = confirm.length > 0 && password === confirm;
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (pending) return;
+    const failedRule = PASSWORD_RULES.find((rule) => !rule.test(password));
+    if (failedRule) {
+      setError(failedRule.message);
+      return;
+    }
     if (password !== confirm) {
       setError("비밀번호 확인이 일치하지 않습니다.");
       return;
@@ -513,13 +521,44 @@ export function RequestAccessView() {
                     autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    minLength={8}
-                    maxLength={72}
+                    aria-invalid={password.length > 0 && !passwordValid}
+                    aria-describedby="request-password-rules request-password-help"
                     required
                   />
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {PASSWORD_GUIDANCE} 다른 서비스와 겹치지 않는 비밀번호를
-                    권장합니다. 관리자는 비밀번호를 확인할 수 없습니다.
+                  <div id="request-password-rules" aria-live="polite">
+                    <ul
+                      className="space-y-1 text-xs leading-5"
+                      aria-label="비밀번호 규칙"
+                    >
+                      {PASSWORD_RULES.map((rule) => {
+                        const met = password.length > 0 && rule.test(password);
+                        return (
+                          <li key={rule.id} className="flex items-center gap-2">
+                            <span
+                              className={
+                                met
+                                  ? "rounded-sm bg-primary px-1.5 text-foreground"
+                                  : "rounded-sm bg-muted px-1.5 text-muted-foreground"
+                              }
+                            >
+                              {password.length === 0
+                                ? "입력 전"
+                                : met
+                                  ? "충족"
+                                  : "미충족"}
+                            </span>
+                            <span>{rule.label}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                  <p
+                    id="request-password-help"
+                    className="text-xs leading-5 text-muted-foreground"
+                  >
+                    다른 서비스와 겹치지 않는 비밀번호를 권장합니다. 관리자는
+                    비밀번호를 확인할 수 없습니다.
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -530,10 +569,21 @@ export function RequestAccessView() {
                     autoComplete="new-password"
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
-                    minLength={8}
-                    maxLength={72}
+                    aria-invalid={confirm.length > 0 && !passwordsMatch}
+                    aria-describedby="request-password-match"
                     required
                   />
+                  <p
+                    id="request-password-match"
+                    role="status"
+                    className="text-xs leading-5 text-muted-foreground"
+                  >
+                    {confirm.length === 0
+                      ? "같은 비밀번호를 한 번 더 입력하세요."
+                      : passwordsMatch
+                        ? "비밀번호가 일치합니다."
+                        : "비밀번호가 일치하지 않습니다."}
+                  </p>
                 </div>
                 <div
                   aria-hidden="true"
@@ -600,7 +650,7 @@ export function RequestAccessView() {
                 <Button
                   type="submit"
                   className="h-11 w-full"
-                  disabled={pending}
+                  disabled={pending || !passwordValid || !passwordsMatch}
                   aria-busy={pending}
                 >
                   {pending ? "접수 중…" : "요청 보내기"}

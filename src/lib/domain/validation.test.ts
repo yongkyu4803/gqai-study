@@ -2,6 +2,20 @@ import { describe, expect, it } from "vitest";
 import { accountRequestSchema, passwordSchema } from "@/lib/domain/validation";
 
 describe("passwordSchema", () => {
+  it.each([
+    ["A123456", false],
+    ["A1234567", true],
+    ["A1" + "a".repeat(70), true],
+    ["A1" + "a".repeat(71), false],
+    ["abcdefgh1", false],
+    ["Abcdefgh", false],
+    ["가나다라마바사1", false],
+    ["Abcdefg１", false],
+    ["", false],
+  ])("길이 경계와 필수 문자 검증: %s", (password, valid) => {
+    expect(passwordSchema.safeParse(password).success).toBe(valid);
+  });
+
   it("영문 대문자와 숫자를 포함한 8~72자 비밀번호를 허용한다", () => {
     expect(passwordSchema.safeParse("MyPassword1").success).toBe(true);
   });

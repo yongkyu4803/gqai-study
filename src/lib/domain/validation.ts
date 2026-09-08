@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PASSWORD_RULES } from "./account-policy";
 import type { ModuleSnapshot, SubmissionItem } from "./types";
 
 export const loginIdSchema = z
@@ -12,12 +13,13 @@ export const loginIdSchema = z
     "영문 소문자, 숫자, 점, 밑줄, 하이픈만 사용할 수 있습니다.",
   );
 
-export const passwordSchema = z
-  .string()
-  .min(8, "비밀번호는 8자 이상 입력하세요.")
-  .max(72, "비밀번호는 72자 이하로 입력하세요.")
-  .regex(/[A-Z]/, "영문 대문자를 한 글자 이상 포함하세요.")
-  .regex(/[0-9]/, "숫자를 한 글자 이상 포함하세요.");
+export const passwordSchema = z.string().superRefine((value, context) => {
+  for (const rule of PASSWORD_RULES) {
+    if (!rule.test(value)) {
+      context.addIssue({ code: "custom", message: rule.message });
+    }
+  }
+});
 
 export const emailSchema = z
   .string()
