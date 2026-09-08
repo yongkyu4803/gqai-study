@@ -46,7 +46,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { PASSWORD_GUIDANCE } from "@/lib/domain/account-policy";
+import { PASSWORD_GUIDANCE, PASSWORD_RULES } from "@/lib/domain/account-policy";
+import { PasswordRules } from "@/components/auth/password-rules";
 import {
   feedbackKindLabel,
   formatDate,
@@ -1286,6 +1287,9 @@ export function AccountView() {
   const [confirm, setConfirm] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [passwordChanged, setPasswordChanged] = useState(false);
+  const passwordValid = PASSWORD_RULES.every((rule) => rule.test(password));
+  const passwordsMatch = confirm.length > 0 && password === confirm;
   async function saveEmail() {
     setEmailPending(true);
     setEmailError("");
@@ -1303,6 +1307,13 @@ export function AccountView() {
     }
   }
   async function change() {
+    if (pending) return;
+    setPasswordChanged(false);
+    const failedRule = PASSWORD_RULES.find((rule) => !rule.test(password));
+    if (failedRule) {
+      setError(failedRule.message);
+      return;
+    }
     if (password !== confirm) {
       setError("비밀번호 확인이 일치하지 않습니다. 두 입력값을 확인해 주세요.");
       return;
@@ -1313,6 +1324,7 @@ export function AccountView() {
       await changePassword(password);
       setPassword("");
       setConfirm("");
+      setPasswordChanged(true);
       toast.success("비밀번호를 변경했습니다.");
     } catch (cause) {
       const message =
@@ -1377,50 +1389,91 @@ export function AccountView() {
           </Button>
         </CardContent>
       </Card>
-      <Card>
+      <Card id="password-change" className="scroll-mt-24">
         <CardHeader>
           <CardTitle className="text-base">비밀번호 변경</CardTitle>
           <CardDescription>{PASSWORD_GUIDANCE}</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="account-password">새 비밀번호</Label>
-            <Input
-              id="account-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "account-password-error" : undefined}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="account-confirm">새 비밀번호 확인</Label>
-            <Input
-              id="account-confirm"
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              aria-invalid={Boolean(error)}
-              aria-describedby={error ? "account-password-error" : undefined}
-            />
-          </div>
-          {error ? (
-            <InlineMessage
-              id="account-password-error"
-              kind="error"
-              title="비밀번호를 변경하지 못했습니다"
-              description={error}
-            />
-          ) : null}
-          <Button
-            className="w-full"
-            onClick={change}
-            disabled={pending || !password}
-            aria-busy={pending}
+        <CardContent>
+          <form
+            className="space-y-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void change();
+            }}
           >
-            {pending ? "변경 중…" : "변경"}
-          </Button>
+            <div className="space-y-2">
+              <Label htmlFor="account-password">새 비밀번호</Label>
+              <Input
+                id="account-password"
+                type="password"
+                autoComplete="new-password"
+                required
+                disabled={pending}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setPasswordChanged(false);
+                  setError("");
+                }}
+                aria-invalid={password.length > 0 && !passwordValid}
+                aria-describedby={`account-password-rules${error ? " account-password-error" : ""}`}
+              />
+              <PasswordRules id="account-password-rules" password={password} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="account-confirm">새 비밀번호 확인</Label>
+              <Input
+                id="account-confirm"
+                type="password"
+                autoComplete="new-password"
+                required
+                disabled={pending}
+                value={confirm}
+                onChange={(e) => {
+                  setConfirm(e.target.value);
+                  setPasswordChanged(false);
+                  setError("");
+                }}
+                aria-invalid={confirm.length > 0 && !passwordsMatch}
+                aria-describedby={`account-password-match${error ? " account-password-error" : ""}`}
+              />
+              <p
+                id="account-password-match"
+                role="status"
+                className="text-xs leading-5 text-muted-foreground"
+              >
+                {confirm.length === 0
+                  ? "같은 비밀번호를 한 번 더 입력하세요."
+                  : passwordsMatch
+                    ? "비밀번호가 일치합니다."
+                    : "비밀번호가 일치하지 않습니다."}
+              </p>
+            </div>
+            {error ? (
+              <InlineMessage
+                id="account-password-error"
+                kind="error"
+                title="비밀번호를 변경하지 못했습니다"
+                description={error}
+              />
+            ) : null}
+            <Button
+              className="w-full"
+              type="submit"
+              disabled={pending || !passwordValid || !passwordsMatch}
+              aria-busy={pending}
+            >
+              {pending ? "변경 중…" : "비밀번호 변경"}
+            </Button>
+            {passwordChanged ? (
+              <InlineMessage
+                kind="success"
+                title="비밀번호를 변경했습니다"
+                description="다음 로그인부터 새 비밀번호를 사용하세요."
+              />
+            ) : null}
+          </form>
         </CardContent>
       </Card>
     </div>

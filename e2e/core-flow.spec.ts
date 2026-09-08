@@ -150,3 +150,65 @@ test("최초 로그인 학생은 비밀번호를 바꾼 뒤 학습한다", async
   await expect(page).toHaveURL("/learn");
   await expect(page.getByText("AI와 친해지기")).toBeVisible();
 });
+
+test("관리자가 설정에서 자신의 비밀번호를 변경하고 새 비밀번호로 로그인한다", async ({
+  page,
+}) => {
+  await page.route("**/api/admin/settings/email-status", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        hasApiKey: false,
+        domainVerified: false,
+        fromAddress: null,
+      }),
+    }),
+  );
+  await login(page, "admin", "admin1234");
+  await expect(page).toHaveURL(/\/admin$/);
+  await page.goto("/admin/settings");
+  await page.getByRole("link", { name: "내 비밀번호 변경" }).click();
+  await expect(page).toHaveURL(/\/admin\/account#password-change$/);
+  const password = page.getByLabel("새 비밀번호", { exact: true });
+  const confirm = page.getByLabel("새 비밀번호 확인");
+  const submit = page.getByRole("button", {
+    name: "비밀번호 변경",
+    exact: true,
+  });
+  await password.fill("lowercase1");
+  await confirm.fill("lowercase1");
+  await expect(submit).toBeDisabled();
+  await password.fill("AdminChanged1234!");
+  await expect(submit).toBeDisabled();
+  await confirm.fill("AdminChanged1234!");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: `/tmp/admin-password-${page.viewportSize()?.width}.png`,
+    fullPage: true,
+  });
+  await confirm.press("Enter");
+  await expect(
+    page.getByText("다음 로그인부터 새 비밀번호를 사용하세요."),
+  ).toBeVisible();
+  await expect(password).toHaveValue("");
+  await expect(confirm).toHaveValue("");
+  if (await page.getByRole("button", { name: "메뉴 열기" }).isVisible()) {
+    await page.getByRole("button", { name: "메뉴 열기" }).click();
+  }
+  await page
+    .getByRole("button", { name: "로그아웃", exact: true })
+    .filter({ visible: true })
+    .click();
+  await expect(page).toHaveURL(/\/login$/);
+  await login(page, "admin", "admin1234");
+  await expect(page.locator("#login-error")).toContainText(
+    "아이디 또는 비밀번호를 확인하세요.",
+  );
+  await login(page, "admin", "AdminChanged1234!");
+  await expect(page).toHaveURL(/\/admin$/);
+});

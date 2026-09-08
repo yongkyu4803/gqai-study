@@ -22,7 +22,7 @@ import {
 import { ModuleReader } from "@/components/modules/module-reader";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -1032,6 +1032,14 @@ export function SettingsView() {
         eyebrow="운영 설정"
         title="설정"
         description="연결 상태와 향후 확장 슬롯을 확인합니다."
+        action={
+          <Link
+            href="/admin/account#password-change"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            내 비밀번호 변경
+          </Link>
+        }
       />
       <Card>
         <CardHeader>

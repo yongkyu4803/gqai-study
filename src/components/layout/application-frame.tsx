@@ -232,7 +232,7 @@ function MobileHeader() {
         >
           <Menu className="size-4" />
         </SheetTrigger>
-        <SheetContent side="right" className="w-[286px] p-4">
+        <SheetContent side="right" className="w-[286px] overflow-y-auto p-4">
           <SheetHeader className="px-2">
             <SheetTitle className="text-left">
               {session?.displayName}
