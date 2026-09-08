@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PolicyPage, PolicySection } from "@/components/policies/policy-page";
+import { ACCOUNT_POLICY_VERSION } from "@/lib/domain/account-policy";
 
 export const metadata: Metadata = {
   title: "이용정책 | GQAI Study",
@@ -68,7 +69,7 @@ export default function TermsPolicyPage() {
         <p>
           운영 방식이 크게 바뀌는 경우 사이트 공지사항 또는 이메일로 안내합니다.
           이용 중 궁금한 점이나 계정 관련 요청은 로그인 후 문의하기에 남길 수
-          있습니다. 현재 정책 버전은 2026-09-07입니다.
+          있습니다. 현재 정책 버전은 {ACCOUNT_POLICY_VERSION}입니다.
         </p>
       </PolicySection>
     </PolicyPage>

@@ -212,3 +212,166 @@ test("관리자가 설정에서 자신의 비밀번호를 변경하고 새 비�
   await login(page, "admin", "AdminChanged1234!");
   await expect(page).toHaveURL(/\/admin$/);
 });
+
+test("계정 신청에서 사전 설문을 함께 제출하고 실패해도 응답을 유지한다", async ({
+  page,
+}) => {
+  let requests = 0;
+  await page.route("**/api/account-requests", async (route) => {
+    requests += 1;
+    expect(route.request().postDataJSON()).toMatchObject({
+      survey: {
+        aiTools: ["none"],
+        aiSkillDetail: "처음 배우려고 합니다.",
+        os: "windows",
+      },
+    });
+    await route.fulfill({
+      status: requests === 1 ? 503 : 201,
+      contentType: "application/json",
+      body: JSON.stringify(
+        requests === 1 ? { error: "잠시 후 다시 신청하세요." } : { ok: true },
+      ),
+    });
+  });
+  await page.goto("/request-access");
+  await page.getByLabel("이름", { exact: true }).fill("테스트 학습자");
+  await page.getByLabel("사이트에서 사용할 아이디").fill("learner");
+  await page.getByLabel("이메일 (필수)").fill("learner@example.com");
+  await page.getByLabel("사용할 비밀번호").fill("Learning1");
+  await page.getByLabel("비밀번호 확인", { exact: true }).fill("Learning1");
+  await page
+    .getByLabel("구체적으로 어떻게 활용하고 계신가요?")
+    .fill("처음 배우려고 합니다.");
+  await page.getByRole("checkbox", { name: /개인정보 처리방침/ }).check();
+  await page.getByRole("button", { name: "요청 보내기" }).click();
+  await expect(
+    page.getByText("하나 이상 선택하세요.", { exact: true }),
+  ).toBeVisible();
+  expect(requests).toBe(0);
+  await page.getByRole("checkbox", { name: "ChatGPT", exact: true }).check();
+  await page.getByRole("checkbox", { name: "사용 안 함", exact: true }).check();
+  await expect(
+    page.getByRole("checkbox", { name: "ChatGPT", exact: true }),
+  ).not.toBeChecked();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: `/tmp/signup-survey-${page.viewportSize()?.width}.png`,
+    fullPage: true,
+  });
+  await page.getByRole("button", { name: "요청 보내기" }).click();
+  await expect(
+    page.getByText("잠시 후 다시 신청하세요.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByLabel("구체적으로 어떻게 활용하고 계신가요?"),
+  ).toHaveValue("처음 배우려고 합니다.");
+  await expect(page.getByLabel("사용할 비밀번호")).toHaveValue("Learning1");
+  await page.getByRole("button", { name: "요청 보내기" }).click();
+  await expect(
+    page.getByText("요청을 접수했습니다", { exact: true }),
+  ).toBeVisible();
+});
+
+test("설문이 없는 기존 학생은 설문 강제 이동 없이 학습한다", async ({
+  page,
+}) => {
+  await login(page, "suyeon", "student1234");
+  await expect(page).toHaveURL("/change-password");
+  await page.getByLabel("새 비밀번호", { exact: true }).fill("Changed1234!");
+  await page.getByLabel("새 비밀번호 확인").fill("Changed1234!");
+  await page.getByRole("button", { name: "비밀번호 변경" }).click();
+  await expect(page).toHaveURL("/learn");
+  await expect(page.getByText("사전 설문에 참여해주세요.")).toHaveCount(0);
+  await page.reload();
+  await expect(page).toHaveURL("/learn");
+  await expect(page.getByRole("heading", { name: /님의 학습/ })).toBeVisible();
+});
+
+test("관리자가 승인 전에 신청 설문을 확인하고 이전 신청은 설문 없이 승인할 수 있다", async ({
+  page,
+}) => {
+  await page.route("**/api/admin/account-requests", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        requests: [
+          {
+            id: "new-request",
+            displayName: "새 신청자",
+            requestedLoginId: "newlearner",
+            email: "new@example.com",
+            note: null,
+            status: "pending",
+            createdAt: "2026-09-08T00:00:00Z",
+            credentialReady: true,
+            surveyAnswers: {
+              os: "windows",
+              aiTools: ["none"],
+              aiSubscription: "",
+              aiUsageFrequency: "rarely",
+              toolFamiliarity: {},
+              aiSkillLevel: 1,
+              aiSkillDetail: "이제 처음 시작합니다.",
+              learningGoal: "automation",
+              learningGoalDetail: "",
+            },
+          },
+          {
+            id: "old-request",
+            displayName: "이전 신청자",
+            requestedLoginId: "oldlearner",
+            email: "old@example.com",
+            note: null,
+            status: "pending",
+            createdAt: "2026-09-07T00:00:00Z",
+            credentialReady: true,
+            surveyAnswers: null,
+          },
+        ],
+      }),
+    }),
+  );
+  let approved = false;
+  await page.route(
+    "**/api/admin/account-requests/old-request",
+    async (route) => {
+      expect(route.request().postDataJSON()).toEqual({ status: "approved" });
+      approved = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: "{}",
+      });
+    },
+  );
+  await login(page, "admin", "admin1234");
+  await expect(page).toHaveURL(/\/admin$/);
+  await page.goto("/admin/account-requests");
+  await page.getByText("사전 설문 보기", { exact: true }).click();
+  await expect(
+    page.getByText("이제 처음 시작합니다.", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("사전 설문 없음 · 이전 신청 건", { exact: true }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: `/tmp/admin-signup-survey-${page.viewportSize()?.width}.png`,
+    fullPage: true,
+  });
+  await page
+    .getByRole("button", { name: "승인 및 계정 활성화" })
+    .nth(1)
+    .click();
+  await expect.poll(() => approved).toBe(true);
+});

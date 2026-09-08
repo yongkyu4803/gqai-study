@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { accountRequestSchema, passwordSchema } from "@/lib/domain/validation";
+import { createEmptySurveyAnswers } from "@/lib/domain/survey";
 
 describe("passwordSchema", () => {
   it.each([
@@ -39,6 +40,11 @@ describe("accountRequestSchema", () => {
     loginId: "learner.01",
     email: "learner@example.com",
     password: "Learning1",
+    survey: {
+      ...createEmptySurveyAnswers(),
+      aiTools: ["none"],
+      aiSkillDetail: "아직 사용해 보지 않았습니다.",
+    },
     policyAccepted: true,
     note: "업무 자동화를 배우고 싶습니다.",
   } as const;
@@ -60,6 +66,18 @@ describe("accountRequestSchema", () => {
       accountRequestSchema.safeParse({
         ...validRequest,
         policyAccepted: false,
+      }).success,
+    ).toBe(false);
+  });
+  it("새 신청은 설문 누락과 필수 답변 누락을 거부한다", () => {
+    expect(
+      accountRequestSchema.safeParse({ ...validRequest, survey: undefined })
+        .success,
+    ).toBe(false);
+    expect(
+      accountRequestSchema.safeParse({
+        ...validRequest,
+        survey: createEmptySurveyAnswers(),
       }).success,
     ).toBe(false);
   });

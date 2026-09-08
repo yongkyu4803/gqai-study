@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { SurveyFields } from "@/components/common/survey-fields";
+import {
+  createEmptySurveyAnswers,
+  surveyAnswersSchema,
+} from "@/lib/domain/survey";
 import { PasswordRules } from "@/components/auth/password-rules";
 import { PASSWORD_GUIDANCE, PASSWORD_RULES } from "@/lib/domain/account-policy";
 
@@ -368,6 +373,8 @@ export function ResetPasswordView() {
 }
 
 export function RequestAccessView() {
+  const [survey, setSurvey] = useState(createEmptySurveyAnswers);
+  const [surveyError, setSurveyError] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loginId, setLoginId] = useState("");
   const [email, setEmail] = useState("");
@@ -394,6 +401,15 @@ export function RequestAccessView() {
       setError("비밀번호 확인이 일치하지 않습니다.");
       return;
     }
+    const surveyResult = surveyAnswersSchema.safeParse(survey);
+    if (!surveyResult.success) {
+      setSurveyError(
+        surveyResult.error.issues[0]?.message || "사전 설문을 확인해 주세요.",
+      );
+      document.getElementById("request-survey")?.focus();
+      return;
+    }
+    setSurveyError("");
     setPending(true);
     setError("");
     try {
@@ -406,6 +422,7 @@ export function RequestAccessView() {
           email,
           password,
           policyAccepted,
+          survey: surveyResult.data,
           note,
           website,
         }),
@@ -425,7 +442,7 @@ export function RequestAccessView() {
   }
   return (
     <main className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 py-12">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-2xl">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
@@ -442,8 +459,8 @@ export function RequestAccessView() {
               계정 발급 요청
             </CardTitle>
             <CardDescription>
-              이메일과 사용할 아이디·비밀번호를 입력하면 관리자가 신청 내용을
-              확인하고 계정 발급만 승인합니다.
+              계정 정보와 사전 설문을 함께 작성해 주세요. 관리자가 신청 내용을
+              확인하고 계정 발급을 승인합니다.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -592,6 +609,41 @@ export function RequestAccessView() {
                     placeholder="소속 반, 요청 사유 등"
                   />
                 </div>
+                <section
+                  id="request-survey"
+                  tabIndex={-1}
+                  aria-labelledby="request-survey-title"
+                  className="space-y-4 border-t pt-6 outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-describedby={
+                    surveyError ? "request-survey-error" : undefined
+                  }
+                >
+                  <h2 id="request-survey-title" className="text-lg font-medium">
+                    사전 설문
+                  </h2>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    나에게 맞는 학습을 준비하기 위해 사용 환경과 경험, 학습
+                    목표를 알려주세요. 계정 신청과 함께 제출됩니다.
+                  </p>
+                  {surveyError ? (
+                    <InlineMessage
+                      id="request-survey-error"
+                      kind="error"
+                      title="사전 설문을 확인해 주세요"
+                      description={surveyError}
+                    />
+                  ) : null}
+                  <fieldset disabled={pending} className="min-w-0">
+                    <legend className="sr-only">사전 설문 응답</legend>
+                    <SurveyFields
+                      answers={survey}
+                      setAnswers={(next) => {
+                        setSurvey(next);
+                        setSurveyError("");
+                      }}
+                    />
+                  </fieldset>
+                </section>
                 <label className="flex items-start gap-3 rounded-lg border p-4 text-sm leading-6">
                   <input
                     type="checkbox"
@@ -620,7 +672,7 @@ export function RequestAccessView() {
                     >
                       이용정책
                     </Link>
-                    을 확인했으며 계정 신청을 위한 필수 정보 수집·이용에
+                    을 확인했으며 계정 정보와 사전 설문 응답 수집·이용에
                     동의합니다.
                   </span>
                 </label>

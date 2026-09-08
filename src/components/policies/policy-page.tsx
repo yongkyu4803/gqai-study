@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ACCOUNT_POLICY_VERSION } from "@/lib/domain/account-policy";
 
 export function PolicyPage({
   title,
@@ -27,7 +28,7 @@ export function PolicyPage({
       </header>
       <article className="content-wrap py-12 sm:py-16">
         <div className="mx-auto max-w-3xl rounded-xl border bg-white p-6 shadow-sm sm:p-10">
-          <p className="eyebrow">기본 정책 · 2026년 9월 7일 시행</p>
+          <p className="eyebrow">기본 정책 · {ACCOUNT_POLICY_VERSION} 시행</p>
           <h1 className="mt-3 text-3xl font-medium tracking-tight">{title}</h1>
           <p className="mt-4 leading-7 text-muted-foreground">{description}</p>
           <div className="policy-content mt-10 space-y-9 text-sm leading-7 text-zinc-700">

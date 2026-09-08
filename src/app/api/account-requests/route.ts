@@ -130,6 +130,7 @@ export async function POST(request: Request) {
         requested_login_id: input.loginId,
         contact: input.email,
         note: input.note || null,
+        survey_answers: input.survey,
         auth_user_id: createdUserId,
         policy_version: ACCOUNT_POLICY_VERSION,
         policy_accepted_at: new Date().toISOString(),

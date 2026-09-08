@@ -78,12 +78,23 @@ describe("계정 신청 비밀번호 검증", () => {
     fireEvent.change(screen.getByLabelText("비밀번호 확인"), {
       target: { value: "Abcdefg1" },
     });
-    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByLabelText("사용 안 함"));
+    fireEvent.change(
+      screen.getByLabelText("구체적으로 어떻게 활용하고 계신가요?"),
+      { target: { value: "아직 사용해 보지 않았습니다." } },
+    );
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: /개인정보 처리방침/ }),
+    );
     fireEvent.click(screen.getByRole("button", { name: "요청 보내기" }));
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({
       password: "Abcdefg1",
       policyAccepted: true,
+      survey: {
+        aiTools: ["none"],
+        aiSkillDetail: "아직 사용해 보지 않았습니다.",
+      },
     });
     await screen.findByText("요청을 접수했습니다");
   });

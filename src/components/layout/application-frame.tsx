@@ -274,14 +274,6 @@ export function ApplicationFrame({ children }: { children: ReactNode }) {
       router.replace("/change-password");
       return;
     }
-    if (
-      session.role === "student" &&
-      session.mustCompleteSurvey &&
-      pathname !== "/survey"
-    ) {
-      router.replace("/survey");
-      return;
-    }
     if (pathname.startsWith("/admin") && session.role !== "admin")
       router.replace("/forbidden");
     if (

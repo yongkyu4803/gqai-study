@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { PASSWORD_RULES } from "./account-policy";
+import { surveyAnswersSchema } from "./survey";
 import type { ModuleSnapshot, SubmissionItem } from "./types";
 
 export const loginIdSchema = z
@@ -33,6 +34,7 @@ export const accountRequestSchema = z.object({
   loginId: loginIdSchema,
   email: emailSchema,
   password: passwordSchema,
+  survey: surveyAnswersSchema,
   policyAccepted: z.literal(true, {
     error: "개인정보 처리방침과 이용정책에 동의해 주세요.",
   }),

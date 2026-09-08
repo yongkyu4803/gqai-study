@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PolicyPage, PolicySection } from "@/components/policies/policy-page";
+import { ACCOUNT_POLICY_VERSION } from "@/lib/domain/account-policy";
 
 export const metadata: Metadata = {
   title: "개인정보 처리방침 | GQAI Study",
@@ -13,7 +14,8 @@ export default function PrivacyPolicyPage() {
     >
       <PolicySection title="1. 수집하는 정보">
         <p>
-          계정 신청 시 이름, 로그인 아이디, 이메일 주소를 필수로 받으며 신청자가
+          계정 신청 시 이름, 로그인 아이디, 이메일 주소와 사전 설문 응답(사용
+          환경, AI·서비스 사용 경험, 활용 수준, 학습 목표)을 받으며 신청자가
           선택해 적은 메모를 함께 받을 수 있습니다. 전화번호는 수집하지
           않습니다.
         </p>
@@ -23,8 +25,8 @@ export default function PrivacyPolicyPage() {
           관리자도 비밀번호를 확인할 수 없습니다.
         </p>
         <p>
-          계정 승인 후에는 맞춤 학습을 위해 사전 설문 답변, 배정 모듈, 학습 진행
-          상태, 제출 결과, 피드백과 문의 내역이 생성·저장될 수 있습니다.
+          계정 승인 후에는 맞춤 학습을 위해 배정 모듈, 학습 진행 상태, 제출
+          결과, 피드백과 문의 내역이 생성·저장될 수 있습니다.
         </p>
       </PolicySection>
 
@@ -69,7 +71,7 @@ export default function PrivacyPolicyPage() {
       <PolicySection title="6. 정책 변경">
         <p>
           중요한 내용이 바뀌면 시행 전에 사이트 공지사항 또는 이메일로
-          안내합니다. 현재 정책 버전은 2026-09-07입니다.
+          안내합니다. 현재 정책 버전은 {ACCOUNT_POLICY_VERSION}입니다.
         </p>
       </PolicySection>
     </PolicyPage>

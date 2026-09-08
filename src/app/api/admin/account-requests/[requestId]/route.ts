@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { adminGuardStatus, requireAdmin } from "@/lib/supabase/auth-guard";
 import { sendAndLogEmail } from "@/lib/server/email";
+import { surveyAnswersSchema } from "@/lib/domain/survey";
 
 const patchSchema = z.object({
   status: z.enum(["approved", "dismissed"]),
@@ -29,7 +30,7 @@ export async function PATCH(
     const { data: accountRequest, error: requestError } = await admin
       .from("gqai_aistudy_account_requests")
       .select(
-        "id, display_name, requested_login_id, contact, status, auth_user_id",
+        "id, display_name, requested_login_id, contact, status, auth_user_id, survey_answers, created_at",
       )
       .eq("id", requestId)
       .single();
@@ -80,6 +81,11 @@ export async function PATCH(
     }
 
     const authUserId = accountRequest.auth_user_id;
+    // Legacy requests can still be approved without fabricating a response.
+    const survey =
+      accountRequest.survey_answers == null
+        ? null
+        : surveyAnswersSchema.parse(accountRequest.survey_answers);
     const now = new Date().toISOString();
     const { error: profileError } = await admin
       .from("gqai_aistudy_profiles")
@@ -90,7 +96,7 @@ export async function PATCH(
         display_name: accountRequest.display_name,
         email: accountRequest.contact,
         must_change_password: false,
-        must_complete_survey: true,
+        must_complete_survey: false,
         is_active: false,
         deactivated_at: now,
         created_by: adminUser.id,
@@ -112,6 +118,20 @@ export async function PATCH(
         .eq("id", authUserId)
         .eq("is_active", false);
     };
+    if (survey) {
+      const { error: surveyError } = await admin
+        .from("gqai_aistudy_survey_responses")
+        .insert({
+          student_id: authUserId,
+          answers: survey,
+          submitted_at: accountRequest.created_at,
+          updated_at: accountRequest.created_at,
+        });
+      if (surveyError) {
+        await rollbackProfile();
+        throw surveyError;
+      }
+    }
     const { data: approved, error: approveError } = await admin
       .from("gqai_aistudy_account_requests")
       .update({
@@ -188,7 +208,7 @@ export async function PATCH(
         kind: "account_created",
         to: accountRequest.contact,
         subject: "[GQAI Study] 학습 계정이 승인되었습니다",
-        text: `${accountRequest.display_name}님, GQAI Study 학습 계정이 승인되었습니다.\n\n로그인: ${origin}/login\n아이디: ${accountRequest.requested_login_id}\n\n신청할 때 직접 설정한 비밀번호로 로그인해 주세요. 비밀번호는 관리자도 확인할 수 없습니다. 로그인 후 먼저 사전 설문을 완료하면 학습을 시작할 수 있습니다.`,
+        text: `${accountRequest.display_name}님, GQAI Study 학습 계정이 승인되었습니다.\n\n로그인: ${origin}/login\n아이디: ${accountRequest.requested_login_id}\n\n신청할 때 직접 설정한 비밀번호로 로그인해 주세요. 비밀번호는 관리자도 확인할 수 없습니다. 로그인 후 내 학습에서 배정된 카드를 확인할 수 있습니다.`,
         studentId: authUserId,
         relatedId: requestId,
       });

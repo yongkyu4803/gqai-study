@@ -9,7 +9,7 @@ export async function GET() {
     const { data, error } = await admin
       .from("gqai_aistudy_account_requests")
       .select(
-        "id, display_name, requested_login_id, contact, note, status, created_at, auth_user_id, policy_accepted_at",
+        "id, display_name, requested_login_id, contact, note, status, created_at, auth_user_id, policy_accepted_at, survey_answers",
       )
       .order("created_at", { ascending: false });
     if (error) throw error;
@@ -23,6 +23,7 @@ export async function GET() {
         status: row.status,
         createdAt: row.created_at,
         credentialReady: Boolean(row.auth_user_id && row.policy_accepted_at),
+        surveyAnswers: row.survey_answers,
       })),
     });
   } catch (error) {

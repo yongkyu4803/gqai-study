@@ -6,6 +6,8 @@ import { EmptyState, PageHeader } from "@/components/common/page-parts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/domain/status";
+import { SurveyAnswerSummary } from "@/components/common/survey-answer-summary";
+import type { SurveyAnswers } from "@/lib/domain/types";
 
 interface AccountRequest {
   id: string;
@@ -16,6 +18,7 @@ interface AccountRequest {
   status: "pending" | "approved" | "dismissed";
   createdAt: string;
   credentialReady: boolean;
+  surveyAnswers: SurveyAnswers | null;
 }
 
 const statusLabel: Record<AccountRequest["status"], string> = {
@@ -77,7 +80,7 @@ export function AccountRequestsView() {
       <PageHeader
         eyebrow="계정 관리"
         title="계정 요청"
-        description="신청자가 아이디와 비밀번호를 정합니다. 관리자는 내용을 확인하고 계정 발급을 승인합니다."
+        description="신청자가 작성한 계정 정보와 사전 설문을 확인하고 계정 발급을 승인합니다."
       />
       {requests === null ? null : requests.length ? (
         <div className="overflow-hidden rounded-lg border">
@@ -133,6 +136,20 @@ export function AccountRequestsView() {
                     </Button>
                   </div>
                 ) : null}
+                {item.surveyAnswers ? (
+                  <details className="min-w-0 rounded-md border p-3 sm:col-span-4">
+                    <summary className="cursor-pointer text-sm font-medium">
+                      사전 설문 보기
+                    </summary>
+                    <div className="mt-3">
+                      <SurveyAnswerSummary answers={item.surveyAnswers} />
+                    </div>
+                  </details>
+                ) : (
+                  <p className="text-xs text-muted-foreground sm:col-span-4">
+                    사전 설문 없음 · 이전 신청 건
+                  </p>
+                )}
               </div>
             ))}
           </div>
