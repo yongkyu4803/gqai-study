@@ -213,6 +213,64 @@ test("관리자가 설정에서 자신의 비밀번호를 변경하고 새 비�
   await expect(page).toHaveURL(/\/admin$/);
 });
 
+test("관리자가 수강생 제출 파일을 내려받는다", async ({ page }) => {
+  await login(page, "admin", "admin1234");
+  await expect(page).toHaveURL(/\/admin$/);
+  await page.evaluate(() => {
+    const key = "gqai-study-demo-state-v3";
+    const state = JSON.parse(localStorage.getItem(key) ?? "{}");
+    const submission = state.submissions.find(
+      (item: { id: string }) => item.id === "submission-ai-minji-1",
+    );
+    submission.items.push({
+      id: "item-demo-download",
+      type: "file",
+      order: submission.items.length,
+      asset: {
+        id: "asset-demo-download",
+        name: "학습 결과.pdf",
+        size: 128,
+        mimeType: "application/pdf",
+        storagePath: "student/assignment/submission/result.pdf",
+      },
+    });
+    localStorage.setItem(key, JSON.stringify(state));
+  });
+  await page.route(
+    "**/api/admin/submission-items/item-demo-download/download",
+    (route) =>
+      route.fulfill({
+        status: 200,
+        body: "result",
+        headers: {
+          "content-type": "application/pdf",
+          "content-disposition":
+            "attachment; filename*=UTF-8''%ED%95%99%EC%8A%B5%20%EA%B2%B0%EA%B3%BC.pdf",
+        },
+      }),
+  );
+  await page.goto("/admin/assignments/assignment-ai-minji");
+  const downloadLink = page.getByRole("link", { name: /다운로드 128 B/ });
+  await expect(downloadLink).toHaveAttribute(
+    "href",
+    "/api/admin/submission-items/item-demo-download/download",
+  );
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: `/tmp/admin-submission-download-${page.viewportSize()?.width}.png`,
+    fullPage: true,
+  });
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    downloadLink.click(),
+  ]);
+  expect(download.suggestedFilename()).toBe("학습 결과.pdf");
+});
+
 test("계정 신청에서 사전 설문을 함께 제출하고 실패해도 응답을 유지한다", async ({
   page,
 }) => {

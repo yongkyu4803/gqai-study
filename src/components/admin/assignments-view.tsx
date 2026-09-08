@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   ArrowRight,
+  Download,
   FileText,
   MessageSquareText,
   Send,
@@ -1261,9 +1262,12 @@ function SubmissionItemRow({
             loading="lazy"
           />
         </a>
-        <figcaption className="flex items-center gap-2 border-t bg-white p-3 text-sm">
-          <FileText className="size-4" />
-          {item.asset.name}
+        <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t bg-white p-3 text-sm">
+          <span className="inline-flex min-w-0 items-center gap-2 [overflow-wrap:anywhere]">
+            <FileText className="size-4 shrink-0" />
+            {item.asset.name}
+          </span>
+          <SubmissionDownload item={item} />
         </figcaption>
       </figure>
     );
@@ -1273,18 +1277,48 @@ function SubmissionItemRow({
       {item.asset?.name ?? "첨부파일"}
     </>
   );
-  return isSafeAssetUrl(item.asset?.url) ? (
-    <a
-      href={item.asset.url}
-      target="_blank"
-      rel="noreferrer"
-      className="flex items-center gap-2 rounded-md border p-3 text-sm text-foreground"
-    >
-      {content}
-    </a>
-  ) : (
-    <div className="flex items-center gap-2 rounded-md border p-3 text-sm">
-      {content}
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-md border p-3 text-sm">
+      <span className="flex min-w-0 items-center gap-2 [overflow-wrap:anywhere]">
+        {content}
+      </span>
+      <SubmissionDownload item={item} />
     </div>
+  );
+}
+
+function SubmissionDownload({
+  item,
+}: {
+  item: ReturnType<
+    typeof useApp
+  >["state"]["submissions"][number]["items"][number];
+}) {
+  const asset = item.asset;
+  if (!asset) return null;
+  const href = asset.storagePath
+    ? `/api/admin/submission-items/${encodeURIComponent(item.id)}/download`
+    : isSafeAssetUrl(asset.url)
+      ? asset.url
+      : null;
+  if (!href) {
+    return (
+      <span className="text-xs text-muted-foreground">
+        파일을 사용할 수 없습니다.
+      </span>
+    );
+  }
+  return (
+    <a
+      href={href}
+      download={asset.storagePath ? undefined : asset.name}
+      className={buttonVariants({ variant: "outline", size: "sm" })}
+    >
+      <Download className="size-3.5" />
+      다운로드
+      <span className="text-muted-foreground">
+        {formatFileSize(asset.size)}
+      </span>
+    </a>
   );
 }
