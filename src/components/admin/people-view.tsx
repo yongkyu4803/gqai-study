@@ -71,8 +71,9 @@ import {
   type StudentStatusFilter,
 } from "@/lib/admin/student-filters";
 
+// 이름·날짜·수치는 내용만큼만 쓰고, 남는 폭은 배지가 늘어나는 그룹 열이 받는다.
 const studentRowColumns =
-  "sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)_120px_110px_88px_72px]";
+  "xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)_120px_116px_76px_60px]";
 
 function StudentSortHeader({
   sortKey,
@@ -94,7 +95,7 @@ function StudentSortHeader({
           ? `${label} 기준 ${sort.direction === "asc" ? "오름차순" : "내림차순"} 정렬됨. 눌러서 방향 바꾸기`
           : `${label} 기준으로 정렬`
       }
-      className={`flex items-center gap-1 text-left hover:text-foreground ${
+      className={`flex items-center gap-1 whitespace-nowrap text-left hover:text-foreground ${
         active ? "text-foreground" : ""
       }`}
     >
@@ -210,7 +211,7 @@ export function StudentsView() {
           </select>
         </div>
       </div>
-      <div className="space-y-2 sm:hidden">
+      <div className="space-y-2 xl:hidden">
         <Label htmlFor="student-sort">정렬</Label>
         <select
           id="student-sort"
@@ -256,7 +257,7 @@ export function StudentsView() {
       {students.length ? (
         <div className="overflow-hidden rounded-lg border">
           <div
-            className={`hidden bg-zinc-50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:items-center sm:gap-3 ${studentRowColumns}`}
+            className={`hidden bg-zinc-50 px-4 py-2.5 text-xs font-medium text-muted-foreground xl:grid xl:items-center xl:gap-4 ${studentRowColumns}`}
           >
             <StudentSortHeader sortKey="name" sort={sort} onSort={applySort} />
             <span>그룹</span>
@@ -281,14 +282,24 @@ export function StudentsView() {
                 <Link
                   href={`/admin/students/${student.id}`}
                   key={student.id}
-                  className={`grid gap-2 p-4 hover:bg-zinc-50 sm:items-center sm:gap-3 ${studentRowColumns}`}
+                  className={`grid gap-1.5 px-4 py-3 hover:bg-zinc-50 xl:items-center xl:gap-4 ${studentRowColumns}`}
                 >
-                  <p className="font-medium">
-                    {student.displayName}
-                    <span className="ml-2 text-xs font-normal text-muted-foreground">
-                      @{student.loginId}
-                    </span>
-                  </p>
+                  {/* 표가 아닌 폭에서는 이름과 상태를 한 줄에 마주 놓고,
+                      xl에서는 contents로 껍데기를 지워 각각 제 열로 보낸다. */}
+                  <div className="flex items-center justify-between gap-2 xl:contents">
+                    <p className="truncate text-sm font-medium">
+                      {student.displayName}
+                      <span className="ml-1.5 text-xs font-normal text-muted-foreground">
+                        @{student.loginId}
+                      </span>
+                    </p>
+                    <Badge
+                      variant={student.isActive ? "outline" : "secondary"}
+                      className="w-fit shrink-0 xl:order-1"
+                    >
+                      {student.isActive ? "활성" : "비활성"}
+                    </Badge>
+                  </div>
                   <div className="flex flex-wrap gap-1">
                     {groups.length ? (
                       groups.map((group) => (
@@ -306,30 +317,23 @@ export function StudentsView() {
                       </span>
                     )}
                   </div>
-                  <span className="text-sm text-muted-foreground">
-                    <span className="sm:hidden">가입 </span>
-                    {formatDate(student.createdAt)}
-                  </span>
-                  <span
-                    className="text-sm text-muted-foreground"
-                    title={
-                      student.lastLoginAt
-                        ? formatDate(student.lastLoginAt, true)
-                        : undefined
-                    }
-                  >
-                    <span className="sm:hidden">마지막 로그인 </span>
-                    {formatLastLogin(student.lastLoginAt)}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    카드 {assigned.length}개
-                  </span>
-                  <Badge
-                    variant={student.isActive ? "outline" : "secondary"}
-                    className="w-fit"
-                  >
-                    {student.isActive ? "활성" : "비활성"}
-                  </Badge>
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground xl:contents">
+                    <span className="truncate">
+                      <span className="xl:hidden">가입 </span>
+                      {formatDate(student.createdAt)}
+                    </span>
+                    <span
+                      title={
+                        student.lastLoginAt
+                          ? formatDate(student.lastLoginAt, true)
+                          : undefined
+                      }
+                    >
+                      <span className="xl:hidden">마지막 로그인 </span>
+                      {formatLastLogin(student.lastLoginAt)}
+                    </span>
+                    <span>카드 {assigned.length}개</span>
+                  </div>
                 </Link>
               );
             })}
