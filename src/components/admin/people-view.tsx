@@ -7,6 +7,9 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import {
   Archive,
+  ArrowDown,
+  ArrowUp,
+  ChevronsUpDown,
   KeyRound,
   Plus,
   Trash2,
@@ -51,18 +54,63 @@ import { formatDate } from "@/lib/domain/status";
 import { SurveyAnswerSummary } from "@/components/common/survey-answer-summary";
 import { getLearningPaths } from "@/lib/domain/learning-paths";
 import {
+  DEFAULT_STUDENT_SORT,
   filterStudents,
   formatLastLogin,
+  sortStudents,
   STUDENT_JOINED_OPTIONS,
   STUDENT_LOGIN_OPTIONS,
+  STUDENT_SORT_LABELS,
   STUDENT_STATUS_OPTIONS,
+  toggleStudentSort,
   type StudentJoinedFilter,
   type StudentLoginFilter,
+  type StudentSort,
+  type StudentSortDirection,
+  type StudentSortKey,
   type StudentStatusFilter,
 } from "@/lib/admin/student-filters";
 
 const studentRowColumns =
   "sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)_120px_110px_88px_72px]";
+
+function StudentSortHeader({
+  sortKey,
+  sort,
+  onSort,
+}: {
+  sortKey: StudentSortKey;
+  sort: StudentSort;
+  onSort: (key: StudentSortKey) => void;
+}) {
+  const active = sort.key === sortKey;
+  const label = STUDENT_SORT_LABELS[sortKey];
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(sortKey)}
+      aria-label={
+        active
+          ? `${label} 기준 ${sort.direction === "asc" ? "오름차순" : "내림차순"} 정렬됨. 눌러서 방향 바꾸기`
+          : `${label} 기준으로 정렬`
+      }
+      className={`flex items-center gap-1 text-left hover:text-foreground ${
+        active ? "text-foreground" : ""
+      }`}
+    >
+      {label}
+      {active ? (
+        sort.direction === "asc" ? (
+          <ArrowUp className="size-3" aria-hidden />
+        ) : (
+          <ArrowDown className="size-3" aria-hidden />
+        )
+      ) : (
+        <ChevronsUpDown className="size-3 opacity-40" aria-hidden />
+      )}
+    </button>
+  );
+}
 
 export function StudentsView() {
   const { state } = useApp();
@@ -70,12 +118,19 @@ export function StudentsView() {
   const [activeFilter, setActiveFilter] = useState<StudentStatusFilter>("all");
   const [joinedFilter, setJoinedFilter] = useState<StudentJoinedFilter>("all");
   const [loginFilter, setLoginFilter] = useState<StudentLoginFilter>("all");
-  const students = filterStudents(state.profiles, {
-    query,
-    status: activeFilter,
-    joined: joinedFilter,
-    login: loginFilter,
-  });
+  const [sort, setSort] = useState<StudentSort>(DEFAULT_STUDENT_SORT);
+  const students = sortStudents(
+    filterStudents(state.profiles, {
+      query,
+      status: activeFilter,
+      joined: joinedFilter,
+      login: loginFilter,
+    }),
+    sort,
+  );
+  function applySort(key: StudentSortKey) {
+    setSort((current) => toggleStudentSort(current, key));
+  }
   const totalStudents = state.profiles.filter(
     (item) => item.role === "student",
   ).length;
@@ -155,6 +210,28 @@ export function StudentsView() {
           </select>
         </div>
       </div>
+      <div className="space-y-2 sm:hidden">
+        <Label htmlFor="student-sort">정렬</Label>
+        <select
+          id="student-sort"
+          className="native-select w-full"
+          value={`${sort.key}:${sort.direction}`}
+          onChange={(event) => {
+            const [key, direction] = event.target.value.split(":");
+            setSort({
+              key: key as StudentSortKey,
+              direction: direction as StudentSortDirection,
+            });
+          }}
+        >
+          <option value="name:asc">이름 가나다순</option>
+          <option value="name:desc">이름 역순</option>
+          <option value="joined:desc">가입일 최신순</option>
+          <option value="joined:asc">가입일 오래된순</option>
+          <option value="login:desc">최근 로그인순</option>
+          <option value="login:asc">오래 미접속순</option>
+        </select>
+      </div>
       <div className="flex flex-wrap items-center gap-3">
         <p className="text-xs text-muted-foreground" aria-live="polite">
           학생 {students.length}명 표시 중
@@ -181,10 +258,14 @@ export function StudentsView() {
           <div
             className={`hidden bg-zinc-50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:items-center sm:gap-3 ${studentRowColumns}`}
           >
-            <span>학생</span>
+            <StudentSortHeader sortKey="name" sort={sort} onSort={applySort} />
             <span>그룹</span>
-            <span>가입일</span>
-            <span>마지막 로그인</span>
+            <StudentSortHeader
+              sortKey="joined"
+              sort={sort}
+              onSort={applySort}
+            />
+            <StudentSortHeader sortKey="login" sort={sort} onSort={applySort} />
             <span>카드</span>
             <span>상태</span>
           </div>

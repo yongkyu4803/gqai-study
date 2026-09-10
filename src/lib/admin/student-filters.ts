@@ -110,6 +110,77 @@ export function filterStudents(
   });
 }
 
+export type StudentSortKey = "name" | "joined" | "login";
+export type StudentSortDirection = "asc" | "desc";
+export interface StudentSort {
+  key: StudentSortKey;
+  direction: StudentSortDirection;
+}
+
+// 운영 DB가 이름순으로 내려주던 순서를 기본값으로 유지한다.
+export const DEFAULT_STUDENT_SORT: StudentSort = {
+  key: "name",
+  direction: "asc",
+};
+
+export const STUDENT_SORT_LABELS: Record<StudentSortKey, string> = {
+  name: "학생",
+  joined: "가입일",
+  login: "마지막 로그인",
+};
+
+/** 날짜 열은 최신순이, 이름은 가나다순이 처음 눌렀을 때 기대하는 방향이다. */
+export function initialSortDirection(
+  key: StudentSortKey,
+): StudentSortDirection {
+  return key === "name" ? "asc" : "desc";
+}
+
+export function toggleStudentSort(
+  current: StudentSort,
+  key: StudentSortKey,
+): StudentSort {
+  if (current.key !== key) return { key, direction: initialSortDirection(key) };
+  return {
+    key,
+    direction: current.direction === "asc" ? "desc" : "asc",
+  };
+}
+
+function timeValue(value?: string) {
+  if (!value) return null;
+  const time = new Date(value).getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+function compareByName(left: Profile, right: Profile) {
+  return (
+    left.displayName.localeCompare(right.displayName, "ko") ||
+    left.loginId.localeCompare(right.loginId, "ko")
+  );
+}
+
+export function sortStudents(profiles: Profile[], sort: StudentSort) {
+  const factor = sort.direction === "asc" ? 1 : -1;
+  return [...profiles].sort((left, right) => {
+    if (sort.key === "name") return compareByName(left, right) * factor;
+    const leftTime = timeValue(
+      sort.key === "joined" ? left.createdAt : left.lastLoginAt,
+    );
+    const rightTime = timeValue(
+      sort.key === "joined" ? right.createdAt : right.lastLoginAt,
+    );
+    // 값이 없는 계정은 방향과 무관하게 항상 끝으로 보낸다.
+    if (leftTime === null && rightTime === null) {
+      return compareByName(left, right);
+    }
+    if (leftTime === null) return 1;
+    if (rightTime === null) return -1;
+    if (leftTime === rightTime) return compareByName(left, right);
+    return (leftTime - rightTime) * factor;
+  });
+}
+
 /** 마지막 로그인을 목록에서 한눈에 읽을 수 있게 상대 표현으로 바꾼다. */
 export function formatLastLogin(value: string | undefined, now = Date.now()) {
   const days = daysSince(value, now);
