@@ -1,24 +1,14 @@
-import type { ModuleTemplate } from "@/lib/domain/types";
+import seedModulesJson from "../../../content/demo-seed-modules.generated.json";
+import type { ModuleSnapshot, ModuleTemplate } from "@/lib/domain/types";
 
-export const ADMIN_MODULE_TITLES_IN_NOTION_ORDER = [
-  "AI와 친해지기",
-  "AI와 외부 서비스 연결하기",
-  "폴더 자료를 AI와 활용하기",
-  "NotebookLM으로 자료 분석하기",
-  "업무 해체하기",
-  "HTML+CSS로 웹페이지 만들기",
-  "자동화 기본기",
-  "첫 배포",
-  "음악 만들어보기",
-  "스킬 익히기",
-  "스킬 공유하기",
-  "데이터베이스 입문",
-  "웹크롤링",
-  "데이터 보여주기",
-] as const;
+// 순서의 원본은 운영 DB에서 뽑아낸 데모 시드다. 시드를 다시 뽑으면
+// (npm run seed:export) 새 강의가 자동으로 다음 번호를 받는다.
+export const ADMIN_MODULE_TITLES_IN_SEED_ORDER = seedModulesJson.map(
+  (module) => (module.snapshot as ModuleSnapshot).title,
+);
 
 const adminModuleSequenceByTitle = new Map<string, number>(
-  ADMIN_MODULE_TITLES_IN_NOTION_ORDER.map((title, index) => [title, index + 1]),
+  ADMIN_MODULE_TITLES_IN_SEED_ORDER.map((title, index) => [title, index + 1]),
 );
 
 export function getAdminModuleSequence(title: string) {

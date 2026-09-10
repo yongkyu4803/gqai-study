@@ -34,7 +34,7 @@
 - 발행 모듈: 11개 — AI와 친해지기, 툴과 친해지기, 업무 해체하기, HTML+CSS로 웹페이지 만들기, 자동화 기본기, 첫 배포, 음악 만들어보기, 스킬 익히기, 스킬 공유하기, 데이터베이스 입문, 웹크롤링
 - 본문 블록: 121개
 - 앱에 보존한 노션 화면 자료: PNG 23개
-- 데모와 운영 DB가 동일한 `content/notion-modules.json`을 사용하며, 운영에서는 `npm run setup:modules`로 중복 없이 등록·갱신하고 이미지 23개를 private Storage에 업로드
+- 운영 DB가 강의 콘텐츠의 원본이며, `content/demo-seed-modules.generated.json`은 `npm run seed:export`로 뽑아낸 데모용 생성물입니다. 새 운영 환경 최초 구축에만 `npm run bootstrap:modules`를 쓰고, 이후 신규 강의는 `npm run module:add`로 등록하며 이미지는 private Storage에 업로드합니다
 
 ## 3. 실제 Supabase E2E 범위
 

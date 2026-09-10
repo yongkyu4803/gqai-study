@@ -1,196 +1,46 @@
-import { createHash } from "node:crypto";
-import { access, readFile } from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import { createClient } from "@supabase/supabase-js";
+// 새 운영 환경을 처음 세울 때 한 번만 쓰는 명령입니다.
+// 이미 모듈이 있는 DB에서는 --force 없이 중단합니다. 이 명령은 시드에 있는
+// 모든 모듈의 초안을 파일 내용으로 덮어쓰기 때문에, 강사가 앱에서 고쳐 둔
+// 내용을 지울 수 있습니다.
+//
+// 운영에 새 강의를 추가할 때는 이 명령이 아니라 `npm run module:add`를 쓰세요.
+import {
+  comparableRow,
+  comparableVersion,
+  createServiceClient,
+  findTemplateByTitles,
+  listAdminModules,
+  publishVersion,
+  readPublishedVersion,
+  readSeedModules,
+  resolveAdmin,
+  stableJson,
+  templatePayload,
+  uploadBundledAssets,
+} from "./lib/module-sync.mjs";
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const requestedAdminLoginId = (process.env.BOOTSTRAP_ADMIN_LOGIN_ID || "")
-  .trim()
-  .toLowerCase();
+const force = process.argv.includes("--force");
+const modules = await readSeedModules();
+const client = createServiceClient();
+const admin = await resolveAdmin(client);
 
-if (!url || !serviceRole) {
-  throw new Error(
-    "NEXT_PUBLIC_SUPABASE_URL과 SUPABASE_SERVICE_ROLE_KEY를 설정하세요.",
+const existingModules = await listAdminModules(client, admin.id);
+if (existingModules.length && !force) {
+  process.stderr.write(
+    [
+      `'${admin.login_id}' 관리자에게 이미 모듈 ${existingModules.length}개가 있습니다.`,
+      "이 명령은 새 운영 환경을 처음 세울 때만 사용합니다.",
+      "",
+      "  새 강의를 추가하려면:      npm run module:add -- <모듈파일.json>",
+      "  데모 시드를 최신화하려면:  npm run seed:export",
+      "  차이를 먼저 확인하려면:    npm run check:modules",
+      "",
+      "그래도 시드 전체를 다시 밀어 넣어야 한다면 --force를 붙이세요.",
+      "강사가 앱에서 편집한 초안은 파일 내용으로 덮이고 새 버전이 발행됩니다.",
+      "",
+    ].join("\n"),
   );
-}
-
-const sourceUrl = new URL("../content/notion-modules.json", import.meta.url);
-const modules = JSON.parse(await readFile(sourceUrl, "utf8"));
-const localAssetPrefix = "/api/module-assets/notion/";
-
-function localAssetFileUrl(assetUrl) {
-  if (
-    !assetUrl.startsWith(localAssetPrefix) ||
-    !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(
-      assetUrl.slice(localAssetPrefix.length),
-    )
-  ) {
-    throw new Error(`허용되지 않은 번들 자산 경로: ${assetUrl}`);
-  }
-  return new URL(
-    `../content/notion-assets/${assetUrl.slice(localAssetPrefix.length)}`,
-    import.meta.url,
-  );
-}
-
-if (!Array.isArray(modules) || modules.length < 1) {
-  throw new Error("학습 모듈 원본이 비어 있습니다.");
-}
-
-const titles = new Set();
-for (const lesson of modules) {
-  const snapshot = lesson.snapshot;
-  if (!snapshot?.title || titles.has(snapshot.title)) {
-    throw new Error(
-      `중복되거나 비어 있는 모듈 제목: ${snapshot?.title || "없음"}`,
-    );
-  }
-  titles.add(snapshot.title);
-  for (const block of snapshot.blocks || []) {
-    const assetUrl = block.asset?.url;
-    if (!assetUrl) continue;
-    await access(fileURLToPath(localAssetFileUrl(assetUrl)));
-  }
-}
-
-const client = createClient(url, serviceRole, {
-  auth: { autoRefreshToken: false, persistSession: false },
-});
-
-let adminQuery = client
-  .from("gqai_aistudy_profiles")
-  .select("id, login_id, display_name")
-  .eq("role", "admin")
-  .eq("is_active", true);
-if (requestedAdminLoginId) {
-  adminQuery = adminQuery.eq("login_id", requestedAdminLoginId);
-}
-const { data: admins, error: adminError } = await adminQuery;
-if (adminError) throw new Error(`관리자 조회 실패: ${adminError.message}`);
-if (admins?.length !== 1) {
-  throw new Error(
-    requestedAdminLoginId
-      ? `활성 관리자 '${requestedAdminLoginId}'를 한 명 찾을 수 없습니다.`
-      : "활성 관리자가 한 명이 아닙니다. BOOTSTRAP_ADMIN_LOGIN_ID로 대상을 지정하세요.",
-  );
-}
-const admin = admins[0];
-
-async function withPrivateAssets(snapshot, templateId) {
-  const blocks = [];
-  for (const block of snapshot.blocks) {
-    if (!block.asset?.url?.startsWith(localAssetPrefix)) {
-      blocks.push(block);
-      continue;
-    }
-    const fileUrl = localAssetFileUrl(block.asset.url);
-    const fileName = block.asset.url.slice(localAssetPrefix.length);
-    const bytes = await readFile(fileUrl);
-    const storagePath = `${templateId}/notion/${fileName}`;
-    const { error: uploadError } = await client.storage
-      .from("gqai-aistudy-module-assets")
-      .upload(storagePath, bytes, {
-        contentType: block.asset.mimeType || "image/png",
-        cacheControl: "31536000",
-        upsert: true,
-      });
-    if (uploadError) {
-      throw new Error(
-        `${snapshot.title} 이미지 업로드 실패: ${uploadError.message}`,
-      );
-    }
-    const { error: assetError } = await client
-      .from("gqai_aistudy_module_assets")
-      .upsert(
-        {
-          module_template_id: templateId,
-          storage_path: storagePath,
-          asset_kind: block.type,
-          original_name: block.asset.name,
-          mime_type: block.asset.mimeType,
-          size_bytes: bytes.byteLength,
-          alt_text: block.text || block.asset.name,
-          state: "ready",
-          uploaded_by: admin.id,
-        },
-        { onConflict: "storage_path" },
-      );
-    if (assetError) {
-      throw new Error(
-        `${snapshot.title} 이미지 메타데이터 저장 실패: ${assetError.message}`,
-      );
-    }
-    const privateAsset = {
-      ...block.asset,
-      size: bytes.byteLength,
-      storagePath,
-    };
-    delete privateAsset.url;
-    blocks.push({ ...block, asset: privateAsset });
-  }
-  return { ...snapshot, blocks };
-}
-
-function templatePayload(snapshot) {
-  return {
-    title: snapshot.title,
-    summary: snapshot.summary,
-    category: snapshot.category,
-    difficulty: snapshot.difficulty,
-    estimated_minutes: snapshot.estimatedMinutes,
-    tags: snapshot.tags,
-    draft_content: { schemaVersion: 1, blocks: snapshot.blocks },
-    draft_learning_objectives: snapshot.learningObjectives,
-    draft_prerequisites: snapshot.prerequisites,
-    draft_submission_requirements: snapshot.submissionRequirements,
-    draft_completion_criteria: snapshot.completionCriteria,
-    draft_schema_version: 1,
-    updated_by: admin.id,
-  };
-}
-
-function comparableVersion(snapshot) {
-  return {
-    title: snapshot.title,
-    summary: snapshot.summary,
-    metadata: {
-      category: snapshot.category,
-      difficulty: snapshot.difficulty,
-      estimatedMinutes: snapshot.estimatedMinutes,
-      tags: snapshot.tags,
-    },
-    content: { schemaVersion: 1, blocks: snapshot.blocks },
-    learningObjectives: snapshot.learningObjectives,
-    prerequisites: snapshot.prerequisites,
-    submissionRequirements: snapshot.submissionRequirements,
-    completionCriteria: snapshot.completionCriteria,
-  };
-}
-
-function comparableRow(row) {
-  if (!row) return null;
-  return {
-    title: row.title_snapshot,
-    summary: row.summary_snapshot,
-    metadata: row.metadata_snapshot,
-    content: row.content_snapshot,
-    learningObjectives: row.learning_objectives_snapshot,
-    prerequisites: row.prerequisites_snapshot,
-    submissionRequirements: row.submission_requirements_snapshot,
-    completionCriteria: row.completion_criteria_snapshot,
-  };
-}
-
-function stableJson(value) {
-  if (Array.isArray(value)) return `[${value.map(stableJson).join(",")}]`;
-  if (value && typeof value === "object") {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`)
-      .join(",")}}`;
-  }
-  return JSON.stringify(value);
+  process.exit(1);
 }
 
 let created = 0;
@@ -200,27 +50,16 @@ let unchanged = 0;
 for (const lesson of modules) {
   const sourceSnapshot = lesson.snapshot;
   const matchTitles = [sourceSnapshot.title, ...(lesson.previousTitles ?? [])];
-  const { data: matches, error: matchError } = await client
-    .from("gqai_aistudy_module_templates")
-    .select("id, current_published_version_id")
-    .eq("created_by", admin.id)
-    .in("title", matchTitles);
-  if (matchError)
-    throw new Error(`${sourceSnapshot.title} 조회 실패: ${matchError.message}`);
-  if ((matches?.length || 0) > 1) {
-    throw new Error(
-      `${sourceSnapshot.title} 제목의 관리자 모듈이 두 개 이상입니다.`,
-    );
-  }
+  const match = await findTemplateByTitles(client, admin.id, matchTitles);
 
   let templateId;
   let currentVersionId;
-  const isNewTemplate = !matches?.length;
+  const isNewTemplate = !match;
   if (isNewTemplate) {
     const { data, error } = await client
       .from("gqai_aistudy_module_templates")
       .insert({
-        ...templatePayload(sourceSnapshot),
+        ...templatePayload(sourceSnapshot, admin.id),
         status: "draft",
         created_by: admin.id,
       })
@@ -234,35 +73,25 @@ for (const lesson of modules) {
     templateId = data.id;
     created += 1;
   } else {
-    templateId = matches[0].id;
-    currentVersionId = matches[0].current_published_version_id;
+    templateId = match.id;
+    currentVersionId = match.current_published_version_id;
   }
 
-  const snapshot = await withPrivateAssets(sourceSnapshot, templateId);
+  const snapshot = await uploadBundledAssets(
+    client,
+    sourceSnapshot,
+    templateId,
+    admin,
+  );
   const { error: draftError } = await client
     .from("gqai_aistudy_module_templates")
-    .update(templatePayload(snapshot))
+    .update(templatePayload(snapshot, admin.id))
     .eq("id", templateId);
   if (draftError) {
     throw new Error(`${snapshot.title} 초안 갱신 실패: ${draftError.message}`);
   }
 
-  let currentVersion = null;
-  if (currentVersionId) {
-    const { data, error } = await client
-      .from("gqai_aistudy_module_versions")
-      .select(
-        "title_snapshot, summary_snapshot, metadata_snapshot, content_snapshot, learning_objectives_snapshot, prerequisites_snapshot, submission_requirements_snapshot, completion_criteria_snapshot",
-      )
-      .eq("id", currentVersionId)
-      .maybeSingle();
-    if (error)
-      throw new Error(
-        `${snapshot.title} 현재 버전 조회 실패: ${error.message}`,
-      );
-    currentVersion = data;
-  }
-
+  const currentVersion = await readPublishedVersion(client, currentVersionId);
   if (
     currentVersion &&
     stableJson(comparableRow(currentVersion)) ===
@@ -278,62 +107,10 @@ for (const lesson of modules) {
     continue;
   }
 
-  const { data: latestVersions, error: latestError } = await client
-    .from("gqai_aistudy_module_versions")
-    .select("version_number")
-    .eq("module_template_id", templateId)
-    .order("version_number", { ascending: false })
-    .limit(1);
-  if (latestError) {
-    throw new Error(
-      `${snapshot.title} 버전 번호 조회 실패: ${latestError.message}`,
-    );
-  }
-  const versionNumber = (latestVersions?.[0]?.version_number || 0) + 1;
-  const versionPayload = comparableVersion(snapshot);
-  const checksum = createHash("sha256")
-    .update(stableJson(versionPayload))
-    .digest("hex");
-  const { data: version, error: versionError } = await client
-    .from("gqai_aistudy_module_versions")
-    .insert({
-      module_template_id: templateId,
-      version_number: versionNumber,
-      title_snapshot: versionPayload.title,
-      summary_snapshot: versionPayload.summary,
-      metadata_snapshot: versionPayload.metadata,
-      content_snapshot: versionPayload.content,
-      learning_objectives_snapshot: versionPayload.learningObjectives,
-      prerequisites_snapshot: versionPayload.prerequisites,
-      submission_requirements_snapshot: versionPayload.submissionRequirements,
-      completion_criteria_snapshot: versionPayload.completionCriteria,
-      schema_version: 1,
-      content_checksum: checksum,
-      published_by: admin.id,
-    })
-    .select("id")
-    .single();
-  if (versionError || !version) {
-    throw new Error(
-      `${snapshot.title} 버전 발행 실패: ${versionError?.message || "결과 없음"}`,
-    );
-  }
-  const { error: activateError } = await client
-    .from("gqai_aistudy_module_templates")
-    .update({
-      status: "active",
-      current_published_version_id: version.id,
-      updated_by: admin.id,
-    })
-    .eq("id", templateId);
-  if (activateError) {
-    throw new Error(
-      `${snapshot.title} 발행 연결 실패: ${activateError.message}`,
-    );
-  }
+  await publishVersion(client, templateId, snapshot, admin);
   if (!isNewTemplate) updated += 1;
 }
 
 process.stdout.write(
-  `노션 강의 모듈 동기화 완료: 신규 ${created}개, 새 버전 ${updated}개, 변경 없음 ${unchanged}개 (관리자: ${admin.login_id})\n`,
+  `데모 시드 모듈 등록 완료: 신규 ${created}개, 새 버전 ${updated}개, 변경 없음 ${unchanged}개 (관리자: ${admin.login_id})\n`,
 );

@@ -100,15 +100,17 @@ BOOTSTRAP_ADMIN_DISPLAY_NAME=
 
 `SUPABASE_SERVICE_ROLE_KEY`는 학생 생성·비밀번호 재설정·비활성화를 위해 운영 서버에 계속 필요합니다. Bootstrap 명령은 같은 아이디로 두 번 실행하지 마세요.
 
-## 5-1. 노션 강의 모듈 11개 등록
+## 5-1. 데모 시드 강의 등록
 
-관리자 계정을 만든 다음 아래 명령을 한 번 실행합니다.
+관리자 계정을 만든 다음 아래 명령을 **한 번만** 실행합니다.
 
 ```bash
-npm run setup:modules
+npm run bootstrap:modules
 ```
 
-이 명령은 `content/notion-modules.json`의 강의 11개를 해당 관리자 소유의 발행 모듈로 등록하고, 화면 자료 23개를 private `module-assets` 버킷에 업로드합니다. 같은 제목의 모듈이 이미 있으면 초안을 갱신하고, 내용이 바뀐 경우에만 새 불변 버전을 발행하므로 재실행해도 중복 모듈을 만들지 않습니다. 활성 관리자가 여러 명이면 `.env.local`의 `BOOTSTRAP_ADMIN_LOGIN_ID`에 대상 관리자 아이디를 지정한 상태로 실행하세요.
+이 명령은 `content/demo-seed-modules.generated.json`의 강의를 해당 관리자 소유의 발행 모듈로 등록하고, 화면 자료를 private `module-assets` 버킷에 업로드합니다. 활성 관리자가 여러 명이면 `.env.local`의 `BOOTSTRAP_ADMIN_LOGIN_ID`에 대상 관리자 아이디를 지정한 상태로 실행하세요.
+
+이미 모듈이 있는 DB에서는 `--force` 없이 중단합니다. 이 명령은 시드에 있는 모든 모듈의 초안을 파일 내용으로 덮어쓰기 때문에, 강사가 앱에서 고쳐 둔 내용을 지울 수 있습니다. **운영 중인 환경에 새 강의를 추가할 때는 이 명령이 아니라 `npm run module:add -- <모듈파일.json>`을 사용하세요.**
 
 ## 6. 로컬 운영 모드 확인
 

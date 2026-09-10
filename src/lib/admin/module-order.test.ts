@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import notionModulesJson from "../../../content/notion-modules.json";
+import seedModulesJson from "../../../content/demo-seed-modules.generated.json";
 import type { ModuleSnapshot, ModuleTemplate } from "@/lib/domain/types";
 import {
-  ADMIN_MODULE_TITLES_IN_NOTION_ORDER,
+  ADMIN_MODULE_TITLES_IN_SEED_ORDER,
   compareAdminModules,
   formatAdminModuleTitle,
   getAdminModuleSequence,
 } from "./module-order";
 
-const notionTitles = notionModulesJson.map(
+const seedTitles = seedModulesJson.map(
   (module) => (module.snapshot as ModuleSnapshot).title,
 );
 
@@ -16,7 +16,7 @@ function moduleWithTitle(title: string): ModuleTemplate {
   return {
     id: title,
     status: "active",
-    draft: { ...(notionModulesJson[0].snapshot as ModuleSnapshot), title },
+    draft: { ...(seedModulesJson[0].snapshot as ModuleSnapshot), title },
     createdBy: "admin",
     createdAt: "2026-09-04T00:00:00.000Z",
     updatedAt: "2026-09-04T00:00:00.000Z",
@@ -24,31 +24,30 @@ function moduleWithTitle(title: string): ModuleTemplate {
 }
 
 describe("관리자용 모듈 순서", () => {
-  it("학습 모듈 원본 순서를 그대로 사용한다", () => {
-    expect(ADMIN_MODULE_TITLES_IN_NOTION_ORDER).toEqual(notionTitles);
-    expect(notionTitles.map(getAdminModuleSequence)).toEqual(
-      notionTitles.map((_, index) => index + 1),
+  it("데모 시드 순서를 그대로 사용한다", () => {
+    expect(ADMIN_MODULE_TITLES_IN_SEED_ORDER).toEqual(seedTitles);
+    expect(seedTitles.map(getAdminModuleSequence)).toEqual(
+      seedTitles.map((_, index) => index + 1),
     );
   });
 
-  it("관리자 제목에는 두 자리 번호를 붙이고 추가 모듈에는 붙이지 않는다", () => {
-    expect(formatAdminModuleTitle("AI와 친해지기")).toBe("01. AI와 친해지기");
-    expect(formatAdminModuleTitle("웹크롤링")).toBe("13. 웹크롤링");
-    expect(formatAdminModuleTitle("데이터 보여주기")).toBe(
-      "14. 데이터 보여주기",
+  it("시드 모듈에는 두 자리 번호를 붙이고 앱에서 만든 모듈에는 붙이지 않는다", () => {
+    expect(formatAdminModuleTitle(seedTitles[0])).toBe(`01. ${seedTitles[0]}`);
+    expect(formatAdminModuleTitle(seedTitles.at(-1) as string)).toBe(
+      `${String(seedTitles.length).padStart(2, "0")}. ${seedTitles.at(-1)}`,
     );
     expect(formatAdminModuleTitle("추가 모듈")).toBe("추가 모듈");
   });
 
-  it("노션 모듈을 먼저 정렬하고 추가 모듈을 뒤에 둔다", () => {
+  it("시드 모듈을 먼저 정렬하고 앱에서 만든 모듈을 뒤에 둔다", () => {
     const modules = [
       moduleWithTitle("추가 모듈"),
-      moduleWithTitle("웹크롤링"),
-      moduleWithTitle("AI와 친해지기"),
+      moduleWithTitle(seedTitles.at(-1) as string),
+      moduleWithTitle(seedTitles[0]),
     ];
 
     expect(
       modules.sort(compareAdminModules).map((module) => module.draft.title),
-    ).toEqual(["AI와 친해지기", "웹크롤링", "추가 모듈"]);
+    ).toEqual([seedTitles[0], seedTitles.at(-1), "추가 모듈"]);
   });
 });

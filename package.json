@@ -18,7 +18,10 @@
     "check:docs": "node scripts/check-doc-links.mjs",
     "verify:supabase": "node --env-file=.env.local scripts/verify-supabase.mjs",
     "setup:admin": "node --env-file=.env.local scripts/bootstrap-admin.mjs",
-    "setup:modules": "node --env-file=.env.local scripts/bootstrap-modules.mjs",
+    "bootstrap:modules": "node --env-file=.env.local scripts/bootstrap-modules.mjs",
+    "module:add": "node --env-file=.env.local scripts/add-module.mjs",
+    "check:modules": "node --env-file=.env.local scripts/check-modules.mjs",
+    "seed:export": "node --env-file=.env.local scripts/export-seed-modules.mjs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run check:docs && npm run build"
   },
   "dependencies": {

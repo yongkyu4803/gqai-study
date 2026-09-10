@@ -1,19 +1,19 @@
 import type { AppState, ModuleSnapshot } from "@/lib/domain/types";
-import notionModulesJson from "../../../content/notion-modules.json";
+import seedModulesJson from "../../../content/demo-seed-modules.generated.json";
 
 const adminId = "profile-admin";
 const minjiId = "profile-minji";
 const junhoId = "profile-junho";
 const suyeonId = "profile-suyeon";
 
-interface NotionModuleSeed {
+interface DemoSeedModule {
   id: string;
   versionId: string;
   sourceDate: string;
   snapshot: ModuleSnapshot;
 }
 
-const notionModuleSeeds = notionModulesJson as NotionModuleSeed[];
+const seedModules = seedModulesJson as DemoSeedModule[];
 
 export const demoCredentials: Record<string, string> = {
   admin: "admin1234",
@@ -88,7 +88,7 @@ export function createDemoSeed(): AppState {
         updatedAt: "2026-08-18T09:00:00.000Z",
       },
     ],
-    modules: notionModuleSeeds.map((module) => ({
+    modules: seedModules.map((module) => ({
       id: module.id,
       status: "active",
       draft: structuredClone(module.snapshot),
@@ -97,7 +97,7 @@ export function createDemoSeed(): AppState {
       createdAt: `${module.sourceDate}T09:00:00.000Z`,
       updatedAt: `${module.sourceDate}T09:00:00.000Z`,
     })),
-    versions: notionModuleSeeds.map((module) => ({
+    versions: seedModules.map((module) => ({
       id: module.versionId,
       moduleTemplateId: module.id,
       versionNumber: 1,

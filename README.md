@@ -25,7 +25,7 @@
 - 전화번호 미수집, 비밀번호 재설정, 계정 활성/비활성
 - 학생 그룹 생성과 구성원 관리
 - 빠른 추가·유형 전환·중간 삽입·복제·키보드 단축키를 지원하는 블록 편집기로 실습 모듈 작성
-- 초기 커리큘럼을 개선한 발행 강의 14개와 화면 자료 23개 기본 제공
+- 발행 강의 14개와 화면 자료 23개를 데모 시드로 기본 제공
 - 문단, 제목, 목록, 체크리스트, 인용, 구분선, 코드, 링크, 이미지, PDF, 첨부파일 블록 지원
 - 초안 저장, 미리보기, 불변 버전 발행, 복제, 보관
 - 학생 개인 또는 그룹 일괄 배정
@@ -89,8 +89,22 @@ npm run build            # 프로덕션 빌드
 npm run verify           # lint + typecheck + unit + 문서 링크 + build
 npm run verify:supabase  # 쓰기 허용된 전용 Supabase 환경의 데이터/RLS 검증
 npm run setup:admin      # 최초 관리자 계정 1회 생성
-npm run setup:modules    # 학습 경로별 강의 14개를 운영 DB에 등록·갱신
+npm run bootstrap:modules # 새 운영 환경에 데모 시드를 처음 밀어 넣을 때만
+npm run module:add       # 운영 DB에 새 강의 하나 등록
+npm run check:modules    # 운영 DB와 데모 시드의 차이 확인
+npm run seed:export      # 운영 DB를 기준으로 데모 시드 재생성
 ```
+
+### 강의 콘텐츠의 원본은 운영 DB입니다
+
+강의를 새로 만들거나 고치는 곳은 **앱의 모듈 편집기**입니다. `content/demo-seed-modules.generated.json`은 운영 DB에서 뽑아낸 **데모용 생성물**이라 직접 고치지 마세요. 고치면 잠금값이 어긋나 테스트가 실패합니다.
+
+| 하려는 일 | 방법 |
+| --- | --- |
+| 강의 내용 수정 | 앱의 모듈 편집기에서 수정 후 발행 |
+| 파일로 준비한 새 강의 등록 | `npm run module:add -- <모듈파일.json>` |
+| 데모에도 최신 강의 반영 | `npm run seed:export` 후 커밋 |
+| 운영과 데모가 어긋났는지 확인 | `npm run check:modules` |
 
 로컬 Supabase의 전체 검증 명령과 필요한 환경변수는 [ENV_SETUP.md](ENV_SETUP.md)에 분리했습니다. `verify:supabase`와 Supabase E2E는 테스트 데이터를 생성하므로 운영 DB에서 실행하지 마세요.
 

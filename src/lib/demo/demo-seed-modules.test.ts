@@ -1,7 +1,8 @@
-import { existsSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import notionModulesJson from "../../../content/notion-modules.json";
+import seedModulesJson from "../../../content/demo-seed-modules.generated.json";
 import type { ModuleSnapshot } from "@/lib/domain/types";
 import {
   isBundledModuleAssetUrl,
@@ -9,21 +10,52 @@ import {
   validateModuleSnapshot,
 } from "@/lib/domain/validation";
 
-interface NotionModuleSeed {
+interface DemoSeedModule {
   id: string;
   versionId: string;
   sourceDate: string;
   snapshot: ModuleSnapshot;
 }
 
-const modules = notionModulesJson as NotionModuleSeed[];
+const SEED_PATH = join(
+  process.cwd(),
+  "content/demo-seed-modules.generated.json",
+);
+const LOCK_PATH = join(process.cwd(), "content/demo-seed-modules.lock");
 
-describe("Notion 강의 모듈 seed", () => {
-  it("14개 강의를 발행 가능한 스냅샷으로 제공한다", () => {
-    expect(modules).toHaveLength(14);
-    expect(new Set(modules.map((lesson) => lesson.id)).size).toBe(14);
+const modules = seedModulesJson as DemoSeedModule[];
+
+describe("데모 시드 모듈", () => {
+  it("손으로 고친 흔적이 없다", () => {
+    const checksum = createHash("sha256")
+      .update(readFileSync(SEED_PATH, "utf8"))
+      .digest("hex");
+    const locked = readFileSync(LOCK_PATH, "utf8").trim();
+
+    expect(
+      checksum,
+      [
+        "content/demo-seed-modules.generated.json은 운영 DB에서 뽑아낸 생성물입니다.",
+        "직접 고치지 마세요.",
+        "",
+        "  운영에 새 강의를 등록하려면:  npm run module:add -- <모듈파일.json>",
+        "  강의 내용을 고치려면:          앱의 모듈 편집기",
+        "  이 파일을 최신화하려면:        npm run seed:export",
+        "",
+      ].join("\n"),
+    ).toBe(locked);
+  });
+
+  it("모든 강의를 발행 가능한 스냅샷으로 제공한다", () => {
+    expect(modules.length).toBeGreaterThan(0);
+    expect(new Set(modules.map((lesson) => lesson.id)).size).toBe(
+      modules.length,
+    );
+    expect(new Set(modules.map((lesson) => lesson.versionId)).size).toBe(
+      modules.length,
+    );
     expect(new Set(modules.map((lesson) => lesson.snapshot.title)).size).toBe(
-      14,
+      modules.length,
     );
 
     for (const lesson of modules) {
@@ -33,12 +65,12 @@ describe("Notion 강의 모듈 seed", () => {
     }
   });
 
-  it("노션 화면 자료 23개를 앱 내부의 안전한 경로로 연결한다", () => {
+  it("모든 화면 자료를 앱 내부의 안전한 경로로 연결한다", () => {
     const images = modules.flatMap((lesson) =>
       lesson.snapshot.blocks.filter((block) => block.type === "image"),
     );
 
-    expect(images).toHaveLength(23);
+    expect(images.length).toBeGreaterThan(0);
     for (const image of images) {
       expect(isBundledModuleAssetUrl(image.asset?.url)).toBe(true);
       expect(isSafeAssetUrl(image.asset?.url)).toBe(true);
