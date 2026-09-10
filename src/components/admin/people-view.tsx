@@ -50,20 +50,36 @@ import {
 import { formatDate } from "@/lib/domain/status";
 import { SurveyAnswerSummary } from "@/components/common/survey-answer-summary";
 import { getLearningPaths } from "@/lib/domain/learning-paths";
+import {
+  filterStudents,
+  formatLastLogin,
+  STUDENT_JOINED_OPTIONS,
+  STUDENT_LOGIN_OPTIONS,
+  STUDENT_STATUS_OPTIONS,
+  type StudentJoinedFilter,
+  type StudentLoginFilter,
+  type StudentStatusFilter,
+} from "@/lib/admin/student-filters";
+
+const studentRowColumns =
+  "sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1.2fr)_120px_110px_88px_72px]";
 
 export function StudentsView() {
   const { state } = useApp();
   const [query, setQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
-  const students = state.profiles.filter(
-    (item) =>
-      item.role === "student" &&
-      (activeFilter === "all" ||
-        (activeFilter === "active" ? item.isActive : !item.isActive)) &&
-      `${item.displayName} ${item.loginId}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
+  const [activeFilter, setActiveFilter] = useState<StudentStatusFilter>("all");
+  const [joinedFilter, setJoinedFilter] = useState<StudentJoinedFilter>("all");
+  const [loginFilter, setLoginFilter] = useState<StudentLoginFilter>("all");
+  const students = filterStudents(state.profiles, {
+    query,
+    status: activeFilter,
+    joined: joinedFilter,
+    login: loginFilter,
+  });
+  const totalStudents = state.profiles.filter(
+    (item) => item.role === "student",
+  ).length;
+  const filtered = students.length !== totalStudents;
   return (
     <div className="space-y-7">
       <PageHeader
@@ -77,7 +93,7 @@ export function StudentsView() {
           </Button>
         }
       />
-      <div className="grid gap-3 sm:max-w-2xl sm:grid-cols-[minmax(260px,1fr)_180px]">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(220px,1fr)_160px_160px_180px]">
         <div className="space-y-2">
           <Label htmlFor="student-search">학생 검색</Label>
           <Input
@@ -93,20 +109,86 @@ export function StudentsView() {
             id="student-status-filter"
             className="native-select w-full"
             value={activeFilter}
-            onChange={(event) => setActiveFilter(event.target.value)}
+            onChange={(event) =>
+              setActiveFilter(event.target.value as StudentStatusFilter)
+            }
           >
-            <option value="all">모든 계정</option>
-            <option value="active">활성</option>
-            <option value="inactive">비활성</option>
+            {STUDENT_STATUS_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="student-joined-filter">가입일</Label>
+          <select
+            id="student-joined-filter"
+            className="native-select w-full"
+            value={joinedFilter}
+            onChange={(event) =>
+              setJoinedFilter(event.target.value as StudentJoinedFilter)
+            }
+          >
+            {STUDENT_JOINED_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="student-login-filter">마지막 로그인</Label>
+          <select
+            id="student-login-filter"
+            className="native-select w-full"
+            value={loginFilter}
+            onChange={(event) =>
+              setLoginFilter(event.target.value as StudentLoginFilter)
+            }
+          >
+            {STUDENT_LOGIN_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </div>
       </div>
-      <p className="text-xs text-muted-foreground" aria-live="polite">
-        학생 {students.length}명 표시 중
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="text-xs text-muted-foreground" aria-live="polite">
+          학생 {students.length}명 표시 중
+          {filtered ? ` (전체 ${totalStudents}명)` : ""}
+        </p>
+        {filtered ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              setQuery("");
+              setActiveFilter("all");
+              setJoinedFilter("all");
+              setLoginFilter("all");
+            }}
+          >
+            필터 초기화
+          </Button>
+        ) : null}
+      </div>
       {students.length ? (
         <div className="overflow-hidden rounded-lg border">
-          <div className="divide-y">
+          <div
+            className={`hidden bg-zinc-50 px-4 py-2 text-xs font-medium text-muted-foreground sm:grid sm:items-center sm:gap-3 ${studentRowColumns}`}
+          >
+            <span>학생</span>
+            <span>그룹</span>
+            <span>가입일</span>
+            <span>마지막 로그인</span>
+            <span>카드</span>
+            <span>상태</span>
+          </div>
+          <div className="divide-y border-t">
             {students.map((student) => {
               const groups = state.groups.filter((group) =>
                 group.memberIds.includes(student.id),
@@ -118,14 +200,14 @@ export function StudentsView() {
                 <Link
                   href={`/admin/students/${student.id}`}
                   key={student.id}
-                  className="grid gap-3 p-4 hover:bg-zinc-50 sm:grid-cols-[1fr_1fr_100px_100px] sm:items-center"
+                  className={`grid gap-2 p-4 hover:bg-zinc-50 sm:items-center sm:gap-3 ${studentRowColumns}`}
                 >
-                  <div>
-                    <p className="font-medium">{student.displayName}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
+                  <p className="font-medium">
+                    {student.displayName}
+                    <span className="ml-2 text-xs font-normal text-muted-foreground">
                       @{student.loginId}
-                    </p>
-                  </div>
+                    </span>
+                  </p>
                   <div className="flex flex-wrap gap-1">
                     {groups.length ? (
                       groups.map((group) => (
@@ -144,6 +226,21 @@ export function StudentsView() {
                     )}
                   </div>
                   <span className="text-sm text-muted-foreground">
+                    <span className="sm:hidden">가입 </span>
+                    {formatDate(student.createdAt)}
+                  </span>
+                  <span
+                    className="text-sm text-muted-foreground"
+                    title={
+                      student.lastLoginAt
+                        ? formatDate(student.lastLoginAt, true)
+                        : undefined
+                    }
+                  >
+                    <span className="sm:hidden">마지막 로그인 </span>
+                    {formatLastLogin(student.lastLoginAt)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
                     카드 {assigned.length}개
                   </span>
                   <Badge
@@ -159,8 +256,14 @@ export function StudentsView() {
         </div>
       ) : (
         <EmptyState
-          title="학생이 없습니다"
-          description="계정 요청에서 신청 내용을 확인하고 첫 계정을 승인하세요."
+          title={
+            totalStudents ? "조건에 맞는 학생이 없습니다" : "학생이 없습니다"
+          }
+          description={
+            totalStudents
+              ? "검색어나 필터를 바꿔 보세요."
+              : "계정 요청에서 신청 내용을 확인하고 첫 계정을 승인하세요."
+          }
         />
       )}
     </div>
