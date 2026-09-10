@@ -16,7 +16,11 @@ describe("learning paths", () => {
       "폴더 자료를 AI와 활용하기",
     ]);
     expect(getSuggestedNextModuleTitles("데이터베이스 입문")).toEqual([
+      "데이터 보여주기",
       "웹크롤링",
+    ]);
+    expect(getSuggestedNextModuleTitles("웹크롤링")).toEqual([
+      "데이터 보여주기",
     ]);
     expect(getSuggestedNextModuleTitles("스킬 익히기", ["공유·협업"])).toEqual([
       "스킬 공유하기",

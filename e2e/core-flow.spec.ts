@@ -17,9 +17,9 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
   ).toBeVisible();
 
   await page.goto("/admin/modules");
-  await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(13);
+  await expect(page.getByRole("button", { name: "미리보기" })).toHaveCount(14);
   const moduleSequenceBadges = page.getByLabel(/관리자용 모듈 순서 \d+번/);
-  await expect(moduleSequenceBadges).toHaveCount(13);
+  await expect(moduleSequenceBadges).toHaveCount(14);
   await expect(moduleSequenceBadges).toHaveText([
     "01",
     "02",
@@ -34,8 +34,11 @@ test("강사가 모듈을 작성·발행하고 3명 그룹에 배정한다", asy
     "11",
     "12",
     "13",
+    "14",
   ]);
-  await expect(page.getByText("웹크롤링", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("데이터 보여주기", { exact: true }),
+  ).toBeVisible();
   await page.goto("/admin/modules/module-tools/preview");
   const lessonPreview = page.getByRole("article");
   await expect(

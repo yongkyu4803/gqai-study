@@ -1971,5 +1971,243 @@
         }
       ]
     }
+  },
+  {
+    "id": "module-data-view",
+    "versionId": "version-data-view-1",
+    "sourceDate": "2026-09-10",
+    "snapshot": {
+      "title": "데이터 보여주기",
+      "summary": "데이터베이스에 쌓아 둔 기사 데이터를 읽어 목록·필터·간단한 그래프가 있는 웹페이지로 만들고 배포합니다.",
+      "category": "바이브 코딩",
+      "difficulty": "intermediate",
+      "estimatedMinutes": 80,
+      "tags": [
+        "대시보드",
+        "차트",
+        "Supabase",
+        "Vercel",
+        "2026-09-10",
+        "경로: 사이드 프로젝트",
+        "경로: 자료 수집·분석"
+      ],
+      "learningObjectives": [
+        "데이터베이스에 저장한 데이터를 웹페이지에서 읽어 화면에 표시할 수 있다.",
+        "목록·필터·숫자 중 무엇을 보여줄지 목적에 맞게 정할 수 있다.",
+        "데이터가 없거나 불러오지 못했을 때의 화면까지 준비할 수 있다."
+      ],
+      "prerequisites": [
+        "웹크롤링 과제에서 데이터를 저장한 Supabase 테이블",
+        "첫 배포 과제에서 사용한 GitHub와 Vercel 계정",
+        "Codex 또는 Claude Code"
+      ],
+      "submissionRequirements": [
+        "정상 접속되는 배포 주소와 GitHub 저장소 링크",
+        "목록·필터·그래프가 함께 보이는 화면 캡처",
+        "결과가 0건일 때와 불러오기에 실패했을 때의 화면과 그렇게 만든 이유",
+        "공개 파일에 비밀키와 개인정보가 포함되지 않았는지 점검한 결과",
+        "학습 회고 4항목: 나의 목적, 내가 한 선택, 실행 결과, 다음 단계"
+      ],
+      "completionCriteria": [
+        "데이터베이스에 저장한 실제 데이터가 배포 주소에서 보인다.",
+        "조건 하나로 목록을 걸러 보는 기능이 동작한다.",
+        "숫자 한 가지를 골라 그래프나 요약 수치로 표현했다.",
+        "결과 0건과 불러오기 실패 화면을 직접 확인했다.",
+        "공개한 파일에 서비스 롤 키 등 비밀키가 없음을 확인했다."
+      ],
+      "blocks": [
+        {
+          "id": "module-data-view-learning-guide",
+          "type": "heading",
+          "text": "시작 전에"
+        },
+        {
+          "id": "module-data-view-learning-guide-purpose",
+          "type": "bullet_list",
+          "text": "이번 실습을 내 업무나 관심사 어디에 활용할지 한 문장으로 정합니다."
+        },
+        {
+          "id": "module-data-view-learning-guide-privacy",
+          "type": "bullet_list",
+          "text": "개인정보나 업무 기밀 대신 민감정보가 없는 연습 자료를 사용합니다."
+        },
+        {
+          "id": "data-view-safety",
+          "type": "heading",
+          "text": "공개 전 확인"
+        },
+        {
+          "id": "data-view-safety-key",
+          "type": "checklist",
+          "text": "공개 페이지에는 읽기 전용 공개 키만 사용하고 서비스 롤 키는 넣지 않습니다."
+        },
+        {
+          "id": "data-view-safety-data",
+          "type": "checklist",
+          "text": "화면에 보여줄 데이터에 개인정보나 공개하면 안 되는 내용이 섞여 있지 않은지 확인합니다."
+        },
+        {
+          "id": "data-view-plan",
+          "type": "heading",
+          "text": "무엇을 보여줄지 먼저 정하기"
+        },
+        {
+          "id": "data-view-plan-intro",
+          "type": "paragraph",
+          "text": "화면을 만들기 전에 이 페이지를 여는 사람이 가장 먼저 알아야 할 것 한 가지를 정합니다. 그것이 정해지면 나머지는 목록·필터·숫자 세 가지로 충분합니다."
+        },
+        {
+          "id": "data-view-plan-01",
+          "type": "numbered_list",
+          "text": "목록에 보여줄 열 3~4개를 고릅니다. 예를 들어 제목, 출처, 날짜, 요약입니다."
+        },
+        {
+          "id": "data-view-plan-02",
+          "type": "numbered_list",
+          "text": "걸러 보고 싶은 조건 한 가지를 정합니다. 예를 들어 출처, 날짜 범위, 검색어입니다."
+        },
+        {
+          "id": "data-view-plan-03",
+          "type": "numbered_list",
+          "text": "세어 보고 싶은 숫자 한 가지를 정합니다. 예를 들어 출처별 기사 수, 날짜별 기사 수입니다."
+        },
+        {
+          "id": "data-view-intro",
+          "type": "paragraph",
+          "text": "이번 과제는 데이터베이스 입문과 웹크롤링에서 쌓아 둔 데이터를 처음으로 눈에 보이게 만드는 단계입니다. 새로 수집하지 말고 이미 저장해 둔 데이터를 그대로 사용합니다."
+        },
+        {
+          "id": "data-view-step1",
+          "type": "heading",
+          "text": "1. 데이터 확인하기"
+        },
+        {
+          "id": "data-view-step1-01",
+          "type": "numbered_list",
+          "text": "Supabase에서 테이블을 열어 행이 몇 개이고 각 열에 어떤 값이 들어 있는지 확인합니다."
+        },
+        {
+          "id": "data-view-step1-02",
+          "type": "numbered_list",
+          "text": "값이 비어 있는 열이나 형식이 다른 행을 미리 적어 둡니다. 화면이 깨지는 원인은 대부분 여기에 있습니다."
+        },
+        {
+          "id": "data-view-step1-03",
+          "type": "numbered_list",
+          "text": "테이블에 읽기 정책이 없으면 페이지에서 데이터가 계속 비어 보입니다. 공개해도 되는 열만 읽을 수 있도록 읽기 전용 정책을 확인하거나 추가합니다."
+        },
+        {
+          "id": "data-view-step1-link",
+          "type": "link",
+          "text": "Supabase 연결 강의",
+          "url": "https://vibecoding.gqai.kr/lecture/lecture-7"
+        },
+        {
+          "id": "data-view-step2",
+          "type": "heading",
+          "text": "2. 페이지 만들기"
+        },
+        {
+          "id": "data-view-step2-intro",
+          "type": "paragraph",
+          "text": "Codex 또는 Claude Code에서 새 폴더를 열고 아래 프롬프트의 대괄호를 자신의 테이블과 열 이름으로 바꿔 요청합니다."
+        },
+        {
+          "id": "data-view-step2-prompt",
+          "type": "code",
+          "text": "Supabase 테이블에 저장된 기사 데이터를 보여주는 단일 웹페이지를 만들어줘.\n\n연결 정보:\n- Supabase 프로젝트 URL과 공개(anon) 키는 내가 넣을 자리만 표시해줘.\n- 서비스 롤 키는 절대 사용하지 말고, 읽기(select)만 하게 해줘.\n\n테이블 정보:\n- 테이블 이름: [테이블명]\n- 사용할 열: [제목], [출처], [날짜], [요약]\n\n화면 요구사항:\n- 최신 날짜부터 기사 목록을 카드나 표로 보여줘.\n- [출처] 기준으로 걸러 보는 필터 하나를 넣어줘.\n- [출처]별 기사 수를 막대 그래프 한 개로 보여줘(외부 차트 라이브러리 없이 CSS로).\n- 필터를 바꾸면 목록과 그래프가 함께 바뀌게 해줘.\n- 불러오는 중, 결과 0건, 불러오기 실패일 때의 화면을 각각 만들어줘.\n- 모바일과 데스크톱에서 모두 보기 좋게 반응형으로 만들어줘.\n\n출력 형식:\n- `index.html` 한 개 파일로 만들고 전체 코드를 코드블록으로 제공해줘.\n- Supabase 연결은 공식 JS 클라이언트를 CDN으로 불러와서 써줘.\n- 설명은 최소화하고 내가 바꿔야 할 자리에만 짧은 주석을 남겨줘."
+        },
+        {
+          "id": "data-view-step2-01",
+          "type": "numbered_list",
+          "text": "만들어진 페이지를 직접 열어 실제 저장된 데이터가 나오는지 확인합니다."
+        },
+        {
+          "id": "data-view-step2-02",
+          "type": "numbered_list",
+          "text": "필터를 걸었다 풀었다 하며 목록과 숫자가 함께 바뀌는지 확인합니다."
+        },
+        {
+          "id": "data-view-step2-03",
+          "type": "numbered_list",
+          "text": "AI가 만든 첫 화면에서 내 목적에 맞지 않는 부분을 한 가지 이상 직접 고칩니다."
+        },
+        {
+          "id": "data-view-step3",
+          "type": "heading",
+          "text": "3. 데이터가 없을 때의 화면"
+        },
+        {
+          "id": "data-view-step3-intro",
+          "type": "paragraph",
+          "text": "데이터가 없거나 불러오지 못했을 때 빈 화면만 나오면 쓰는 사람은 고장으로 받아들입니다. 이 화면을 만드는 것까지가 이번 과제입니다."
+        },
+        {
+          "id": "data-view-step3-empty",
+          "type": "checklist",
+          "text": "필터 결과가 0건일 때 무엇을 바꾸면 되는지 알려주는 안내가 나옵니다."
+        },
+        {
+          "id": "data-view-step3-error",
+          "type": "checklist",
+          "text": "데이터를 불러오지 못했을 때 실패했다는 사실과 다음 행동을 알려주는 안내가 나옵니다."
+        },
+        {
+          "id": "data-view-step3-test",
+          "type": "paragraph",
+          "text": "필터에 없는 값을 넣어 0건 화면을 직접 확인하고, 테이블 이름을 잠시 틀리게 바꿔 실패 화면도 직접 확인한 뒤 되돌립니다."
+        },
+        {
+          "id": "data-view-step4",
+          "type": "heading",
+          "text": "4. 배포하기"
+        },
+        {
+          "id": "data-view-step4-01",
+          "type": "numbered_list",
+          "text": "첫 배포 과제와 같은 방식으로 GitHub 저장소에 올리고 Vercel로 배포합니다."
+        },
+        {
+          "id": "data-view-step4-02",
+          "type": "numbered_list",
+          "text": "저장소에 올라간 파일을 다시 열어 키와 개인정보가 들어 있지 않은지 확인합니다."
+        },
+        {
+          "id": "data-view-step4-03",
+          "type": "numbered_list",
+          "text": "배포 주소를 휴대폰에서도 열어 목록과 그래프가 보이는지 확인합니다."
+        },
+        {
+          "id": "data-view-outcome",
+          "type": "quote",
+          "text": "산출물은 실제 저장된 데이터가 보이는 공개 주소 하나입니다."
+        },
+        {
+          "id": "module-data-view-learning-guide-blocked",
+          "type": "heading",
+          "text": "막혔을 때"
+        },
+        {
+          "id": "module-data-view-learning-guide-blocked-record",
+          "type": "paragraph",
+          "text": "설치, 권한, 요금제 또는 실행 오류로 완료하지 못해도 괜찮습니다. 시도한 단계, 오류 화면, 필요한 도움을 결과물과 학습 회고에 남기면 학습 진행으로 인정합니다."
+        },
+        {
+          "id": "module-data-view-learning-guide-check",
+          "type": "heading",
+          "text": "제출 전 확인"
+        },
+        {
+          "id": "module-data-view-learning-guide-check-result",
+          "type": "checklist",
+          "text": "결과물을 직접 열거나 실행해 확인했습니다."
+        },
+        {
+          "id": "module-data-view-learning-guide-check-edit",
+          "type": "checklist",
+          "text": "AI가 만든 결과를 그대로 제출하지 않고 한 가지 이상 검토하거나 수정했습니다."
+        }
+      ]
+    }
   }
 ]

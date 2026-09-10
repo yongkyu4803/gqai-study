@@ -14,6 +14,7 @@ export const ADMIN_MODULE_TITLES_IN_NOTION_ORDER = [
   "스킬 공유하기",
   "데이터베이스 입문",
   "웹크롤링",
+  "데이터 보여주기",
 ] as const;
 
 const adminModuleSequenceByTitle = new Map<string, number>(

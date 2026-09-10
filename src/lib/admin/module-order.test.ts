@@ -34,6 +34,9 @@ describe("관리자용 모듈 순서", () => {
   it("관리자 제목에는 두 자리 번호를 붙이고 추가 모듈에는 붙이지 않는다", () => {
     expect(formatAdminModuleTitle("AI와 친해지기")).toBe("01. AI와 친해지기");
     expect(formatAdminModuleTitle("웹크롤링")).toBe("13. 웹크롤링");
+    expect(formatAdminModuleTitle("데이터 보여주기")).toBe(
+      "14. 데이터 보여주기",
+    );
     expect(formatAdminModuleTitle("추가 모듈")).toBe("추가 모듈");
   });
 
