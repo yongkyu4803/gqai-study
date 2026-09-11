@@ -89,7 +89,7 @@ export function SurveyFields({
         <CardContent className="space-y-4">
           <fieldset>
             <legend className="mb-2 text-sm font-medium">
-              주로 쓰는 AI (복수 선택 가능)
+              주로 쓰는 AI (복수 선택 가능) (필수)
             </legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {aiToolOptions.map((option) => (
@@ -241,7 +241,7 @@ export function SurveyFields({
           </div>
           <div className="space-y-2">
             <Label htmlFor="ai-skill-detail">
-              구체적으로 어떻게 활용하고 계신가요?
+              구체적으로 어떻게 활용하고 계신가요? (필수)
             </Label>
             <Textarea
               id="ai-skill-detail"
@@ -253,7 +253,6 @@ export function SurveyFields({
                 }))
               }
               placeholder="예: 구글 검색 대신 원하는 정보를 자세히 물어보는 정도로 씁니다. 스킬이나 MCP는 아직 잘 모릅니다."
-              required
             />
           </div>
         </CardContent>

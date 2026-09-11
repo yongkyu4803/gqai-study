@@ -80,7 +80,7 @@ describe("계정 신청 비밀번호 검증", () => {
     });
     fireEvent.click(screen.getByLabelText("사용 안 함"));
     fireEvent.change(
-      screen.getByLabelText("구체적으로 어떻게 활용하고 계신가요?"),
+      screen.getByLabelText("구체적으로 어떻게 활용하고 계신가요? (필수)"),
       { target: { value: "아직 사용해 보지 않았습니다." } },
     );
     fireEvent.click(
@@ -97,5 +97,67 @@ describe("계정 신청 비밀번호 검증", () => {
       },
     });
     await screen.findByText("요청을 접수했습니다");
+  });
+
+  it("사전 설문을 채우지 않으면 모달로 이유를 보여준다", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    render(<RequestAccessView />);
+    fireEvent.change(screen.getByLabelText("이름"), {
+      target: { value: "신청자" },
+    });
+    fireEvent.change(screen.getByLabelText("사이트에서 사용할 아이디"), {
+      target: { value: "learner" },
+    });
+    fireEvent.change(screen.getByLabelText("이메일 (필수)"), {
+      target: { value: "learner@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("사용할 비밀번호"), {
+      target: { value: "Abcdefg1" },
+    });
+    fireEvent.change(screen.getByLabelText("비밀번호 확인"), {
+      target: { value: "Abcdefg1" },
+    });
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: /개인정보 처리방침/ }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "요청 보내기" }));
+    expect(fetchMock).not.toHaveBeenCalled();
+    await screen.findByText("신청을 접수하지 못했습니다");
+  });
+
+  it("서버가 요청을 거부하면 모달로 이유를 보여준다", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ error: "이미 사용 중인 아이디입니다." }),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<RequestAccessView />);
+    fireEvent.change(screen.getByLabelText("이름"), {
+      target: { value: "신청자" },
+    });
+    fireEvent.change(screen.getByLabelText("사이트에서 사용할 아이디"), {
+      target: { value: "learner" },
+    });
+    fireEvent.change(screen.getByLabelText("이메일 (필수)"), {
+      target: { value: "learner@example.com" },
+    });
+    fireEvent.change(screen.getByLabelText("사용할 비밀번호"), {
+      target: { value: "Abcdefg1" },
+    });
+    fireEvent.change(screen.getByLabelText("비밀번호 확인"), {
+      target: { value: "Abcdefg1" },
+    });
+    fireEvent.click(screen.getByLabelText("사용 안 함"));
+    fireEvent.change(
+      screen.getByLabelText("구체적으로 어떻게 활용하고 계신가요? (필수)"),
+      { target: { value: "아직 사용해 보지 않았습니다." } },
+    );
+    fireEvent.click(
+      screen.getByRole("checkbox", { name: /개인정보 처리방침/ }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "요청 보내기" }));
+    await screen.findByText("신청을 접수하지 못했습니다");
+    await screen.findByText("이미 사용 중인 아이디입니다.");
   });
 });

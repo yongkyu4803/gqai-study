@@ -19,6 +19,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { SurveyFields } from "@/components/common/survey-fields";
 import {
   createEmptySurveyAnswers,
@@ -386,32 +394,39 @@ export function RequestAccessView() {
   const [website, setWebsite] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [done, setDone] = useState(false);
   const passwordValid = PASSWORD_RULES.every((rule) => rule.test(password));
   const passwordsMatch = confirm.length > 0 && password === confirm;
+  function failSubmit(message: string) {
+    setError(message);
+    setShowErrorDialog(true);
+  }
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (pending) return;
     const failedRule = PASSWORD_RULES.find((rule) => !rule.test(password));
     if (failedRule) {
-      setError(failedRule.message);
+      failSubmit(failedRule.message);
       return;
     }
     if (password !== confirm) {
-      setError("비밀번호 확인이 일치하지 않습니다.");
+      failSubmit("비밀번호 확인이 일치하지 않습니다.");
       return;
     }
     const surveyResult = surveyAnswersSchema.safeParse(survey);
     if (!surveyResult.success) {
-      setSurveyError(
-        surveyResult.error.issues[0]?.message || "사전 설문을 확인해 주세요.",
-      );
+      const message =
+        surveyResult.error.issues[0]?.message || "사전 설문을 확인해 주세요.";
+      setSurveyError(message);
       document.getElementById("request-survey")?.focus();
+      failSubmit(`사전 설문을 확인해 주세요. ${message}`);
       return;
     }
     setSurveyError("");
     setPending(true);
     setError("");
+    setShowErrorDialog(false);
     try {
       const response = await fetch("/api/account-requests", {
         method: "POST",
@@ -433,7 +448,7 @@ export function RequestAccessView() {
       }
       setDone(true);
     } catch (cause) {
-      setError(
+      failSubmit(
         cause instanceof Error ? cause.message : "요청을 접수하지 못했습니다.",
       );
     } finally {
@@ -486,13 +501,6 @@ export function RequestAccessView() {
                     학습 방식과 운영 원칙 자세히 보기
                   </Link>
                 </div>
-                {error ? (
-                  <Alert variant="destructive">
-                    <GqaiIcon name="status-error" />
-                    <AlertTitle>요청을 접수하지 못했습니다</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                ) : null}
                 <div className="space-y-2">
                   <Label htmlFor="requestName">이름</Label>
                   <Input
@@ -689,6 +697,19 @@ export function RequestAccessView() {
           </CardContent>
         </Card>
       </div>
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>신청을 접수하지 못했습니다</DialogTitle>
+            <DialogDescription>{error}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" onClick={() => setShowErrorDialog(false)}>
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
