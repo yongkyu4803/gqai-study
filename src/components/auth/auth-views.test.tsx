@@ -34,6 +34,21 @@ describe("계정 신청 비밀번호 검증", () => {
     expect(confirm).toHaveAttribute("aria-invalid", "true");
   });
 
+  it("아이디 입력에 따라 규칙 충족 여부를 실시간으로 갱신한다", () => {
+    render(<RequestAccessView />);
+    const loginId = screen.getByLabelText("사이트에서 사용할 아이디");
+    const rules = screen.getByRole("list", { name: "아이디 규칙" });
+    expect(within(rules).getAllByText("입력 전")).toHaveLength(4);
+
+    fireEvent.change(loginId, { target: { value: "-ab" } });
+    expect(within(rules).getAllByText("미충족")).toHaveLength(2);
+    expect(loginId).toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.change(loginId, { target: { value: "learner_01" } });
+    expect(within(rules).getAllByText("충족")).toHaveLength(4);
+    expect(loginId).not.toHaveAttribute("aria-invalid", "true");
+  });
+
   it("제출 이벤트를 직접 실행해도 잘못된 비밀번호를 서버로 보내지 않는다", () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);

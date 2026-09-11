@@ -33,7 +33,12 @@ import {
   surveyAnswersSchema,
 } from "@/lib/domain/survey";
 import { PasswordRules } from "@/components/auth/password-rules";
-import { PASSWORD_GUIDANCE, PASSWORD_RULES } from "@/lib/domain/account-policy";
+import { RuleChecklist } from "@/components/auth/rule-checklist";
+import {
+  LOGIN_ID_RULES,
+  PASSWORD_GUIDANCE,
+  PASSWORD_RULES,
+} from "@/lib/domain/account-policy";
 
 function safeNext(value: string | null, role: "admin" | "student") {
   const fallback = role === "admin" ? "/admin" : "/learn";
@@ -398,6 +403,7 @@ export function RequestAccessView() {
   const [done, setDone] = useState(false);
   const passwordValid = PASSWORD_RULES.every((rule) => rule.test(password));
   const passwordsMatch = confirm.length > 0 && password === confirm;
+  const loginIdValid = LOGIN_ID_RULES.every((rule) => rule.test(loginId));
   function failSubmit(message: string) {
     setError(message);
     setShowErrorDialog(true);
@@ -520,7 +526,15 @@ export function RequestAccessView() {
                     onChange={(e) => setLoginId(e.target.value)}
                     autoCapitalize="none"
                     placeholder="영문 소문자, 숫자, 점, 밑줄, 하이픈"
+                    aria-invalid={loginId.length > 0 && !loginIdValid}
+                    aria-describedby="request-login-id-rules"
                     required
+                  />
+                  <RuleChecklist
+                    id="request-login-id-rules"
+                    value={loginId}
+                    rules={LOGIN_ID_RULES}
+                    ariaLabel="아이디 규칙"
                   />
                 </div>
                 <div className="space-y-2">
