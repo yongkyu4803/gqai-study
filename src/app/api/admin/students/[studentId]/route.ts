@@ -10,6 +10,8 @@ const actionSchema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("set_email"), email: emailSchema }),
 ]);
 
+const deleteSchema = z.object({ confirmLoginId: z.string().min(1) });
+
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ studentId: string }> },
@@ -99,6 +101,62 @@ export async function PATCH(
           : status < 500
             ? "관리자 권한을 확인하세요."
             : "학생 계정을 변경하지 못했습니다.",
+      },
+      { status },
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ studentId: string }> },
+) {
+  try {
+    const { user: adminUser } = await requireAdmin();
+    const { studentId } = await params;
+    const { confirmLoginId } = deleteSchema.parse(await request.json());
+    const admin = createSupabaseAdminClient();
+    const { data: profile, error: profileError } = await admin
+      .from("gqai_aistudy_profiles")
+      .select("id, role, login_id, display_name")
+      .eq("id", studentId)
+      .single();
+    if (profileError || profile?.role !== "student")
+      return NextResponse.json(
+        { error: "학생을 찾을 수 없습니다." },
+        { status: 404 },
+      );
+    if (confirmLoginId.trim().toLowerCase() !== profile.login_id.toLowerCase())
+      return NextResponse.json(
+        { error: "아이디가 일치하지 않습니다." },
+        { status: 400 },
+      );
+    const { error: deleteError } = await admin
+      .from("gqai_aistudy_profiles")
+      .delete()
+      .eq("id", studentId);
+    if (deleteError) throw deleteError;
+    const { error: authDeleteError } =
+      await admin.auth.admin.deleteUser(studentId);
+    if (authDeleteError) throw authDeleteError;
+    await admin.from("gqai_aistudy_activity_events").insert({
+      event_name: "student.deleted",
+      actor_id: adminUser.id,
+      entity_type: "student",
+      entity_id: studentId,
+      metadata: { loginId: profile.login_id, displayName: profile.display_name },
+    });
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const validation = error instanceof Error && error.name === "ZodError";
+    const status = validation ? 400 : adminGuardStatus(error);
+    return NextResponse.json(
+      {
+        error: validation
+          ? "입력값을 확인하세요."
+          : status < 500
+            ? "관리자 권한을 확인하세요."
+            : "학생 계정을 삭제하지 못했습니다.",
       },
       { status },
     );

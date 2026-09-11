@@ -4,6 +4,7 @@ import { AssignmentOrderControls } from "./assignment-order-controls";
 import { compareAssignmentOrder } from "@/lib/domain/assignment-order";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import {
   Archive,
@@ -356,11 +357,13 @@ export function StudentsView() {
 }
 
 export function StudentDetailView({ studentId }: { studentId: string }) {
+  const router = useRouter();
   const {
     state,
     resetStudentPassword,
     toggleStudentActive,
     updateStudentEmail,
+    deleteStudent,
     assignMany,
   } = useApp();
   const student = state.profiles.find(
@@ -378,6 +381,10 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
   const [assignInstruction, setAssignInstruction] = useState("");
   const [assignPending, setAssignPending] = useState(false);
   const [assignError, setAssignError] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deletePending, setDeletePending] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
   if (!student)
     return (
       <EmptyState
@@ -467,6 +474,21 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
       setPending(false);
     }
   }
+  async function confirmDelete() {
+    setDeletePending(true);
+    setDeleteError("");
+    try {
+      await deleteStudent(currentStudentId, deleteConfirmText);
+      toast.success("학생 계정을 삭제했습니다.");
+      router.push("/admin/students");
+    } catch (cause) {
+      const message =
+        cause instanceof Error ? cause.message : "삭제하지 못했습니다.";
+      setDeleteError(message);
+    } finally {
+      setDeletePending(false);
+    }
+  }
   async function resetPassword() {
     setPending(true);
     setError("");
@@ -504,15 +526,29 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
           </span>
         }
         action={
-          <Button
-            variant={student.isActive ? "destructive" : "outline"}
-            onClick={changeActiveState}
-            disabled={pending}
-            aria-busy={pending}
-          >
-            {student.isActive ? <UserMinus /> : <UserCheck />}
-            {pending ? "처리 중…" : student.isActive ? "비활성화" : "활성화"}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={student.isActive ? "destructive" : "outline"}
+              onClick={changeActiveState}
+              disabled={pending}
+              aria-busy={pending}
+            >
+              {student.isActive ? <UserMinus /> : <UserCheck />}
+              {pending ? "처리 중…" : student.isActive ? "비활성화" : "활성화"}
+            </Button>
+            <Button
+              variant="outline"
+              className="text-destructive hover:text-destructive"
+              onClick={() => {
+                setDeleteError("");
+                setDeleteConfirmText("");
+                setShowDeleteDialog(true);
+              }}
+            >
+              <Trash2 />
+              계정 삭제
+            </Button>
+          </div>
         }
       />
       {error ? (
@@ -826,6 +862,70 @@ export function StudentDetailView({ studentId }: { studentId: string }) {
               {assignPending
                 ? "배정 중…"
                 : `${assignModuleVersionIds.length}개 모듈 배정`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={showDeleteDialog}
+        onOpenChange={(open) => {
+          setShowDeleteDialog(open);
+          if (!open) {
+            setDeleteConfirmText("");
+            setDeleteError("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>계정 삭제</DialogTitle>
+            <DialogDescription>
+              {student.displayName}님({student.loginId})의 계정과 배정된
+              카드·제출물·피드백·활동 기록이 모두 영구히 삭제됩니다. 되돌릴 수
+              없습니다. 계속하려면 아이디를 입력하세요.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="student-delete-confirm">
+              확인을 위해 아이디 &ldquo;{student.loginId}&rdquo; 입력
+            </Label>
+            <Input
+              id="student-delete-confirm"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder={student.loginId}
+              disabled={deletePending}
+              autoFocus
+            />
+          </div>
+          {deleteError ? (
+            <InlineMessage
+              kind="error"
+              title="계정을 삭제하지 못했습니다"
+              description={deleteError}
+            />
+          ) : null}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+              disabled={deletePending}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={
+                deletePending ||
+                deleteConfirmText.trim().toLowerCase() !==
+                  student.loginId.toLowerCase()
+              }
+              aria-busy={deletePending}
+              onClick={confirmDelete}
+            >
+              {deletePending ? "삭제 중…" : "영구 삭제"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -99,6 +99,7 @@ interface AppContextValue {
   resetStudentPassword: (studentId: string, password: string) => Promise<void>;
   toggleStudentActive: (studentId: string) => Promise<void>;
   updateStudentEmail: (studentId: string, email: string) => Promise<void>;
+  deleteStudent: (studentId: string, confirmLoginId: string) => Promise<void>;
   updateMyEmail: (email: string) => Promise<void>;
   createGroup: (input: CreateGroupInput) => Promise<string>;
   updateGroup: (groupId: string, input: CreateGroupInput) => Promise<void>;
@@ -543,6 +544,63 @@ export function AppProvider({ children }: { children: ReactNode }) {
       persistDemo(next);
     },
     [mode, persistDemo, refresh, session, state],
+  );
+
+  const deleteStudent = useCallback(
+    async (studentId: string, confirmLoginId: string) => {
+      if (!session || session.role !== "admin")
+        throw new Error("관리자 권한이 필요합니다.");
+      const profile = state.profiles.find((item) => item.id === studentId);
+      if (!profile) throw new Error("학생을 찾을 수 없습니다.");
+      if (confirmLoginId.trim().toLowerCase() !== profile.loginId.toLowerCase())
+        throw new Error("아이디가 일치하지 않습니다.");
+      if (mode === "supabase") {
+        const response = await fetch(`/api/admin/students/${studentId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirmLoginId }),
+        });
+        const result = (await response.json()) as { error?: string };
+        if (!response.ok)
+          throw new Error(result.error ?? "학생 계정을 삭제하지 못했습니다.");
+        await refresh();
+        return;
+      }
+      const removedAssignmentIds = new Set(
+        state.assignments
+          .filter((item) => item.studentId === studentId)
+          .map((item) => item.id),
+      );
+      const next = structuredClone(state);
+      next.profiles = next.profiles.filter((item) => item.id !== studentId);
+      next.groups = next.groups.map((group) => ({
+        ...group,
+        memberIds: group.memberIds.filter((id) => id !== studentId),
+      }));
+      next.assignments = next.assignments.filter(
+        (item) => item.studentId !== studentId,
+      );
+      next.submissions = next.submissions.filter(
+        (item) => !removedAssignmentIds.has(item.assignmentId),
+      );
+      next.feedback = next.feedback.filter(
+        (item) => !removedAssignmentIds.has(item.assignmentId),
+      );
+      next.activities = next.activities.filter(
+        (item) => item.studentId !== studentId,
+      );
+      next.announcements = (next.announcements ?? []).filter(
+        (item) => !(item.scope === "student" && item.targetId === studentId),
+      );
+      next.surveyResponses = (next.surveyResponses ?? []).filter(
+        (item) => item.studentId !== studentId,
+      );
+      next.inquiryMessages = (next.inquiryMessages ?? []).filter(
+        (item) => item.studentId !== studentId,
+      );
+      commitDemo(next);
+    },
+    [commitDemo, mode, refresh, session, state],
   );
 
   const updateMyEmail = useCallback(
@@ -1264,6 +1322,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       toggleStudentActive,
       updateMyEmail,
       updateStudentEmail,
+      deleteStudent,
       createGroup,
       updateGroup,
       archiveGroup,
@@ -1304,6 +1363,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       createFeedback,
       createGroup,
       createModule,
+      deleteStudent,
       duplicateModule,
       login,
       logout,
