@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { ReactNode } from "react";
 import { ACCOUNT_POLICY_VERSION } from "@/lib/domain/account-policy";
 
@@ -15,8 +16,15 @@ export function PolicyPage({
     <main className="min-h-dvh bg-zinc-50">
       <header className="border-b bg-white">
         <div className="content-wrap flex h-16 items-center justify-between">
-          <Link href="/" className="font-medium">
-            GQAI Study
+          <Link href="/" className="block" aria-label="GQAI Study 홈">
+            <Image
+              src="/brand/gqai-logo.svg"
+              alt="GQAI"
+              width={110}
+              height={37}
+              className="h-auto w-[95px] sm:w-[110px]"
+              priority
+            />
           </Link>
           <Link
             href="/request-access"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowDown, ArrowRight, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,13 +25,17 @@ export default function HomePage() {
         <div className="content-wrap flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 font-medium"
+            className="block"
             aria-label="GQAI Study 홈"
           >
-            <span className="flex size-7 items-center justify-center rounded-md bg-[#171717] text-xs font-semibold text-white">
-              G
-            </span>
-            GQAI Study
+            <Image
+              src="/brand/gqai-logo.svg"
+              alt="GQAI"
+              width={110}
+              height={37}
+              className="h-auto w-[95px] sm:w-[110px]"
+              priority
+            />
           </Link>
           <Button variant="outline" render={<Link href="/login" />}>
             로그인

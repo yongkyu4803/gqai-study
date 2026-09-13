@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -171,12 +172,17 @@ function Sidebar() {
     <aside className="hidden min-h-dvh w-60 shrink-0 border-r bg-[#fafafa] p-4 lg:flex lg:flex-col">
       <Link
         href={session?.role === "admin" ? "/admin" : "/learn"}
-        className="mb-8 flex items-center gap-2 px-2"
+        className="mb-8 block px-2"
+        aria-label="GQAI Study 홈"
       >
-        <span className="flex size-7 items-center justify-center rounded-md bg-[#171717] text-xs font-semibold text-white">
-          G
-        </span>
-        <span className="font-medium tracking-tight">GQAI Study</span>
+        <Image
+          src="/brand/gqai-logo.svg"
+          alt="GQAI"
+          width={110}
+          height={37}
+          className="h-auto w-[110px]"
+          priority
+        />
       </Link>
       <NavLinks />
       <div className="mt-auto border-t pt-4">
@@ -217,12 +223,17 @@ function MobileHeader() {
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between border-b bg-white/95 px-5 backdrop-blur lg:hidden">
       <Link
         href={session?.role === "admin" ? "/admin" : "/learn"}
-        className="flex items-center gap-2 font-medium"
+        className="block"
+        aria-label="GQAI Study 홈"
       >
-        <span className="flex size-7 items-center justify-center rounded-md bg-[#171717] text-xs font-semibold text-white">
-          G
-        </span>
-        GQAI Study
+        <Image
+          src="/brand/gqai-logo.svg"
+          alt="GQAI"
+          width={95}
+          height={32}
+          className="h-auto w-[95px]"
+          priority
+        />
       </Link>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger
