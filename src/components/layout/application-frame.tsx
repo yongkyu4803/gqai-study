@@ -175,14 +175,19 @@ function Sidebar() {
         className="mb-8 block px-2"
         aria-label="GQAI Study 홈"
       >
-        <Image
-          src="/brand/gqai-logo.svg"
-          alt="GQAI"
-          width={110}
-          height={37}
-          className="h-auto w-[110px]"
-          priority
-        />
+        <span className="flex items-center gap-2.5">
+          <Image
+            src="/brand/gqai-logo.svg"
+            alt="GQAI"
+            width={110}
+            height={37}
+            className="h-auto w-[110px]"
+            priority
+          />
+          <span className="border-l pl-2.5 text-sm font-medium tracking-tight">
+            Study
+          </span>
+        </span>
       </Link>
       <NavLinks />
       <div className="mt-auto border-t pt-4">
@@ -226,14 +231,19 @@ function MobileHeader() {
         className="block"
         aria-label="GQAI Study 홈"
       >
-        <Image
-          src="/brand/gqai-logo.svg"
-          alt="GQAI"
-          width={95}
-          height={32}
-          className="h-auto w-[95px]"
-          priority
-        />
+        <span className="flex items-center gap-2">
+          <Image
+            src="/brand/gqai-logo.svg"
+            alt="GQAI"
+            width={95}
+            height={32}
+            className="h-auto w-[95px]"
+            priority
+          />
+          <span className="border-l pl-2 text-xs font-medium tracking-tight">
+            Study
+          </span>
+        </span>
       </Link>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger

@@ -28,14 +28,19 @@ export default function HomePage() {
             className="block"
             aria-label="GQAI Study 홈"
           >
-            <Image
-              src="/brand/gqai-logo.svg"
-              alt="GQAI"
-              width={110}
-              height={37}
-              className="h-auto w-[95px] sm:w-[110px]"
-              priority
-            />
+            <span className="flex items-center gap-2 sm:gap-2.5">
+              <Image
+                src="/brand/gqai-logo.svg"
+                alt="GQAI"
+                width={110}
+                height={37}
+                className="h-auto w-[95px] sm:w-[110px]"
+                priority
+              />
+              <span className="border-l pl-2 text-xs font-medium tracking-tight sm:pl-2.5 sm:text-sm">
+                Study
+              </span>
+            </span>
           </Link>
           <Button variant="outline" render={<Link href="/login" />}>
             로그인

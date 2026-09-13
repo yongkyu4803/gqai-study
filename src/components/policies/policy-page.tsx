@@ -17,14 +17,19 @@ export function PolicyPage({
       <header className="border-b bg-white">
         <div className="content-wrap flex h-16 items-center justify-between">
           <Link href="/" className="block" aria-label="GQAI Study 홈">
-            <Image
-              src="/brand/gqai-logo.svg"
-              alt="GQAI"
-              width={110}
-              height={37}
-              className="h-auto w-[95px] sm:w-[110px]"
-              priority
-            />
+            <span className="flex items-center gap-2 sm:gap-2.5">
+              <Image
+                src="/brand/gqai-logo.svg"
+                alt="GQAI"
+                width={110}
+                height={37}
+                className="h-auto w-[95px] sm:w-[110px]"
+                priority
+              />
+              <span className="border-l pl-2 text-xs font-medium tracking-tight sm:pl-2.5 sm:text-sm">
+                Study
+              </span>
+            </span>
           </Link>
           <Link
             href="/request-access"
