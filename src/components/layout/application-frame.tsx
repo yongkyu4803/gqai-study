@@ -188,7 +188,7 @@ function Sidebar() {
             aria-hidden="true"
             className="h-[18px] w-px bg-[#D1D5DB] min-[768px]:h-5"
           />
-          <span className="font-[family-name:var(--font-montserrat)] text-[15.4px] leading-[18px] font-semibold text-[#1A1A1A] min-[768px]:text-[17.6px] min-[768px]:leading-5">
+          <span className="font-[family-name:var(--font-montserrat)] text-[16.94px] leading-[18px] font-semibold text-[#1A1A1A] min-[768px]:text-[19.36px] min-[768px]:leading-5">
             Study
           </span>
         </span>
@@ -245,7 +245,7 @@ function MobileHeader() {
             priority
           />
           <span aria-hidden="true" className="h-[18px] w-px bg-[#D1D5DB]" />
-          <span className="font-[family-name:var(--font-montserrat)] text-[15.4px] leading-[18px] font-semibold text-[#1A1A1A]">
+          <span className="font-[family-name:var(--font-montserrat)] text-[16.94px] leading-[18px] font-semibold text-[#1A1A1A]">
             Study
           </span>
         </span>
