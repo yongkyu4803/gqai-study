@@ -28,16 +28,20 @@ export default function HomePage() {
             className="block"
             aria-label="GQAI Study 홈"
           >
-            <span className="flex items-center gap-2 sm:gap-2.5">
+            <span className="flex items-center gap-3 min-[768px]:gap-4">
               <Image
                 src="/brand/gqai-logo.svg"
-                alt="GQAI"
+                alt=""
                 width={110}
                 height={37}
                 className="h-auto w-[95px] sm:w-[110px]"
                 priority
               />
-              <span className="border-l pl-2 text-xs font-medium tracking-tight sm:pl-2.5 sm:text-sm">
+              <span
+                aria-hidden="true"
+                className="h-[18px] w-px bg-[#D1D5DB] min-[768px]:h-5"
+              />
+              <span className="font-[family-name:var(--font-montserrat)] text-[14px] leading-[18px] font-semibold text-[#1A1A1A] min-[768px]:text-[16px] min-[768px]:leading-5">
                 Study
               </span>
             </span>

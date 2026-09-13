@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Noto_Sans_KR } from "next/font/google";
+import { Inter, Montserrat, Noto_Sans_KR } from "next/font/google";
 import type { CSSProperties, ReactNode } from "react";
 import { AppProvider } from "@/components/providers/app-provider";
 import { ApplicationFrame } from "@/components/layout/application-frame";
@@ -16,6 +16,11 @@ const korean = Noto_Sans_KR({
   weight: ["400", "500"],
   variable: "--font-korean",
 });
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["600"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   title: { default: "GQAI Study", template: "%s · GQAI Study" },
@@ -25,7 +30,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ko" className={`${inter.variable} ${korean.variable}`}>
+    <html
+      lang="ko"
+      className={`${inter.variable} ${korean.variable} ${montserrat.variable}`}
+    >
       <body
         style={
           {
