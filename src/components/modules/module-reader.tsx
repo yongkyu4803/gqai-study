@@ -44,9 +44,11 @@ function groupBlocks(blocks: ContentBlock[]): BlockGroup[] {
 export function ModuleReader({
   snapshot,
   compact = false,
+  showTitle = true,
 }: {
   snapshot: ModuleSnapshot;
   compact?: boolean;
+  showTitle?: boolean;
 }) {
   const infoLists = [
     { title: "학습 목표", items: snapshot.learningObjectives },
@@ -55,12 +57,24 @@ export function ModuleReader({
     { title: "완료 기준", items: snapshot.completionCriteria },
   ].filter((list) => list.items.length > 0);
   return (
-    <article className={cn("mx-auto w-full max-w-3xl", !compact && "py-2")}>
+    <article
+      className={cn(
+        "mx-auto min-w-0 w-full max-w-3xl [overflow-wrap:anywhere]",
+        !compact && "py-2",
+      )}
+    >
       <header className="border-b pb-4">
-        <h1 className="text-2xl font-medium leading-tight tracking-[-0.035em] sm:text-3xl">
-          {snapshot.title}
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        {showTitle ? (
+          <h1 className="text-2xl font-medium leading-tight tracking-[-0.035em] sm:text-3xl">
+            {snapshot.title}
+          </h1>
+        ) : null}
+        <p
+          className={cn(
+            "text-sm leading-6 text-muted-foreground",
+            showTitle && "mt-2",
+          )}
+        >
           {snapshot.category} · {difficultyLabel[snapshot.difficulty]} · 약{" "}
           {snapshot.estimatedMinutes}분
           {snapshot.summary ? ` · ${snapshot.summary}` : ""}
@@ -114,7 +128,7 @@ function ContentBlockView({ block }: { block: ContentBlock }) {
     );
   if (block.type === "code")
     return (
-      <pre className="overflow-x-auto rounded-sm bg-[#1c1c1c] p-5 font-mono text-sm leading-6 text-white">
+      <pre className="max-w-full overflow-x-auto rounded-sm bg-[#1c1c1c] p-5 font-mono text-sm leading-6 text-white">
         <code>{block.text}</code>
       </pre>
     );

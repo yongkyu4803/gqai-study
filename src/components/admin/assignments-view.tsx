@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import {
   ArrowRight,
+  ChevronDown,
   Download,
   FileText,
   MessageSquareText,
@@ -533,33 +534,29 @@ export function AssignmentDetailView({
           description={actionError}
         />
       ) : null}
-      <div className="grid gap-6 xl:grid-cols-[1.08fr_.92fr]">
-        <div className="space-y-6">
-          {assignment.personalInstruction ? (
-            <Alert>
-              <MessageSquareText className="size-4" />
-              <AlertTitle>배정 안내</AlertTitle>
-              <AlertDescription>
-                {assignment.personalInstruction}
-              </AlertDescription>
-            </Alert>
-          ) : null}
-          {version ? (
-            <Card>
-              <CardContent className="p-6 sm:p-8">
-                <ModuleReader snapshot={version.snapshot} compact />
-              </CardContent>
-            </Card>
-          ) : null}
+      {assignment.personalInstruction ? (
+        <Alert>
+          <MessageSquareText className="size-4" />
+          <AlertTitle>배정 안내</AlertTitle>
+          <AlertDescription>{assignment.personalInstruction}</AlertDescription>
+        </Alert>
+      ) : null}
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.08fr)_minmax(0,.92fr)]">
+        <div className="min-w-0 space-y-6 [overflow-wrap:anywhere]">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">제출 이력</CardTitle>
+              <CardTitle>
+                <h2 className="text-base">제출 이력</h2>
+              </CardTitle>
+              <CardDescription>
+                최신 제출부터 결과물과 학습 회고를 확인하세요.
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {submissions.length ? (
-                submissions.map((submission) => (
+                [...submissions].reverse().map((submission) => (
                   <div key={submission.id} className="rounded-lg border p-4">
-                    <div className="mb-3 flex items-center justify-between">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-medium">
                         {submission.status === "draft"
                           ? "저장된 초안"
@@ -586,17 +583,198 @@ export function AssignmentDetailView({
               )}
             </CardContent>
           </Card>
-        </div>
-        <div className="space-y-6">
-          <NextModuleDecisionCard
-            title={version?.snapshot.title}
-            tags={version?.snapshot.tags}
-            assignHref={`/admin/students/${assignment.studentId}`}
-            assignLabel="학생 상세에서 다음 모듈 배정"
-          />
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">학습 정보</CardTitle>
+              <CardTitle>
+                <h2 className="text-base">피드백 타임라인</h2>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {messages.length ? (
+                messages.map((message) => {
+                  const author = state.profiles.find(
+                    (item) => item.id === message.authorId,
+                  );
+                  return (
+                    <div key={message.id} className="rounded-lg border p-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline">
+                          {feedbackKindLabel[message.kind]}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {author?.displayName} ·{" "}
+                          {formatDate(message.createdAt, true)}
+                        </span>
+                      </div>
+                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6">
+                        {message.body}
+                      </p>
+                      {message.attachments.map((asset) =>
+                        isSafeAssetUrl(asset.url) ? (
+                          <a
+                            key={asset.id}
+                            href={asset.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-2 block text-xs text-foreground underline-offset-4 hover:underline"
+                          >
+                            첨부 열기 · {asset.name} (
+                            {formatFileSize(asset.size)})
+                          </a>
+                        ) : (
+                          <p
+                            key={asset.id}
+                            className="mt-2 text-xs text-muted-foreground"
+                          >
+                            첨부 · {asset.name} ({formatFileSize(asset.size)})
+                          </p>
+                        ),
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="py-6 text-center text-sm text-muted-foreground">
+                  아직 피드백이 없습니다.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+          {version ? (
+            <Card className="gap-0 py-0">
+              <details className="group">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-6 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+                  <h2 className="text-base font-medium">강의 내용</h2>
+                  <ChevronDown
+                    aria-hidden="true"
+                    className="size-5 shrink-0 transition-transform group-open:rotate-180"
+                  />
+                </summary>
+                <CardContent className="border-t py-6">
+                  <ModuleReader
+                    snapshot={version.snapshot}
+                    compact
+                    showTitle={false}
+                  />
+                </CardContent>
+              </details>
+            </Card>
+          ) : null}
+        </div>
+        <div className="min-w-0 space-y-6 [overflow-wrap:anywhere]">
+          {isTerminal ? (
+            <Alert>
+              <GqaiIcon name="status-lock" />
+              <AlertTitle>종료된 카드입니다</AlertTitle>
+              <AlertDescription>
+                기존 학습·제출·피드백 이력은 읽을 수 있지만 새 피드백은 추가할
+                수 없습니다.
+              </AlertDescription>
+            </Alert>
+          ) : !latest && assignment.assignmentStatus !== "completed" ? (
+            <Alert>
+              <GqaiIcon name="status-info" />
+              <AlertTitle>제출을 기다리고 있습니다</AlertTitle>
+              <AlertDescription>
+                학생의 첫 제출이 도착하면 해당 차수에 피드백을 남길 수 있습니다.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>
+                  <h2 className="text-base">피드백 작성</h2>
+                </CardTitle>
+                <CardDescription>
+                  현재 상태에 맞는 다음 단계를 선택하세요.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {assignment.assignmentStatus === "completed" ? (
+                  <Button
+                    className="w-full"
+                    variant={
+                      kind === "completion_reopened" ? "dark" : "outline"
+                    }
+                    aria-pressed={kind === "completion_reopened"}
+                    onClick={() => setKind("completion_reopened")}
+                  >
+                    완료 취소
+                  </Button>
+                ) : (
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button
+                      variant={kind === "feedback" ? "dark" : "outline"}
+                      aria-pressed={kind === "feedback"}
+                      onClick={() => setKind("feedback")}
+                    >
+                      피드백
+                    </Button>
+                    <Button
+                      variant={kind === "revision_request" ? "dark" : "outline"}
+                      aria-pressed={kind === "revision_request"}
+                      onClick={() => setKind("revision_request")}
+                    >
+                      재제출 요청
+                    </Button>
+                    <Button
+                      variant={kind === "final_approval" ? "dark" : "outline"}
+                      aria-pressed={kind === "final_approval"}
+                      onClick={() => setKind("final_approval")}
+                    >
+                      최종 완료
+                    </Button>
+                  </div>
+                )}
+                <Label htmlFor="feedback-body">피드백 내용</Label>
+                <Textarea
+                  id="feedback-body"
+                  className="min-h-40"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  placeholder="학생이 다음 행동을 알 수 있도록 구체적으로 작성하세요."
+                />
+                <div>
+                  <Label htmlFor="feedback-file">파일 첨부</Label>
+                  <Input
+                    id="feedback-file"
+                    className="mt-2"
+                    type="file"
+                    onChange={attach}
+                    disabled={pending}
+                  />
+                  {attachments.map((asset) => (
+                    <p
+                      key={asset.id}
+                      className="mt-1 text-xs text-muted-foreground"
+                    >
+                      {asset.name}
+                    </p>
+                  ))}
+                </div>
+                <div className="rounded-lg border border-dashed bg-muted p-4 text-muted-foreground">
+                  <p className="text-xs font-medium">AI 보조 피드백</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    향후 기능 연결 위치 · 현재 외부 호출 없음
+                  </p>
+                </div>
+                <Button
+                  className="w-full"
+                  onClick={send}
+                  disabled={pending || (!body.trim() && !attachments.length)}
+                  aria-busy={pending}
+                >
+                  <Send />
+                  {pending ? "저장 중…" : "피드백 저장"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <h2 className="text-base">학습 정보</h2>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <Summary label="학생" value={student?.displayName ?? "—"} />
@@ -624,7 +802,9 @@ export function AssignmentDetailView({
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">카드 운영</CardTitle>
+              <CardTitle>
+                <h2 className="text-base">카드 운영</h2>
+              </CardTitle>
               <CardDescription>
                 학생별 안내를 수정하거나 기존 이력을 보존한 채 카드를
                 종료합니다.
@@ -671,164 +851,12 @@ export function AssignmentDetailView({
               ) : null}
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">피드백 타임라인</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {messages.length ? (
-                messages.map((message) => {
-                  const author = state.profiles.find(
-                    (item) => item.id === message.authorId,
-                  );
-                  return (
-                    <div key={message.id} className="rounded-lg border p-4">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          {feedbackKindLabel[message.kind]}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {author?.displayName} ·{" "}
-                          {formatDate(message.createdAt, true)}
-                        </span>
-                      </div>
-                      <p className="mt-3 whitespace-pre-wrap text-sm leading-6">
-                        {message.body}
-                      </p>
-                      {message.attachments.map((asset) =>
-                        isSafeAssetUrl(asset.url) ? (
-                          <a
-                            key={asset.id}
-                            href={asset.url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="mt-2 block text-xs text-foreground underline-offset-4 hover:underline"
-                          >
-                            첨부 열기 · {asset.name} (
-                            {formatFileSize(asset.size)})
-                          </a>
-                        ) : (
-                          <p
-                            key={asset.id}
-                            className="mt-2 text-xs text-muted-foreground"
-                          >
-                            첨부 · {asset.name} ({formatFileSize(asset.size)})
-                          </p>
-                        ),
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="py-6 text-center text-sm text-muted-foreground">
-                  아직 피드백이 없습니다.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-          {isTerminal ? (
-            <Alert>
-              <GqaiIcon name="status-lock" />
-              <AlertTitle>종료된 카드입니다</AlertTitle>
-              <AlertDescription>
-                기존 학습·제출·피드백 이력은 읽을 수 있지만 새 피드백은 추가할
-                수 없습니다.
-              </AlertDescription>
-            </Alert>
-          ) : !latest && assignment.assignmentStatus !== "completed" ? (
-            <Alert>
-              <GqaiIcon name="status-info" />
-              <AlertTitle>제출을 기다리고 있습니다</AlertTitle>
-              <AlertDescription>
-                학생의 첫 제출이 도착하면 해당 차수에 피드백을 남길 수 있습니다.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">피드백 작성</CardTitle>
-                <CardDescription>
-                  현재 상태에 맞는 다음 단계를 선택하세요.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {assignment.assignmentStatus === "completed" ? (
-                  <Button
-                    className="w-full"
-                    variant={
-                      kind === "completion_reopened" ? "dark" : "outline"
-                    }
-                    aria-pressed={kind === "completion_reopened"}
-                    onClick={() => setKind("completion_reopened")}
-                  >
-                    완료 취소
-                  </Button>
-                ) : (
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button
-                      variant={kind === "feedback" ? "dark" : "outline"}
-                      aria-pressed={kind === "feedback"}
-                      onClick={() => setKind("feedback")}
-                    >
-                      피드백
-                    </Button>
-                    <Button
-                      variant={kind === "revision_request" ? "dark" : "outline"}
-                      aria-pressed={kind === "revision_request"}
-                      onClick={() => setKind("revision_request")}
-                    >
-                      재제출 요청
-                    </Button>
-                    <Button
-                      variant={kind === "final_approval" ? "dark" : "outline"}
-                      aria-pressed={kind === "final_approval"}
-                      onClick={() => setKind("final_approval")}
-                    >
-                      최종 완료
-                    </Button>
-                  </div>
-                )}
-                <Textarea
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  placeholder="학생이 다음 행동을 알 수 있도록 구체적으로 작성하세요."
-                />
-                <div>
-                  <Label htmlFor="feedback-file">파일 첨부</Label>
-                  <Input
-                    id="feedback-file"
-                    className="mt-2"
-                    type="file"
-                    onChange={attach}
-                    disabled={pending}
-                  />
-                  {attachments.map((asset) => (
-                    <p
-                      key={asset.id}
-                      className="mt-1 text-xs text-muted-foreground"
-                    >
-                      {asset.name}
-                    </p>
-                  ))}
-                </div>
-                <div className="rounded-lg border border-dashed bg-muted p-4 text-muted-foreground">
-                  <p className="text-xs font-medium">AI 보조 피드백</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    향후 기능 연결 위치 · 현재 외부 호출 없음
-                  </p>
-                </div>
-                <Button
-                  className="w-full"
-                  onClick={send}
-                  disabled={pending || (!body.trim() && !attachments.length)}
-                  aria-busy={pending}
-                >
-                  <Send />
-                  {pending ? "저장 중…" : "피드백 저장"}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+          <NextModuleDecisionCard
+            title={version?.snapshot.title}
+            tags={version?.snapshot.tags}
+            assignHref={`/admin/students/${assignment.studentId}`}
+            assignLabel="학생 상세에서 다음 모듈 배정"
+          />
         </div>
       </div>
     </div>
@@ -1199,8 +1227,10 @@ function NextModuleDecisionCard({
 function Summary({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 border-b py-2 text-sm last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="text-right font-medium">{value}</span>
+      <span className="shrink-0 whitespace-nowrap text-muted-foreground">
+        {label}
+      </span>
+      <span className="min-w-0 text-right font-medium">{value}</span>
     </div>
   );
 }
@@ -1241,10 +1271,10 @@ function SubmissionItemRow({
         href={item.url}
         target="_blank"
         rel="noreferrer"
-        className="flex items-center gap-2 rounded-md border p-3 text-sm text-foreground"
+        className="flex min-w-0 items-center gap-2 rounded-md border p-3 text-sm text-foreground [overflow-wrap:anywhere]"
       >
-        <ArrowRight className="size-3.5" />
-        {item.url}
+        <ArrowRight className="size-3.5 shrink-0" />
+        <span className="min-w-0">{item.url}</span>
       </a>
     ) : (
       <div className="rounded-md border p-3 text-sm text-muted-foreground">
