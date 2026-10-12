@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { Profile } from "@/lib/domain/types";
+import type { Profile, Submission } from "@/lib/domain/types";
 import {
   DEFAULT_STUDENT_SORT,
   filterStudents,
   formatLastLogin,
+  latestSubmittedAtByStudent,
   sortStudents,
   toggleStudentSort,
   type StudentSort,
@@ -192,9 +193,56 @@ describe("학생 목록 정렬", () => {
   });
   const 셋 = [박, 이, 김];
 
-  it("기본값은 운영 DB와 같은 이름 가나다순이다", () => {
-    expect(DEFAULT_STUDENT_SORT).toEqual({ key: "name", direction: "asc" });
+  function submission(studentId: string, submittedAt?: string): Submission {
+    return {
+      id: `${studentId}-${submittedAt ?? "draft"}`,
+      assignmentId: "a1",
+      studentId,
+      status: submittedAt ? "submitted" : "draft",
+      items: [],
+      submittedAt,
+      createdAt: daysAgo(30),
+      updatedAt: daysAgo(30),
+    };
+  }
+
+  it("학생별 가장 최근 제출 시각만 남기고 임시저장은 뺀다", () => {
+    const latest = latestSubmittedAtByStudent([
+      submission("박", daysAgo(5)),
+      submission("박", daysAgo(1)),
+      submission("박", daysAgo(3)),
+      submission("이"),
+    ]);
+    expect(latest.get("박")).toBe(daysAgo(1));
+    expect(latest.has("이")).toBe(false);
+  });
+
+  it("기본값은 최근 제출순이고, 제출이 없는 학생은 이름순으로 끝에 둔다", () => {
+    expect(DEFAULT_STUDENT_SORT).toEqual({
+      key: "submitted",
+      direction: "desc",
+    });
+    const latest = latestSubmittedAtByStudent([
+      submission("박", daysAgo(4)),
+      submission("이", daysAgo(1)),
+    ]);
+    expect(ids(sortStudents(셋, DEFAULT_STUDENT_SORT, latest))).toEqual([
+      "이",
+      "박",
+      "김",
+    ]);
+    expect(
+      ids(sortStudents(셋, { key: "submitted", direction: "asc" }, latest)),
+    ).toEqual(["박", "이", "김"]);
     expect(ids(sortStudents(셋, DEFAULT_STUDENT_SORT))).toEqual([
+      "김",
+      "박",
+      "이",
+    ]);
+  });
+
+  it("이름 가나다순으로 정렬한다", () => {
+    expect(ids(sortStudents(셋, { key: "name", direction: "asc" }))).toEqual([
       "김",
       "박",
       "이",

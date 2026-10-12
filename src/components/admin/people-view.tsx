@@ -58,6 +58,7 @@ import {
   DEFAULT_STUDENT_SORT,
   filterStudents,
   formatLastLogin,
+  latestSubmittedAtByStudent,
   sortStudents,
   STUDENT_JOINED_OPTIONS,
   STUDENT_LOGIN_OPTIONS,
@@ -74,7 +75,7 @@ import {
 
 // 이름·날짜·수치는 내용만큼만 쓰고, 남는 폭은 배지가 늘어나는 그룹 열이 받는다.
 const studentRowColumns =
-  "xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)_120px_116px_76px_60px]";
+  "xl:grid-cols-[minmax(0,220px)_minmax(0,1fr)_120px_116px_116px_76px_60px]";
 
 function StudentSortHeader({
   sortKey,
@@ -121,6 +122,7 @@ export function StudentsView() {
   const [joinedFilter, setJoinedFilter] = useState<StudentJoinedFilter>("all");
   const [loginFilter, setLoginFilter] = useState<StudentLoginFilter>("all");
   const [sort, setSort] = useState<StudentSort>(DEFAULT_STUDENT_SORT);
+  const latestSubmittedAt = latestSubmittedAtByStudent(state.submissions);
   const students = sortStudents(
     filterStudents(state.profiles, {
       query,
@@ -129,6 +131,7 @@ export function StudentsView() {
       login: loginFilter,
     }),
     sort,
+    latestSubmittedAt,
   );
   function applySort(key: StudentSortKey) {
     setSort((current) => toggleStudentSort(current, key));
@@ -226,6 +229,8 @@ export function StudentsView() {
             });
           }}
         >
+          <option value="submitted:desc">최근 제출순</option>
+          <option value="submitted:asc">제출 오래된순</option>
           <option value="name:asc">이름 가나다순</option>
           <option value="name:desc">이름 역순</option>
           <option value="joined:desc">가입일 최신순</option>
@@ -268,6 +273,11 @@ export function StudentsView() {
               onSort={applySort}
             />
             <StudentSortHeader sortKey="login" sort={sort} onSort={applySort} />
+            <StudentSortHeader
+              sortKey="submitted"
+              sort={sort}
+              onSort={applySort}
+            />
             <span>카드</span>
             <span>상태</span>
           </div>
@@ -279,6 +289,7 @@ export function StudentsView() {
               const assigned = state.assignments.filter(
                 (item) => item.studentId === student.id,
               );
+              const submittedAt = latestSubmittedAt.get(student.id);
               return (
                 <Link
                   href={`/admin/students/${student.id}`}
@@ -332,6 +343,14 @@ export function StudentsView() {
                     >
                       <span className="xl:hidden">마지막 로그인 </span>
                       {formatLastLogin(student.lastLoginAt)}
+                    </span>
+                    <span
+                      title={
+                        submittedAt ? formatDate(submittedAt, true) : undefined
+                      }
+                    >
+                      <span className="xl:hidden">최근 제출 </span>
+                      {submittedAt ? formatLastLogin(submittedAt) : "제출 없음"}
                     </span>
                     <span>카드 {assigned.length}개</span>
                   </div>

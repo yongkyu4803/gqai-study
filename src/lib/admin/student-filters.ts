@@ -1,4 +1,4 @@
-import type { Profile } from "@/lib/domain/types";
+import type { Profile, Submission } from "@/lib/domain/types";
 
 export type StudentStatusFilter = "all" | "active" | "inactive";
 export type StudentJoinedFilter = "all" | "7d" | "30d" | "90d" | "over90d";
@@ -110,23 +110,24 @@ export function filterStudents(
   });
 }
 
-export type StudentSortKey = "name" | "joined" | "login";
+export type StudentSortKey = "name" | "joined" | "login" | "submitted";
 export type StudentSortDirection = "asc" | "desc";
 export interface StudentSort {
   key: StudentSortKey;
   direction: StudentSortDirection;
 }
 
-// 운영 DB가 이름순으로 내려주던 순서를 기본값으로 유지한다.
+// 확인할 제출물이 있는 학생부터 보이도록 최근 제출순을 기본값으로 둔다.
 export const DEFAULT_STUDENT_SORT: StudentSort = {
-  key: "name",
-  direction: "asc",
+  key: "submitted",
+  direction: "desc",
 };
 
 export const STUDENT_SORT_LABELS: Record<StudentSortKey, string> = {
   name: "학생",
   joined: "가입일",
   login: "마지막 로그인",
+  submitted: "최근 제출",
 };
 
 /** 날짜 열은 최신순이, 이름은 가나다순이 처음 눌렀을 때 기대하는 방향이다. */
@@ -160,16 +161,38 @@ function compareByName(left: Profile, right: Profile) {
   );
 }
 
-export function sortStudents(profiles: Profile[], sort: StudentSort) {
+/** 학생별로 가장 최근에 제출한 시각을 모은다. 임시저장(draft)은 제출 시각이 없어 빠진다. */
+export function latestSubmittedAtByStudent(submissions: Submission[]) {
+  const latest = new Map<string, string>();
+  for (const submission of submissions) {
+    const time = timeValue(submission.submittedAt);
+    if (time === null) continue;
+    const current = timeValue(latest.get(submission.studentId));
+    if (current === null || time > current) {
+      latest.set(submission.studentId, submission.submittedAt!);
+    }
+  }
+  return latest;
+}
+
+export function sortStudents(
+  profiles: Profile[],
+  sort: StudentSort,
+  latestSubmittedAt: ReadonlyMap<string, string> = new Map(),
+) {
   const factor = sort.direction === "asc" ? 1 : -1;
+  const sortValue = (student: Profile) =>
+    timeValue(
+      sort.key === "joined"
+        ? student.createdAt
+        : sort.key === "login"
+          ? student.lastLoginAt
+          : latestSubmittedAt.get(student.id),
+    );
   return [...profiles].sort((left, right) => {
     if (sort.key === "name") return compareByName(left, right) * factor;
-    const leftTime = timeValue(
-      sort.key === "joined" ? left.createdAt : left.lastLoginAt,
-    );
-    const rightTime = timeValue(
-      sort.key === "joined" ? right.createdAt : right.lastLoginAt,
-    );
+    const leftTime = sortValue(left);
+    const rightTime = sortValue(right);
     // 값이 없는 계정은 방향과 무관하게 항상 끝으로 보낸다.
     if (leftTime === null && rightTime === null) {
       return compareByName(left, right);
